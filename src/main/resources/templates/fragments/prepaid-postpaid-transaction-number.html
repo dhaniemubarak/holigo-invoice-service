@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8" />
+    <link th:href="@{https://sandbox.holigo.id/css/custom.css}" rel="stylesheet" th:media="${media}" />
+    <title>Invoice</title>
+</head>
+
+<body>
+    <div class="frame-9476 flex-col-hstart-vstart" th:fragment="transactionNumber">
+        <div class="frame-9469 flex-col-hstart-vstart">
+            <div class="frame-9465 flex-row-vcenter-hstart">
+                <img th:src="@{https://sandbox.holigo.id/images/pul.png}" alt="image not found" class="frame-9467" />
+                <div class="frame-9287 flex-col-hstart-vstart">
+                    <div class="frame-9465 flex-row-vcenter-hstart">
+                        <p class="txt-511" th:text="#{invoice.number}">Nomor</p>
+                        <p class="txt-570" th:text="${transactionDto.getInvoiceNumber()}">INV/20211014/XXI/X/888786592
+                        </p>
+                    </div>
+                    <div class="frame-9465 flex-row-vcenter-hstart">
+                        <p class="txt-272" th:text="#{invoice.date}">Tanggal</p>
+                        <p class="txt-570"
+                            th:text="${#dates.format(transactionDto.getCreatedAt(), 'dd MMM yyyy HH:mm')}">14 Okt 2021
+                            06:27 </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

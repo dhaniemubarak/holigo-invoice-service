@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8" />
+    <link th:href="@{https://sandbox.holigo.id/css/custom.css}" rel="stylesheet" th:media="${media}" />
+    <style>
+        @page {
+            size: A4;
+            margin: 0;
+        }
+
+        @media print {
+
+            html,
+            body {
+                width: 210mm;
+                height: 297mm;
+            }
+        }
+    </style>
+    <title>Invoice</title>
+</head>
+
+<body>
+    <div class="bukti-tagihan-pln flex-col-hstart-vstart clip-contents">
+        <div class="flex-col-hcenter">
+            <div class="frame-9479 flex-col-hstart-vstart">
+                <div class="frame-9470 flex-row-vcenter-hstart"
+                    th:replace="fragments/prepaid-postpaid-header :: header">
+                </div>
+                <div class="frame-9287 flex-col-hstart-vstart">
+                    <div class="frame-9473 flex-col-hstart-vstart"
+                        th:replace="fragments/prepaid-postpaid-invoice-type :: invoiceType">
+                    </div>
+                    <div class="frame-9287 flex-col-hstart-vstart">
+                        <div class="frame-9476 flex-col-hstart-vstart"
+                            th:replace="fragments/prepaid-postpaid-transaction-number :: transactionNumber">
+                        </div>
+                        <div class="frame-9287 flex-col-hstart-vstart">
+                            <div th:if="${transactionDto.getTransactionType() == 'PUL'}">
+                                <div class="frame-9499 flex-col-hstart-vstart"
+                                    th:replace="fragments/prepaid-pulsa :: pulsa">
+                                </div>
+                            </div>
+                            <div class="frame-9474 flex-col-hstart-vstart"
+                                th:replace="fragments/prepaid-postpaid-total-fare :: totalFare">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

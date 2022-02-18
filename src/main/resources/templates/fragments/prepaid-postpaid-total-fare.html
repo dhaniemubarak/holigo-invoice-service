@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8" />
+    <link th:href="@{https://sandbox.holigo.id/css/custom.css}" rel="stylesheet" th:media="${media}" />
+    <title>Invoice</title>
+</head>
+
+<body>
+    <div class="frame-9474 flex-col-hstart-vstart" th:fragment="totalFare">
+        <div class="frame-9287 flex-col-hstart-vstart">
+            <div class="frame-9420 flex-col-hstart-vstart" th:if="${transactionDto.getDiscountAmount() > 0}">
+                <div class="frame-9418 flex-row-vstart-hsb">
+                    <div class="frame-9395 flex-row-vstart-hstart">
+                        <p class="txt-268" th:text="#{invoice.product-fare}">Harga produk</p>
+                    </div>
+                    <div class="frame-9395 flex-row-vstart-hstart">
+                        <p class="txt-289 flex-hend"
+                            th:text="#{invoice.rupiah} +' '+ ${#numbers.formatInteger(transactionDto.getFareAmount(),3,'POINT')}">
+                            Rp 65.000</p>
+                    </div>
+                </div>
+                <div class="frame-9419 flex-row-vstart-hsb">
+                    <div class="frame-9395 flex-row-vstart-hstart">
+                        <p class="txt-268" th:text="#{invoice.promo}">Promo</p>
+                    </div>
+                    <div class="frame-9395 flex-row-vstart-hstart">
+                        <p class="txt-289 flex-hend"
+                            th:text="#{invoice.rupiah} +' '+ ${#numbers.formatInteger(transactionDto.getDiscountAmount(),3,'POINT')}">
+                            Rp 1000</p>
+                    </div>
+                </div>
+            </div>
+            <div class="frame-9419 flex-row-vstart-hsb">
+                <div class="frame-9395 flex-row-vstart-hstart">
+                    <p class="txt-1092" th:text="#{invoice.total-fare}">Total Bayar</p>
+                </div>
+                <div class="frame-9395 flex-row-vstart-hstart">
+                    <p class="txt-619 flex-hend"
+                        th:text="#{invoice.rupiah} +' '+ ${#numbers.formatInteger(transactionDto.getFareAmount(),3,'POINT')}">
+                        Rp 64.000</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8" />
+    <link th:href="@{https://sandbox.holigo.id/css/custom.css}" rel="stylesheet" th:media="${media}" />
+    <title>Invoice</title>
+</head>
+
+<body>
+    <div class="frame-9473 flex-col-hstart-vstart" th:fragment="invoiceType">
+        <div class="frame-9471 flex-row-vstart-hstart" th:switch="${transactionDto.getTransactionType()}">
+            <div th:case="'PUL'">
+                <p class="txt-134" th:text="#{invoice.prepaid-pulsa}">Invoice Paket Data</p>
+            </div>
+        </div>
+        <div class="frame-9471 flex-row-vstart-hstart">
+            <p class="txt-201" th:text="#{invoice.description}">
+                Invoice ini merupakan bukti pembayaran yang sah dari holigo
+            </p>
+        </div>
+    </div>
+</body>
+
+</html>
