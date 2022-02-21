@@ -31,28 +31,23 @@ public class InvoiceController {
     @Autowired
     private PdfService pdfService;
 
-    @GetMapping("/")
-    public String index() {
-        return "index";
-    }
-
     @GetMapping("/web/v1/invoice/{id}/download")
     public void downloadReceipt(HttpServletResponse httpServletResponse, @PathVariable("id") UUID id)
             throws IOException {
         TransactionDto transactionDto = transactionService.getTransactionDetail(id);
         // String invoice = getInvoice(transactionDto);
         String invoice = "index";
-        try {
-            Path file = Paths.get(pdfService.generatePdf(transactionDto, invoice).getAbsolutePath());
-            if (Files.exists(file)) {
-                httpServletResponse.setContentType("application/pdf");
-                httpServletResponse.addHeader("Content-Disposition", "attachment; filename=" + file.getFileName());
-                Files.copy(file, httpServletResponse.getOutputStream());
-                httpServletResponse.getOutputStream().flush();
-            }
-        } catch (DocumentException | IOException e) {
-            e.printStackTrace();
-        }
+        // try {
+        //     // Path file = Paths.get(pdfService.export(httpServletResponse).getAbsolutePath());
+        //     // if (Files.exists(file)) {
+        //     //     httpServletResponse.setContentType("application/pdf");
+        //     //     httpServletResponse.addHeader("Content-Disposition", "attachment; filename=" + file.getFileName());
+        //     //     Files.copy(file, httpServletResponse.getOutputStream());
+        //     //     httpServletResponse.getOutputStream().flush();
+        //     // }
+        // } catch (DocumentException | IOException e) {
+        //     e.printStackTrace();
+        // }
     }
 
     @GetMapping("/web/v1/invoice/{id}")

@@ -1,13 +1,11 @@
 package id.holigo.services.holigoinvoiceservice.services;
 
-import java.io.File;
 import java.io.IOException;
+
+import javax.servlet.http.HttpServletResponse;
 
 import com.lowagie.text.DocumentException;
 
-import id.holigo.services.holigoinvoiceservice.web.model.TransactionDto;
-
 public interface PdfService {
-
-    File generatePdf(TransactionDto transactionDto, String template) throws IOException, DocumentException;
+    void export(HttpServletResponse response) throws DocumentException, IOException;
 }
