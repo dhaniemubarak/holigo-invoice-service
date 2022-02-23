@@ -16,7 +16,7 @@ public class InvoiceConfig implements WebMvcConfigurer {
     @Bean
     public LocaleResolver localeResolver() {
         SessionLocaleResolver sessionLocaleResolver = new SessionLocaleResolver();
-        sessionLocaleResolver.setDefaultLocale(Locale.US);
+        sessionLocaleResolver.setDefaultLocale(new Locale("id"));
         return sessionLocaleResolver;
     }
 

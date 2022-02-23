@@ -1,9 +1,6 @@
 package id.holigo.services.holigoinvoiceservice.web.controllers;
 
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.UUID;
 
 import javax.servlet.http.HttpServletResponse;
@@ -32,21 +29,25 @@ public class InvoiceController {
     private PdfService pdfService;
 
     @GetMapping("/web/v1/invoice/{id}/download")
-    public void downloadReceipt(HttpServletResponse httpServletResponse, @PathVariable("id") UUID id)
-            throws IOException {
+    public void downloadReceipt(HttpServletResponse response, @PathVariable("id") UUID id)
+            throws IOException, DocumentException {
         TransactionDto transactionDto = transactionService.getTransactionDetail(id);
+        response.setContentType("application/pdf");
+        response.addHeader("Content-Disposition",
+                "attachment;filename=" + "invoice-" + transactionDto.getInvoiceNumber() + ".pdf");
+        pdfService.export(response, transactionDto);
         // String invoice = getInvoice(transactionDto);
-        String invoice = "index";
+        // String invoice = "index";
         // try {
-        //     // Path file = Paths.get(pdfService.export(httpServletResponse).getAbsolutePath());
-        //     // if (Files.exists(file)) {
-        //     //     httpServletResponse.setContentType("application/pdf");
-        //     //     httpServletResponse.addHeader("Content-Disposition", "attachment; filename=" + file.getFileName());
-        //     //     Files.copy(file, httpServletResponse.getOutputStream());
-        //     //     httpServletResponse.getOutputStream().flush();
-        //     // }
+        // // Path file =
+        // Paths.get(pdfService.export(httpServletResponse).getAbsolutePath());
+        // // if (Files.exists(file)) {
+
+        // // Files.copy(file, httpServletResponse.getOutputStream());
+        // // httpServletResponse.getOutputStream().flush();
+        // // }
         // } catch (DocumentException | IOException e) {
-        //     e.printStackTrace();
+        // e.printStackTrace();
         // }
     }
 

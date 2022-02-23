@@ -6,6 +6,8 @@ import javax.servlet.http.HttpServletResponse;
 
 import com.lowagie.text.DocumentException;
 
+import id.holigo.services.holigoinvoiceservice.web.model.TransactionDto;
+
 public interface PdfService {
-    void export(HttpServletResponse response) throws DocumentException, IOException;
+    void export(HttpServletResponse response, TransactionDto transactionDto) throws DocumentException, IOException;
 }
