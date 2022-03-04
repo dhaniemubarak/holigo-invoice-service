@@ -47,22 +47,36 @@ public class PdfServiceImpl implements PdfService {
         String invoiceDateValueText = sdf.format(transactionDto.getCreatedAt());// sdf.format(transactionDto.getCreatedAt()).toString();
         String invoiceNumberValueText = transactionDto.getInvoiceNumber();
         String statusText = getStatus(transactionDto.getOrderStatus());
-        String paymentMethodText = "BCA Bank Transfer";
+        String paymentMethodText = transactionDto.getPayment().getPaymentService().getName();
         String productText = getProduct(transactionDto.getIndexProduct());
         String customerNumberText = transactionDto.getDetail().get("customerNumber").asText();
-        String getFareText = messageSource.getMessage("invoice.rupiah", null, LocaleContextHolder.getLocale()) + " "
-                + getPrice(transactionDto.getFareAmount());
-        String serialNumberText = transactionDto.getDetail().get("serialNumber").asText();
+        String getFareText = messageSource.getMessage("invoice.rupiah", null, LocaleContextHolder.getLocale()) + " ";
+        String getTotalFareText = messageSource.getMessage("invoice.rupiah", null, LocaleContextHolder.getLocale())
+                + " ";
         String infoText = messageSource.getMessage("invoice.tax-included", null, LocaleContextHolder.getLocale());
-
+        String serialNumberText = "";
+        String serialNumberLbl = "invoice.serial-number";
+        String fareLbl = "invoice.fare";
         switch (transactionDto.getTransactionType()) {
             case "PUL":
                 titleLbl = messageSource.getMessage("invoice.prepaid-pulsa", null,
                         LocaleContextHolder.getLocale());
                 break;
-            default:
-                titleLbl = "";
+            case "CC":
+                titleLbl = messageSource.getMessage("invoice.postpaid-cc", null,
+                        LocaleContextHolder.getLocale());
+                serialNumberLbl = "invoice.reference";
+                serialNumberText = transactionDto.getDetail().get("reference").asText();
+                fareLbl = "invoice.admin-fee";
+                getFareText += getPrice(BigDecimal.valueOf(transactionDto.getDetail().get("adminAmount").asLong()));
+                getTotalFareText += getPrice(transactionDto.getFareAmount());
                 break;
+            default:
+                getFareText += getPrice(transactionDto.getFareAmount());
+                getTotalFareText += getPrice(transactionDto.getFareAmount());
+                serialNumberText = transactionDto.getDetail().get("serialNumber").asText();
+                break;
+
         }
 
         Document document = new Document(PageSize.A4);
@@ -160,9 +174,9 @@ public class PdfServiceImpl implements PdfService {
                 messageSource.getMessage("invoice.cutomer-number", null, LocaleContextHolder.getLocale()) + "\n",
                 detailLbl));
         ct.addText(new Phrase(40,
-                messageSource.getMessage("invoice.fare", null, LocaleContextHolder.getLocale()) + "\n", detailLbl));
+                messageSource.getMessage(fareLbl, null, LocaleContextHolder.getLocale()) + "\n", detailLbl));
         ct.addText(new Phrase(40,
-                messageSource.getMessage("invoice.serial-number", null, LocaleContextHolder.getLocale()) + "\n",
+                messageSource.getMessage(serialNumberLbl, null, LocaleContextHolder.getLocale()) + "\n",
                 detailLbl));
         ct.addText(new Phrase(40,
                 messageSource.getMessage("invoice.additional-information", null, LocaleContextHolder.getLocale())
@@ -191,7 +205,7 @@ public class PdfServiceImpl implements PdfService {
         fareAmountLblCt.go();
 
         // Fare amount value
-        Chunk fareAmountValue = new Chunk(getFareText);
+        Chunk fareAmountValue = new Chunk(getTotalFareText);
         fareAmountValue.setFont(fareAmountFont);
         ColumnText fareAmountValueCt = new ColumnText(cb);
         fareAmountValueCt.setSimpleColumn(305, 340, 400, 300, 40, Element.ALIGN_RIGHT);

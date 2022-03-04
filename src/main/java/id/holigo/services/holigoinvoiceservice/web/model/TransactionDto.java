@@ -8,6 +8,7 @@ import java.util.UUID;
 import com.fasterxml.jackson.databind.JsonNode;
 
 import id.holigo.services.common.model.OrderStatusEnum;
+import id.holigo.services.common.model.PaymentDto;
 import id.holigo.services.common.model.PaymentStatusEnum;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -30,6 +31,7 @@ public class TransactionDto implements Serializable {
     private String transactionId;
     private String transactionType;
     private UUID paymentId;
+    private PaymentDto payment;
     private PaymentStatusEnum paymentStatus;
     private OrderStatusEnum orderStatus;
     private JsonNode detail;

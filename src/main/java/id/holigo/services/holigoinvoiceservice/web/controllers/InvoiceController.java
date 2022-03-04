@@ -12,7 +12,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-
 import id.holigo.services.holigoinvoiceservice.services.PdfService;
 import id.holigo.services.holigoinvoiceservice.services.transaction.TransactionService;
 import id.holigo.services.holigoinvoiceservice.web.model.TransactionDto;
@@ -36,19 +35,6 @@ public class InvoiceController {
         response.addHeader("Content-Disposition",
                 "attachment;filename=" + "invoice-" + transactionDto.getInvoiceNumber() + ".pdf");
         pdfService.export(response, transactionDto);
-        // String invoice = getInvoice(transactionDto);
-        // String invoice = "index";
-        // try {
-        // // Path file =
-        // Paths.get(pdfService.export(httpServletResponse).getAbsolutePath());
-        // // if (Files.exists(file)) {
-
-        // // Files.copy(file, httpServletResponse.getOutputStream());
-        // // httpServletResponse.getOutputStream().flush();
-        // // }
-        // } catch (DocumentException | IOException e) {
-        // e.printStackTrace();
-        // }
     }
 
     @GetMapping("/web/v1/invoice/{id}")
