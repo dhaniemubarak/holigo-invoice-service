@@ -55,17 +55,34 @@ public class PdfServiceImpl implements PdfService {
                 + " ";
         String infoText = messageSource.getMessage("invoice.tax-included", null, LocaleContextHolder.getLocale());
         String serialNumberText = "";
+        String customerNumberLbl = "invoice.customer-number";
         String serialNumberLbl = "invoice.serial-number";
         String fareLbl = "invoice.fare";
+        int startingPoint = 620;
+        int endingPoint = 340;
         switch (transactionDto.getTransactionType()) {
             case "PUL":
                 titleLbl = messageSource.getMessage("invoice.prepaid-pulsa", null,
                         LocaleContextHolder.getLocale());
                 break;
+            case "PRA":
+                titleLbl = messageSource.getMessage("invoice.prepaid-electricity", null,
+                        LocaleContextHolder.getLocale());
+                serialNumberLbl = "invoice.token-number";
+                customerNumberLbl = "invoice.customer-number";
+                fareLbl = "invoice.kwh";
+                getFareText = transactionDto.getDetail().get("customerName").asText();
+                serialNumberText = transactionDto.getDetail().get("token").asText();
+                productText = transactionDto.getDetail().get("productName").asText();
+                getTotalFareText += getPrice(transactionDto.getFareAmount());
+                startingPoint = 620;
+                endingPoint = 260;
+                break;
             case "CC":
                 titleLbl = messageSource.getMessage("invoice.postpaid-cc", null,
                         LocaleContextHolder.getLocale());
                 serialNumberLbl = "invoice.reference";
+                customerNumberLbl = "invoice.card-number";
                 serialNumberText = transactionDto.getDetail().get("reference").asText();
                 fareLbl = "invoice.admin-fee";
                 getFareText += getPrice(BigDecimal.valueOf(transactionDto.getDetail().get("adminAmount").asLong()));
@@ -75,6 +92,7 @@ public class PdfServiceImpl implements PdfService {
                 getFareText += getPrice(transactionDto.getFareAmount());
                 getTotalFareText += getPrice(transactionDto.getFareAmount());
                 serialNumberText = transactionDto.getDetail().get("serialNumber").asText();
+                customerNumberLbl = "invoice.customer-number";
                 break;
 
         }
@@ -162,7 +180,7 @@ public class PdfServiceImpl implements PdfService {
         ColumnText ct = new ColumnText(cb);
 
         // Detail label
-        ct.setSimpleColumn(50, 340 + 28 * 10, 200, 340, 40, Element.ALIGN_LEFT);
+        ct.setSimpleColumn(50, startingPoint, 200, endingPoint, 40, Element.ALIGN_LEFT);
         ct.addText(new Phrase(40,
                 messageSource.getMessage("invoice.status", null, LocaleContextHolder.getLocale()) + "\n", detailLbl));
         ct.addText(new Phrase(40,
@@ -171,8 +189,16 @@ public class PdfServiceImpl implements PdfService {
         ct.addText(new Phrase(40,
                 messageSource.getMessage("invoice.product", null, LocaleContextHolder.getLocale()) + "\n", detailLbl));
         ct.addText(new Phrase(40,
-                messageSource.getMessage("invoice.cutomer-number", null, LocaleContextHolder.getLocale()) + "\n",
+                messageSource.getMessage(customerNumberLbl, null, LocaleContextHolder.getLocale()) + "\n",
                 detailLbl));
+        if (transactionDto.getTransactionType().equals("PRA")) {
+            ct.addText(new Phrase(40,
+                    messageSource.getMessage("invoice.customer-name", null, LocaleContextHolder.getLocale()) + "\n",
+                    detailLbl));
+            ct.addText(new Phrase(40,
+                    messageSource.getMessage("invoice.power-electricity", null, LocaleContextHolder.getLocale()) + "\n",
+                    detailLbl));
+        }
         ct.addText(new Phrase(40,
                 messageSource.getMessage(fareLbl, null, LocaleContextHolder.getLocale()) + "\n", detailLbl));
         ct.addText(new Phrase(40,
@@ -185,12 +211,16 @@ public class PdfServiceImpl implements PdfService {
         ct.go();
 
         // Detail value
-        ct.setSimpleColumn(205, 340 + 28 * 10, 400, 340, 40, Element.ALIGN_LEFT);
+        ct.setSimpleColumn(205, startingPoint, 400, endingPoint, 40, Element.ALIGN_LEFT);
         ct.addText(new Phrase(40, statusText + "\n", detailValue));
         ct.addText(new Phrase(40, paymentMethodText + "\n", detailValue));
         ct.addText(new Phrase(40, productText + "\n", detailValue));
         ct.addText(new Phrase(40, customerNumberText + "\n", detailValue));
         ct.addText(new Phrase(40, getFareText + "\n", detailValue));
+        if (transactionDto.getTransactionType().equals("PRA")) {
+            ct.addText(new Phrase(40, transactionDto.getDetail().get("tariffAdjustment").asText() + "\n", detailValue));
+            ct.addText(new Phrase(40, transactionDto.getDetail().get("kwh").asText() + "\n", detailValue));
+        }
         ct.addText(new Phrase(40, serialNumberText + "\n", detailValue));
         ct.addText(new Phrase(40, infoText + "\n", detailValue));
         ct.go();
@@ -200,7 +230,9 @@ public class PdfServiceImpl implements PdfService {
         Chunk fareAmountLbl = new Chunk("Total Bayar");
         fareAmountLbl.setFont(fareAmountFont);
         ColumnText fareAmountLblCt = new ColumnText(cb);
-        fareAmountLblCt.setSimpleColumn(205, 340, 305, 300, 40, Element.ALIGN_LEFT);
+        // label y1= 340
+        // lable y2= 300
+        fareAmountLblCt.setSimpleColumn(205, endingPoint - 10, 305, endingPoint - 50, 40, Element.ALIGN_LEFT);
         fareAmountLblCt.addText(fareAmountLbl);
         fareAmountLblCt.go();
 
@@ -208,7 +240,7 @@ public class PdfServiceImpl implements PdfService {
         Chunk fareAmountValue = new Chunk(getTotalFareText);
         fareAmountValue.setFont(fareAmountFont);
         ColumnText fareAmountValueCt = new ColumnText(cb);
-        fareAmountValueCt.setSimpleColumn(305, 340, 400, 300, 40, Element.ALIGN_RIGHT);
+        fareAmountValueCt.setSimpleColumn(305, endingPoint - 10, 400, endingPoint - 50, 40, Element.ALIGN_RIGHT);
         fareAmountValueCt.addText(fareAmountValue);
         fareAmountValueCt.go();
 
@@ -224,6 +256,9 @@ public class PdfServiceImpl implements PdfService {
         cbu.rectangle(25, 485, 400, 40);
         cbu.rectangle(25, 405, 400, 40);
         cbu.rectangle(25, 325, 400, 40);
+        if (transactionDto.getTransactionType().equals("PRA")) {
+            cbu.rectangle(25, 245, 400, 40);
+        }
         // stroke the lines
         cbu.closePathFillStroke();
         cbu.stroke();

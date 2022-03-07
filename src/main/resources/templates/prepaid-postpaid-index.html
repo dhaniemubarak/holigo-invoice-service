@@ -43,6 +43,11 @@
                                     th:replace="fragments/prepaid-pulsa :: pulsa">
                                 </div>
                             </div>
+                            <div th:if="${transactionDto.getTransactionType() == 'PRA'}">
+                                <div class="frame-9499 flex-col-hstart-vstart"
+                                    th:replace="fragments/prepaid-pln :: pra">
+                                </div>
+                            </div>
                             <div th:if="${transactionDto.getTransactionType() == 'CC'}">
                                 <div class="frame-9499 flex-col-hstart-vstart"
                                     th:replace="fragments/postpaid-cc :: cc">

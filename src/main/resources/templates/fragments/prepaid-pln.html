@@ -8,7 +8,7 @@
 </head>
 
 <body>
-    <div class="frame-9499 flex-col-hstart-vstart" th:fragment="pulsa">
+    <div class="frame-9499 flex-col-hstart-vstart" th:fragment="pra">
         <div class="frame-9397 flex-row-vcenter-hstart">
             <div class="frame-9396 flex-row-vstart-hstart">
                 <p class="txt-655" th:text="#{invoice.status}">Status</p>
@@ -61,7 +61,8 @@
                 <p class="txt-655" th:text="#{invoice.payment-method}">Metode pembayaran</p>
             </div>
             <div class="frame-9395 flex-row-vstart-hstart">
-                <p class="txt-270">BCA Bank Transfer</p>
+                <p class="txt-270" th:text="${transactionDto.getPayment().getPaymentService().getName()}">BCA
+                    Bank Transfer</p>
             </div>
         </div>
         <div class="frame-9397 flex-row-vcenter-hstart">
@@ -70,7 +71,7 @@
             </div>
             <div class="frame-9395 flex-row-vstart-hstart">
                 <p class="txt-270"
-                    th:text="${#strings.arraySplit(transactionDto.getIndexProduct(), '|')[1]} +' '+ ${#strings.arraySplit(transactionDto.getIndexProduct(), '|')[2]}">
+                    th:text="${transactionDto.getDetail().get('serviceName').asText() + ' ' + transactionDto.getDetail().get('productName').asText()} ">
                     GamesMAX
                     UNLIMITED PLAY
                     25 AOV</p>
@@ -87,26 +88,45 @@
         </div>
         <div class="frame-9397 flex-row-vcenter-hstart">
             <div class="frame-9396 flex-row-vstart-hstart">
-                <p class="txt-655" th:text="#{invoice.fare}">Harga</p>
+                <p class="txt-655" th:text="#{invoice.customer-name}">Nama</p>
             </div>
             <div class="frame-9395 flex-row-vstart-hstart">
                 <p class="txt-270"
-                    th:text="#{invoice.rupiah} +' '+ ${#numbers.formatInteger(transactionDto.getFareAmount(),3,'POINT')}">
+                    th:text="${transactionDto.getDetail().get('customerName').asText()}">
                     xxxxxxxxx</p>
             </div>
         </div>
         <div class="frame-9398 flex-row-vcenter-hstart">
             <div class="frame-9396 flex-row-vstart-hstart">
-                <p class="txt-655" th:text="#{invoice.serial-number}">Serial number</p>
+                <p class="txt-655" th:text="#{invoice.power-electricity}">Daya</p>
+            </div>
+            <div class="frame-9395 flex-row-vstart-hstart">
+                <p class="txt-270" th:text="${transactionDto.getDetail().get('tariffAdjustment').asText()}">
+                    085159757550</p>
+            </div>
+        </div>
+        <div class="frame-9397 flex-row-vcenter-hstart">
+            <div class="frame-9396 flex-row-vstart-hstart">
+                <p class="txt-655" th:text="#{invoice.kwh}">kwH</p>
+            </div>
+            <div class="frame-9395 flex-row-vstart-hstart">
+                <p class="txt-270"
+                    th:text="${transactionDto.getDetail().get('kwh').asText()}">
+                    xxxxxxxxx</p>
+            </div>
+        </div>
+        <div class="frame-9398 flex-row-vcenter-hstart">
+            <div class="frame-9396 flex-row-vstart-hstart">
+                <p class="txt-655" th:text="#{invoice.token-number}">Serial number</p>
             </div>
             <div class="frame-9395 flex-row-vstart-hstart"
-                th:if="${transactionDto.getDetail().get('serialNumber').isNull()}">
+                th:if="${transactionDto.getDetail().get('token').isNull()}">
                 <p class="txt-270" th:text="'N/A'">
                     085159757550</p>
             </div>
             <div class="frame-9395 flex-row-vstart-hstart"
-                th:unless="${transactionDto.getDetail().get('serialNumber').isNull()}">
-                <p class="txt-270" th:text="${transactionDto.getDetail().get('serialNumber').asText()}">
+                th:unless="${transactionDto.getDetail().get('token').isNull()}">
+                <p class="txt-270" th:text="${transactionDto.getDetail().get('token').asText()}">
                     085159757550</p>
             </div>
         </div>
