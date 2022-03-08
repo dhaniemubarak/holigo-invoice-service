@@ -43,9 +43,34 @@
                                     th:replace="fragments/prepaid-pulsa :: pulsa">
                                 </div>
                             </div>
+                            <div th:if="${transactionDto.getTransactionType() == 'PD'}">
+                                <div class="frame-9499 flex-col-hstart-vstart"
+                                    th:replace="fragments/prepaid-pulsa :: pulsa">
+                                </div>
+                            </div>
+                            <div th:if="${transactionDto.getTransactionType() == 'PR'}">
+                                <div class="frame-9499 flex-col-hstart-vstart"
+                                    th:replace="fragments/prepaid-pulsa :: pulsa">
+                                </div>
+                            </div>
+                            <div th:if="${transactionDto.getTransactionType() == 'EWAL'}">
+                                <div class="frame-9499 flex-col-hstart-vstart"
+                                    th:replace="fragments/prepaid-ewallet :: ewallet">
+                                </div>
+                            </div>
+                            <div th:if="${transactionDto.getTransactionType() == 'DWAL'}">
+                                <div class="frame-9499 flex-col-hstart-vstart"
+                                    th:replace="fragments/prepaid-ewallet :: ewallet">
+                                </div>
+                            </div>
                             <div th:if="${transactionDto.getTransactionType() == 'PRA'}">
                                 <div class="frame-9499 flex-col-hstart-vstart"
                                     th:replace="fragments/prepaid-pln :: pra">
+                                </div>
+                            </div>
+                            <div th:if="${transactionDto.getTransactionType() == 'PAS'}">
+                                <div class="frame-9499 flex-col-hstart-vstart"
+                                    th:replace="fragments/postpaid-pln :: pas">
                                 </div>
                             </div>
                             <div th:if="${transactionDto.getTransactionType() == 'CC'}">

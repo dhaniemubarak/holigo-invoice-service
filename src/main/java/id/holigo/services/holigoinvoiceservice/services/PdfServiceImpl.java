@@ -64,6 +64,17 @@ public class PdfServiceImpl implements PdfService {
             case "PUL":
                 titleLbl = messageSource.getMessage("invoice.prepaid-pulsa", null,
                         LocaleContextHolder.getLocale());
+                getFareText += getPrice(transactionDto.getFareAmount());
+                break;
+            case "PR":
+                titleLbl = messageSource.getMessage("invoice.prepaid-pulsa", null,
+                        LocaleContextHolder.getLocale());
+                getFareText += getPrice(transactionDto.getFareAmount());
+                break;
+            case "PD":
+                titleLbl = messageSource.getMessage("invoice.prepaid-pulsa", null,
+                        LocaleContextHolder.getLocale());
+                getFareText += getPrice(transactionDto.getFareAmount());
                 break;
             case "PRA":
                 titleLbl = messageSource.getMessage("invoice.prepaid-electricity", null,
@@ -77,6 +88,16 @@ public class PdfServiceImpl implements PdfService {
                 getTotalFareText += getPrice(transactionDto.getFareAmount());
                 startingPoint = 620;
                 endingPoint = 260;
+                break;
+            case "PAS":
+                titleLbl = messageSource.getMessage("invoice.prepaid-electricity", null,
+                        LocaleContextHolder.getLocale());
+                serialNumberText = transactionDto.getDetail().get("standMeter").asText();
+                productText = transactionDto.getDetail().get("productName").asText();
+                startingPoint = 620;
+                endingPoint = 180;
+                getFareText += getPrice(transactionDto.getFareAmount());
+                getTotalFareText += getPrice(transactionDto.getFareAmount());
                 break;
             case "CC":
                 titleLbl = messageSource.getMessage("invoice.postpaid-cc", null,
@@ -191,19 +212,53 @@ public class PdfServiceImpl implements PdfService {
         ct.addText(new Phrase(40,
                 messageSource.getMessage(customerNumberLbl, null, LocaleContextHolder.getLocale()) + "\n",
                 detailLbl));
-        if (transactionDto.getTransactionType().equals("PRA")) {
-            ct.addText(new Phrase(40,
-                    messageSource.getMessage("invoice.customer-name", null, LocaleContextHolder.getLocale()) + "\n",
-                    detailLbl));
-            ct.addText(new Phrase(40,
-                    messageSource.getMessage("invoice.power-electricity", null, LocaleContextHolder.getLocale()) + "\n",
-                    detailLbl));
+        switch (transactionDto.getTransactionType()) {
+            case "PRA":
+                ct.addText(new Phrase(40,
+                        messageSource.getMessage("invoice.customer-name", null, LocaleContextHolder.getLocale()) + "\n",
+                        detailLbl));
+                ct.addText(new Phrase(40,
+                        messageSource.getMessage("invoice.power-electricity", null, LocaleContextHolder.getLocale())
+                                + "\n",
+                        detailLbl));
+                ct.addText(new Phrase(40,
+                        messageSource.getMessage(fareLbl, null, LocaleContextHolder.getLocale()) + "\n", detailLbl));
+                ct.addText(new Phrase(40,
+                        messageSource.getMessage(serialNumberLbl, null, LocaleContextHolder.getLocale()) + "\n",
+                        detailLbl));
+                break;
+            case "PAS":
+                ct.addText(new Phrase(40,
+                        messageSource.getMessage("invoice.customer-name", null, LocaleContextHolder.getLocale()) + "\n",
+                        detailLbl));
+                ct.addText(new Phrase(40,
+                        messageSource.getMessage("invoice.power-electricity", null, LocaleContextHolder.getLocale())
+                                + "\n",
+                        detailLbl));
+                ct.addText(new Phrase(40,
+                        messageSource.getMessage("invoice.period", null, LocaleContextHolder.getLocale()) + "\n",
+                        detailLbl));
+                ct.addText(new Phrase(40,
+                        messageSource.getMessage("invoice.stand-meter", null, LocaleContextHolder.getLocale()) + "\n",
+                        detailLbl));
+                ct.addText(new Phrase(40,
+                        messageSource.getMessage("invoice.bill-amount", null, LocaleContextHolder.getLocale()) + "\n",
+                        detailLbl));
+                ct.addText(new Phrase(40,
+                        messageSource.getMessage("invoice.admin-fee", null, LocaleContextHolder.getLocale()) + "\n",
+                        detailLbl));
+                break;
+
+            default:
+                ct.addText(new Phrase(40,
+                        messageSource.getMessage(fareLbl, null, LocaleContextHolder.getLocale()) + "\n", detailLbl));
+                ct.addText(new Phrase(40,
+                        messageSource.getMessage(serialNumberLbl, null, LocaleContextHolder.getLocale()) + "\n",
+                        detailLbl));
+
+                break;
         }
-        ct.addText(new Phrase(40,
-                messageSource.getMessage(fareLbl, null, LocaleContextHolder.getLocale()) + "\n", detailLbl));
-        ct.addText(new Phrase(40,
-                messageSource.getMessage(serialNumberLbl, null, LocaleContextHolder.getLocale()) + "\n",
-                detailLbl));
+
         ct.addText(new Phrase(40,
                 messageSource.getMessage("invoice.additional-information", null, LocaleContextHolder.getLocale())
                         + "\n",
@@ -216,12 +271,36 @@ public class PdfServiceImpl implements PdfService {
         ct.addText(new Phrase(40, paymentMethodText + "\n", detailValue));
         ct.addText(new Phrase(40, productText + "\n", detailValue));
         ct.addText(new Phrase(40, customerNumberText + "\n", detailValue));
-        ct.addText(new Phrase(40, getFareText + "\n", detailValue));
-        if (transactionDto.getTransactionType().equals("PRA")) {
-            ct.addText(new Phrase(40, transactionDto.getDetail().get("tariffAdjustment").asText() + "\n", detailValue));
-            ct.addText(new Phrase(40, transactionDto.getDetail().get("kwh").asText() + "\n", detailValue));
+
+        switch (transactionDto.getTransactionType()) {
+            case "PRA":
+                ct.addText(new Phrase(40, getFareText + "\n", detailValue));
+                ct.addText(new Phrase(40, transactionDto.getDetail().get("tariffAdjustment").asText() + "\n",
+                        detailValue));
+                ct.addText(new Phrase(40, transactionDto.getDetail().get("kwh").asText() + "\n", detailValue));
+                ct.addText(new Phrase(40, serialNumberText + "\n", detailValue));
+                break;
+            case "PAS":
+                String rupiah = messageSource.getMessage("invoice.rupiah", null, LocaleContextHolder.getLocale())
+                        + " ";
+                ct.addText(new Phrase(40, transactionDto.getDetail().get("customerName").asText() + "\n", detailValue));
+                ct.addText(new Phrase(40, transactionDto.getDetail().get("tariffAdjustment").asText() + "\n",
+                        detailValue));
+                ct.addText(new Phrase(40, transactionDto.getDetail().get("period").asText() + "\n", detailValue));
+                ct.addText(new Phrase(40, serialNumberText + "\n", detailValue));
+                ct.addText(new Phrase(40, rupiah + getPrice(BigDecimal
+                        .valueOf(Double.parseDouble((transactionDto.getDetail().get("billAmount").asText())))) + "\n",
+                        detailValue));
+                ct.addText(new Phrase(40, rupiah + getPrice(BigDecimal
+                        .valueOf(Double.parseDouble(transactionDto.getDetail().get("adminAmount").asText()))) + "\n",
+                        detailValue));
+                break;
+            default:
+                ct.addText(new Phrase(40, getFareText + "\n", detailValue));
+                ct.addText(new Phrase(40, serialNumberText + "\n", detailValue));
+                break;
         }
-        ct.addText(new Phrase(40, serialNumberText + "\n", detailValue));
+
         ct.addText(new Phrase(40, infoText + "\n", detailValue));
         ct.go();
 
