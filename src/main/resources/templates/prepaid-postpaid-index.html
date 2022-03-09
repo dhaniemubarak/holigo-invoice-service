@@ -53,6 +53,11 @@
                                     th:replace="fragments/prepaid-pulsa :: pulsa">
                                 </div>
                             </div>
+                            <div th:if="${transactionDto.getTransactionType() == 'GAME'}">
+                                <div class="frame-9499 flex-col-hstart-vstart"
+                                    th:replace="fragments/prepaid-game :: game">
+                                </div>
+                            </div>
                             <div th:if="${transactionDto.getTransactionType() == 'EWAL'}">
                                 <div class="frame-9499 flex-col-hstart-vstart"
                                     th:replace="fragments/prepaid-ewallet :: ewallet">
@@ -71,6 +76,11 @@
                             <div th:if="${transactionDto.getTransactionType() == 'PAS'}">
                                 <div class="frame-9499 flex-col-hstart-vstart"
                                     th:replace="fragments/postpaid-pln :: pas">
+                                </div>
+                            </div>
+                            <div th:if="${transactionDto.getTransactionType() == 'PAM'}">
+                                <div class="frame-9499 flex-col-hstart-vstart"
+                                    th:replace="fragments/postpaid-pam :: pam">
                                 </div>
                             </div>
                             <div th:if="${transactionDto.getTransactionType() == 'CC'}">

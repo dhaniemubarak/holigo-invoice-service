@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8" />
+    <link th:href="@{https://sandbox.holigo.id/css/custom.css}" rel="stylesheet" th:media="${media}" />
+    <title>Title</title>
+</head>
+
+<body>
+    <div class="frame-9499 flex-col-hstart-vstart" th:fragment="ewallet">
+        <div class="frame-9397 flex-row-vcenter-hstart">
+            <div class="frame-9396 flex-row-vstart-hstart">
+                <p class="txt-655" th:text="#{invoice.status}">Status</p>
+            </div>
+            <div class="frame-9395 flex-row-vstart-hstart">
+                <div
+                    th:if="${transactionDto.getOrderStatus() == T(id.holigo.services.common.model.OrderStatusEnum).PROCESS_BOOK}">
+                    <p class="txt-270" th:text="#{invoice.status-process-book}">Transaksi Berhasil</p>
+                </div>
+                <div
+                    th:if="${transactionDto.getOrderStatus() == T(id.holigo.services.common.model.OrderStatusEnum).BOOKED}">
+                    <p class="txt-270" th:text="#{invoice.status-booked}">Transaksi Berhasil</p>
+                </div>
+                <div
+                    th:if="${transactionDto.getOrderStatus() == T(id.holigo.services.common.model.OrderStatusEnum).BOOK_FAILED}">
+                    <p class="txt-270" th:text="#{invoice.status-book-failed}">Transaksi Berhasil</p>
+                </div>
+                <div
+                    th:if="${transactionDto.getOrderStatus() == T(id.holigo.services.common.model.OrderStatusEnum).PROCESS_ISSUED}">
+                    <p class="txt-270" th:text="#{invoice.status-process-issued}">Transaksi Berhasil</p>
+                </div>
+                <div
+                    th:if="${transactionDto.getOrderStatus() == T(id.holigo.services.common.model.OrderStatusEnum).WAITING_ISSUED}">
+                    <p class="txt-270" th:text="#{invoice.status-waiting-issued}">Transaksi Berhasil</p>
+                </div>
+                <div
+                    th:if="${transactionDto.getOrderStatus() == T(id.holigo.services.common.model.OrderStatusEnum).ISSUED}">
+                    <p class="txt-270" th:text="#{invoice.status-issued}">Transaksi Berhasil</p>
+                </div>
+                <div
+                    th:if="${transactionDto.getOrderStatus() == T(id.holigo.services.common.model.OrderStatusEnum).RETRYING_ISSUED}">
+                    <p class="txt-270" th:text="#{invoice.status-retrying-issued}">Transaksi Berhasil</p>
+                </div>
+                <div
+                    th:if="${transactionDto.getOrderStatus() == T(id.holigo.services.common.model.OrderStatusEnum).ISSUED_FAILED}">
+                    <p class="txt-270" th:text="#{invoice.status-issued-failed}">Transaksi Berhasil</p>
+                </div>
+                <div
+                    th:if="${transactionDto.getOrderStatus() == T(id.holigo.services.common.model.OrderStatusEnum).ORDER_EXPIRED}">
+                    <p class="txt-270" th:text="#{invoice.status-order-expired}">Transaksi Berhasil</p>
+                </div>
+                <div
+                    th:if="${transactionDto.getOrderStatus() == T(id.holigo.services.common.model.OrderStatusEnum).ORDER_CANCELED}">
+                    <p class="txt-270" th:text="#{invoice.status-order-canceled}">Transaksi Berhasil</p>
+                </div>
+            </div>
+        </div>
+        <div class="frame-9398 flex-row-vcenter-hstart">
+            <div class="frame-9396 flex-row-vstart-hstart">
+                <p class="txt-655" th:text="#{invoice.payment-method}">Metode pembayaran</p>
+            </div>
+            <div class="frame-9395 flex-row-vstart-hstart">
+                <p class="txt-270">BCA Bank Transfer</p>
+            </div>
+        </div>
+        <div class="frame-9397 flex-row-vcenter-hstart">
+            <div class="frame-9396 flex-row-vstart-hstart">
+                <p class="txt-655" th:text="#{invoice.product}">Produk</p>
+            </div>
+            <div class="frame-9395 flex-row-vstart-hstart">
+                <p class="txt-270"
+                    th:text="${#strings.arraySplit(transactionDto.getIndexProduct(), '|')[1]} +' '+ ${#strings.arraySplit(transactionDto.getIndexProduct(), '|')[2]}">
+                    GamesMAX
+                    UNLIMITED PLAY
+                    25 AOV</p>
+            </div>
+        </div>
+        <div class="frame-9398 flex-row-vcenter-hstart">
+            <div class="frame-9396 flex-row-vstart-hstart">
+                <p class="txt-655" th:text="#{invoice.customer-number}">No. handphone</p>
+            </div>
+            <div class="frame-9395 flex-row-vstart-hstart">
+                <p class="txt-270" th:text="${transactionDto.getDetail().get('customerNumber').asText()}">
+                    085159757550</p>
+            </div>
+        </div>
+        <div class="frame-9397 flex-row-vcenter-hstart">
+            <div class="frame-9396 flex-row-vstart-hstart">
+                <p class="txt-655" th:text="#{invoice.fare}">Harga</p>
+            </div>
+            <div class="frame-9395 flex-row-vstart-hstart">
+                <p class="txt-270"
+                    th:text="#{invoice.rupiah} +' '+ ${#numbers.formatInteger(transactionDto.getFareAmount(),3,'POINT')}">
+                    xxxxxxxxx</p>
+            </div>
+        </div>
+        <div class="frame-9398 flex-row-vcenter-hstart">
+            <div class="frame-9396 flex-row-vstart-hstart">
+                <p class="txt-655" th:text="#{invoice.serial-number}">Serial number</p>
+            </div>
+            <div class="frame-9395 flex-row-vstart-hstart"
+                th:if="${transactionDto.getDetail().get('serialNumber').isNull()}">
+                <p class="txt-270" th:text="'N/A'">
+                    085159757550</p>
+            </div>
+            <div class="frame-9395 flex-row-vstart-hstart"
+                th:unless="${transactionDto.getDetail().get('serialNumber').isNull()}">
+                <p class="txt-270" th:text="${transactionDto.getDetail().get('serialNumber').asText()}">
+                    085159757550</p>
+            </div>
+        </div>
+        <div class="frame-9398 flex-row-vcenter-hstart">
+            <div class="frame-9396 flex-row-vstart-hstart">
+                <p class="txt-655" th:text="#{invoice.additional-information}">Info Tambahan</p>
+            </div>
+            <div class="frame-9395 flex-row-vstart-hstart">
+                <p class="txt-270" th:text="#{invoice.tax-included}">Harga sudah termasuk PPN
+                    10%</p>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

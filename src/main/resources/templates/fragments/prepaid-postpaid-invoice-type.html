@@ -10,9 +10,34 @@
 <body>
     <div class="frame-9473 flex-col-hstart-vstart" th:fragment="invoiceType">
         <div class="frame-9471 flex-row-vstart-hstart" th:switch="${transactionDto.getTransactionType()}">
+            <div th:case="'DWAL'">
+                <p class="txt-134" th:text="#{invoice.digital-wallet}">Invoice Paket Data</p>
+            </div>
+            <div th:case="'EWAL'">
+                <p class="txt-134" th:text="#{invoice.ewallet}">Invoice Paket Data</p>
+            </div>
+            <div th:case="'PAS'">
+                <p class="txt-134" th:text="#{invoice.postpaid-electricity}">Invoice Paket Data</p>
+            </div>
+            <div th:case="'PRA'">
+                <p class="txt-134" th:text="#{invoice.prepaid-electricity}">Invoice Paket Data</p>
+            </div>
+            <div th:case="'GAME'">
+                <p class="txt-134" th:text="#{invoice.prepaid-game}">Invoice Paket Data</p>
+            </div>
             <div th:case="'PUL'">
                 <p class="txt-134" th:text="#{invoice.prepaid-pulsa}">Invoice Paket Data</p>
             </div>
+            <div th:case="'PR'">
+                <p class="txt-134" th:text="#{invoice.prepaid-pulsa}">Invoice Paket Data</p>
+            </div>
+            <div th:case="'PD'">
+                <p class="txt-134" th:text="#{invoice.prepaid-pulsa}">Invoice Paket Data</p>
+            </div>
+            <div th:case="'CC'">
+                <p class="txt-134" th:text="#{invoice.postpaid-cc}">Invoice Paket Data</p>
+            </div>
+            
         </div>
         <div class="frame-9471 flex-row-vstart-hstart">
             <p class="txt-201" th:text="#{invoice.description}">
