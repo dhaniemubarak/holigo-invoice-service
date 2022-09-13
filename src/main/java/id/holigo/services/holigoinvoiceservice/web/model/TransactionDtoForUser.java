@@ -1,26 +1,21 @@
 package id.holigo.services.holigoinvoiceservice.web.model;
 
-import java.io.Serializable;
+import id.holigo.services.common.model.OrderStatusEnum;
+import id.holigo.services.common.model.PaymentDtoForUser;
+import id.holigo.services.common.model.PaymentStatusEnum;
+import lombok.*;
+
 import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-import com.fasterxml.jackson.databind.JsonNode;
-
-import id.holigo.services.common.model.OrderStatusEnum;
-import id.holigo.services.common.model.PaymentDtoForUser;
-import id.holigo.services.common.model.PaymentStatusEnum;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class TransactionDto implements Serializable {
+public class TransactionDtoForUser {
 
     private UUID id;
 
@@ -60,7 +55,7 @@ public class TransactionDto implements Serializable {
 
     private Integer productId;
 
-    private JsonNode detail;
+    private Object detail;
 
     @Builder.Default
     private Timestamp serverTime = Timestamp.valueOf(LocalDateTime.now());
