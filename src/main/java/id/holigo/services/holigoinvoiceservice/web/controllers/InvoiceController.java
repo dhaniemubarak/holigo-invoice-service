@@ -1,6 +1,7 @@
 package id.holigo.services.holigoinvoiceservice.web.controllers;
 
 import java.io.IOException;
+import java.util.Objects;
 import java.util.UUID;
 
 import javax.servlet.http.HttpServletResponse;
@@ -48,11 +49,11 @@ public class InvoiceController {
     }
 
     private String getInvoice(TransactionDto transactionDto) {
-        String invoice;
+        String invoice = null;
         switch (transactionDto.getTransactionType()) {
-            default:
+            default -> {
                 invoice = "prepaid-postpaid-index";
-                break;
+            }
         }
         return invoice;
     }
