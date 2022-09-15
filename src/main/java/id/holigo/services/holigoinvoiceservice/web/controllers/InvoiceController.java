@@ -8,6 +8,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import com.lowagie.text.DocumentException;
 
+import id.holigo.services.holigoinvoiceservice.services.PdfAirlineService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -28,14 +29,22 @@ public class InvoiceController {
     @Autowired
     private PdfService pdfService;
 
+    @Autowired
+    private PdfAirlineService pdfAirlineService;
+
     @GetMapping("/web/v1/invoice/{id}/download")
     public void downloadReceipt(HttpServletResponse response, @PathVariable("id") UUID id)
             throws IOException, DocumentException {
         TransactionDto transactionDto = transactionService.getTransactionDetail(id);
-        response.setContentType("application/pdf");
-        response.addHeader("Content-Disposition",
-                "attachment;filename=" + "invoice-" + transactionDto.getInvoiceNumber() + ".pdf");
-        pdfService.export(response, transactionDto);
+        if (transactionDto.getTransactionType().equals("AIR")){
+            pdfAirlineService.airline(transactionDto);
+        }else {
+            response.setContentType("application/pdf");
+            response.addHeader("Content-Disposition",
+                    "attachment;filename=" + "invoice-" + transactionDto.getInvoiceNumber() + ".pdf");
+            pdfService.export(response, transactionDto);
+        }
+
     }
 
     @GetMapping("/web/v1/invoice/{id}")
@@ -57,4 +66,5 @@ public class InvoiceController {
         }
         return invoice;
     }
+
 }

@@ -36,8 +36,7 @@ public class PdfServiceImpl implements PdfService {
         @Autowired
         private final MessageSource messageSource;
 
-        public void export(HttpServletResponse response, TransactionDto transactionDto)
-                        throws DocumentException, IOException {
+        public void export(HttpServletResponse response, TransactionDto transactionDto) throws DocumentException, IOException {
 
                 SimpleDateFormat sdf = new SimpleDateFormat("dd MMM yyyy HH:mm");
                 String titleLbl = "";
