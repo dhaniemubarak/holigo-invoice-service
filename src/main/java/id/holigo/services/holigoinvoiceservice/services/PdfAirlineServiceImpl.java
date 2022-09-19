@@ -38,6 +38,9 @@ public class PdfAirlineServiceImpl implements PdfAirlineService {
         pdfDocument.setDefaultPageSize(PageSize.A4);
         Document document = new Document(pdfDocument);
         PdfFont plusJakarta = PdfFontFactory.createFont("fonts/PlusJakartaSans-Regular.ttf");
+        PdfFont plusJakartaDisplayBold = PdfFontFactory.createFont("fonts/PlusJakartaDisplay-Bold.otf");
+        PdfFont plusJakartaDisplayMedium = PdfFontFactory.createFont("fonts/PlusJakartaDisplay-Medium.otf");
+        PdfFont plusJakartaDisplayLight = PdfFontFactory.createFont("fonts/PlusJakartaDisplay-Light.otf");
         pdfDocument.addNewPage();
 
 //        Image
@@ -133,11 +136,11 @@ public class PdfAirlineServiceImpl implements PdfAirlineService {
 //        nameCustomer.setNextRenderer(new TableBorderRenderer(nameCustomer));
 //        tblDetailPemesanan.addCell(new Cell().add(nameCustomer).setBorder(Border.NO_BORDER));
 
-        tblDetailPemesanan.addCell(getDetailUser(transactionDto.getDetail().get("contactPerson").get("name").asText(), plusJakarta));
+        tblDetailPemesanan.addCell(getDetailUserBold(transactionDto.getDetail().get("contactPerson").get("name").asText(), plusJakartaDisplayBold));
         tblDetailPemesanan.addCell(new Cell().add("").setBorder(Border.NO_BORDER));
-        tblDetailPemesanan.addCell(getDetailUser(transactionDto.getDetail().get("contactPerson").get("email").asText(), plusJakarta));
+        tblDetailPemesanan.addCell(getDetailUserBold(transactionDto.getDetail().get("contactPerson").get("email").asText(), plusJakartaDisplayBold));
         tblDetailPemesanan.addCell(new Cell().add("").setBorder(Border.NO_BORDER));
-        tblDetailPemesanan.addCell(getDetailUser(transactionDto.getDetail().get("contactPerson").get("phoneNumber").asText(), plusJakarta));
+        tblDetailPemesanan.addCell(getDetailUserBold(transactionDto.getDetail().get("contactPerson").get("phoneNumber").asText(), plusJakartaDisplayBold));
 
 
 //        Header Detail Pembayaran
@@ -159,12 +162,14 @@ public class PdfAirlineServiceImpl implements PdfAirlineService {
 
 //        Detail Pembayaran user
         //        Dummy payment
-        detailPembayaran.addCell(getDetailUser("Senin, 12 Februari 2021", plusJakarta));
-        detailPembayaran.addCell(getTextDetail(" ", plusJakarta));
-        detailPembayaran.addCell(getDetailUser("13:5 WIB", plusJakarta).setTextAlignment(TextAlignment.CENTER)
+        detailPembayaran.addCell(getDetailUserBold("Senin, 12 Februari 2021", plusJakartaDisplayBold));
+        detailPembayaran.addCell(getTextDetail(" ", plusJakartaDisplayBold));
+        detailPembayaran.addCell(getDetailUserBold("13:5 WIB", plusJakartaDisplayBold).setTextAlignment(TextAlignment.CENTER)
                 .setPaddings(0, 0, 0, 0));
-        detailPembayaran.addCell(getTextDetail(" ", plusJakarta));
-        detailPembayaran.addCell(getDetailUser("Mandiri - Virtual Account", plusJakarta));
+        detailPembayaran.addCell(getTextDetail(" ", plusJakartaDisplayBold));
+//        Payment method
+//        transactionDto.getPayment().getPaymentService().getName()
+        detailPembayaran.addCell(getDetailUserBold("Mandiri - Virtual Account", plusJakartaDisplayBold));
 
 
         document.add(detailPembayaranHead);
@@ -195,8 +200,8 @@ public class PdfAirlineServiceImpl implements PdfAirlineService {
             detailProdukTbl.addCell(getDetailProdukOutput("" + count, plusJakarta));
             detailProdukTbl.addCell(getDetailProdukOutput("Tiket pesawat", plusJakarta));
             detailProdukTbl.addCell(new Cell().add(deskripsiProduk).setBorder(Border.NO_BORDER));
-            detailProdukTbl.addCell(getDetailProdukOutput("" + transactionDto.getDetail().get("trips").get(0).get("adultAmount"), plusJakarta).setTextAlignment(TextAlignment.CENTER));
-            detailProdukTbl.addCell(getDetailProdukOutput("Rp "+getPrice(transactionDto.getDetail().get("fareAmount").floatValue())+",-", plusJakarta));
+            detailProdukTbl.addCell(getDetailProdukOutput("" + transactionDto.getDetail().get("trips").size(), plusJakarta).setTextAlignment(TextAlignment.CENTER));
+            detailProdukTbl.addCell(getDetailProdukOutput("Rp "+getPrice(transactionDto.getFareAmount().floatValue())+",-", plusJakarta));
 
             // pricing
             String fareAmountStr = transactionDto.getDetail().get("fareAmount").asText();
@@ -324,12 +329,13 @@ public class PdfAirlineServiceImpl implements PdfAirlineService {
                 .setFontColor(new DeviceRgb(97, 97, 97));
     }
 
-    public static Cell getDetailUser(String textVelue, PdfFont plusJakarta) {
+    public static Cell getDetailUserBold(String textVelue, PdfFont plusJakarta) {
         return new Cell().add(textVelue)
                 .setBorder(Border.NO_BORDER)
                 .setFontSize(9)
-                .setFont(plusJakarta)
                 .setBold()
+//                .setHeight(15)
+                .setFont(plusJakarta)
                 .setBackgroundColor(new DeviceRgb(209, 244, 206))
                 .setPaddings(0, 0, 0, 7)
                 .setFontColor(new DeviceRgb(32, 34, 33));
