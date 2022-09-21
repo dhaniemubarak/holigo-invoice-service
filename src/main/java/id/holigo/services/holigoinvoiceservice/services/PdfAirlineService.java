@@ -6,5 +6,7 @@ import id.holigo.services.holigoinvoiceservice.web.model.TransactionDto;
 import java.io.IOException;
 
 public interface PdfAirlineService {
-    void airline(TransactionDto transactionDto)throws IOException;
+    void airlineEreceipt(TransactionDto transactionDto)throws IOException;
+
+    void airlineEticket(TransactionDto transactionDto) throws IOException;
 }

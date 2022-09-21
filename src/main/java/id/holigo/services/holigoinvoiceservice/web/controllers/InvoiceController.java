@@ -1,7 +1,6 @@
 package id.holigo.services.holigoinvoiceservice.web.controllers;
 
 import java.io.IOException;
-import java.util.Objects;
 import java.util.UUID;
 
 import javax.servlet.http.HttpServletResponse;
@@ -9,6 +8,7 @@ import javax.servlet.http.HttpServletResponse;
 import com.lowagie.text.DocumentException;
 
 import id.holigo.services.holigoinvoiceservice.services.PdfAirlineService;
+import id.holigo.services.holigoinvoiceservice.services.PdfHotelEreceipt;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -32,12 +32,18 @@ public class InvoiceController {
     @Autowired
     private PdfAirlineService pdfAirlineService;
 
+    @Autowired
+    private PdfHotelEreceipt pdfHotelEreceipt;
+
     @GetMapping("/web/v1/invoice/{id}/download")
     public void downloadReceipt(HttpServletResponse response, @PathVariable("id") UUID id)
             throws IOException, DocumentException {
         TransactionDto transactionDto = transactionService.getTransactionDetail(id);
         if (transactionDto.getTransactionType().equals("AIR")){
-            pdfAirlineService.airline(transactionDto);
+            pdfAirlineService.airlineEreceipt(transactionDto);
+            pdfAirlineService.airlineEticket(transactionDto);
+        }if (transactionDto.getTransactionType().equals("HTL")){
+            pdfHotelEreceipt.eReceiptHotel(transactionDto);
         }else {
             response.setContentType("application/pdf");
             response.addHeader("Content-Disposition",
