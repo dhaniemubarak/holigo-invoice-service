@@ -2,6 +2,7 @@ package id.holigo.services.holigoinvoiceservice.services;
 
 import com.itextpdf.io.image.ImageData;
 import com.itextpdf.io.image.ImageDataFactory;
+import com.itextpdf.io.source.ByteArrayOutputStream;
 import com.itextpdf.kernel.color.Color;
 import com.itextpdf.kernel.color.DeviceRgb;
 import com.itextpdf.kernel.font.PdfFont;
@@ -19,22 +20,26 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.text.DecimalFormat;
-import java.text.DecimalFormatSymbols;
+import java.io.OutputStream;
+import java.text.*;
+import java.util.Date;
 
 @RequiredArgsConstructor
 @Service
 @Slf4j
-public class PdfAirlineServiceImpl implements PdfAirlineService {
+public class PdfAirlineServiceImpl extends HttpServlet implements PdfAirlineService {
 
     @Override
-    public void airlineEreceipt(TransactionDto transactionDto) throws IOException {
+    public void airlineEreceipt(TransactionDto transactionDto, HttpServletResponse response) throws IOException {
 
-        PdfWriter pdfWriter = new PdfWriter("airline-invoice.pdf");
+//        PdfWriter pdfWriter = new PdfWriter("airline-invoice.pdf");
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
+        PdfDocument pdfDocument = new PdfDocument(new PdfWriter(baos));
 
-        PdfDocument pdfDocument = new PdfDocument(pdfWriter);
         pdfDocument.setDefaultPageSize(PageSize.A4);
         Document document = new Document(pdfDocument);
         PdfFont plusJakarta = PdfFontFactory.createFont("fonts/PlusJakartaSans-Regular.ttf");
@@ -190,7 +195,7 @@ public class PdfAirlineServiceImpl implements PdfAirlineService {
         deskripsiProduk.addCell(getDetailProdukOutput("" + transactionDto.getDetail().get("trips").get(0).get("itineraries").get(0).get("airlinesName").asText(), plusJakarta));
         deskripsiProduk.addCell(getDetailProdukOutput(transactionDto.getDetail().get("trips").get(0).get("itineraries").get(0).get("originAirport").get("id").asText() + "-" + transactionDto.getDetail().get("trips").get(0).get("itineraries").get(0).get("destinationAirport").get("id").asText(), plusJakarta).setFontSize(8).setPaddingTop(-6));
         //hardcode
-        deskripsiProduk.addCell(getDetailProdukOutput("Kode Booking : VFYRSW", plusJakarta).setFontSize(8).setPaddingTop(-6));
+        deskripsiProduk.addCell(getDetailProdukOutput("Kode Booking : " + "Dummy", plusJakarta).setFontSize(8).setPaddingTop(-6));
 
         int count = 1;
         detailProdukTbl.addCell(getDetailProdukOutput("" + count, plusJakarta));
@@ -304,21 +309,33 @@ public class PdfAirlineServiceImpl implements PdfAirlineService {
 
         document.close();
 
-
+        response.setHeader("Expires", "0");
+        response.setHeader("Cache-Control",
+                "must-revalidate, post-check=0, pre-check=0");
+        response.setHeader("Pragma", "public");
+        // setting the content type
+        response.setContentType("application/pdf");
+        // the contentlength
+        response.setContentLength(baos.size());
+        // write ByteArrayOutputStream to the ServletOutputStream
+        OutputStream os = response.getOutputStream();
+        baos.writeTo(os);
+        os.flush();
+        os.close();
     }
 
     @Override
-    public void airlineEticket(TransactionDto transactionDto) throws IOException {
+    public void airlineEticket(TransactionDto transactionDto, HttpServletResponse response) throws IOException {
 
         //starter pack
-        String pathPdf = "etiket-airline.pdf";
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
         String jakartaPlusDisplayPath = "fonts/PlusJakartaSans-Regular.ttf";
         String jakartaPDLightPath = "fonts/PlusJakartaDisplay-Light.otf";
         String jakartaPDBoldPath = "fonts/PlusJakartaDisplay-Bold.otf";
 
-        PdfWriter pdfWriter = new PdfWriter(pathPdf);
-        PdfDocument pdfDocument = new PdfDocument(pdfWriter);
+        PdfDocument pdfDocument = new PdfDocument(new PdfWriter(baos));
+
         pdfDocument.setDefaultPageSize(PageSize.A4);
         Document eTiketDoc = new Document(pdfDocument);
         PdfFont plusJakarta = PdfFontFactory.createFont(jakartaPlusDisplayPath);
@@ -380,6 +397,10 @@ public class PdfAirlineServiceImpl implements PdfAirlineService {
         Table oneLine = new Table(fullWidth);
         oneLine.setBorder(oneLineBd);
 
+        //TIme FORMATING
+        SimpleDateFormat oldTimeFormat = new SimpleDateFormat("hh:mm:ss");
+        SimpleDateFormat newTimeFormat = new SimpleDateFormat("hh:mm");
+
 
         //      --> HEADER START
         Table nestedBuktiTable = new Table(new float[]{col150});
@@ -424,7 +445,7 @@ public class PdfAirlineServiceImpl implements PdfAirlineService {
         eTiketDoc.add(space);
 
 //        Body / container
-        Table containerTbl = new Table(new float[]{155, 10, 10, 255, 102});
+        Table containerTbl = new Table(new float[]{155, 0, 305, 102});
 
         //        --HELP/Intruction--
         Table helpTbl = new Table(new float[]{45, 104});
@@ -449,45 +470,68 @@ public class PdfAirlineServiceImpl implements PdfAirlineService {
 
 //        SPACING
         containerTbl.addCell(new Cell().add(" ")
-                .setBorder(Border.NO_BORDER));
-        containerTbl.addCell(new Cell().add(" ")
                 .setBorderBottom(Border.NO_BORDER)
                 .setBorderRight(Border.NO_BORDER)
                 .setBorderTop(Border.NO_BORDER));
 
         //        --DESTINATION--
-        Table destinationChild = new Table(new float[]{75, 20, 140});
-        Table dateTbl = new Table(new float[]{15});
+        Table destinationChild = new Table(new float[]{115, 10, 140});
+
+        Table dateTbl = new Table(new float[]{30});
         Table terminalTbl = new Table(new float[]{115});
-        Table dateTblEnd = new Table(new float[]{15});
+        Table dateTblEnd = new Table(new float[]{30});
         Table terminalTblEnd = new Table(new float[]{115});
 
 
         //START Date frame (COL 1)
+        DateFormat inputDate = new SimpleDateFormat("yyyy-MM-dd");
+        DateFormat outputFormat = new SimpleDateFormat("dd MMMM yyyy");
         //date
-        dateTbl.addCell(getDestinationDate(transactionDto.getDetail()
-                .get("trips").get(0)
-                .get("itineraries").get(0)
-                .get("departureDate").asText(), jakartaPDLight));
-        //time
-        dateTbl.addCell(getDestinationDate(transactionDto.getDetail()
-                .get("trips").get(0)
-                .get("itineraries").get(0)
-                .get("departureTime").asText(), jakartaPDLight).setPaddingTop(-3));
+        Date startDatex;
+        try {
+            startDatex = inputDate.parse(transactionDto.getDetail()
+                    .get("trips").get(0)
+                    .get("itineraries").get(0)
+                    .get("departureDate").asText());
+        } catch (ParseException e) {
+            throw new RuntimeException(e);
+        }
+
+        String outputEndDate = outputFormat.format(startDatex);
+        dateTbl.addCell(getDestinationDate(outputEndDate, jakartaPDLight));
+
+        //time departure
+        Date timeDeparture;
+        DateFormat inputTime = new SimpleDateFormat("hh:mm:ss");
+        DateFormat outputTime = new SimpleDateFormat("hh:mm");
+
+        try {
+            timeDeparture = inputTime.parse(transactionDto.getDetail()
+                        .get("trips").get(0)
+                        .get("itineraries").get(0)
+                        .get("departureTime").asText());
+        } catch (ParseException e) {
+            throw new RuntimeException(e);
+        }
+
+        String departureTimeStr = outputTime.format(timeDeparture);
+        dateTbl.addCell(getDestinationDate(departureTimeStr, jakartaPDLight));
 
         //START Terminal Frame (COL 3)
-        // nama kota / city airport
-        terminalTbl.addCell(getDestinationBandara(transactionDto.getDetail()
+
+        // nama kota
+        String[] kota = transactionDto.getDetail()
                 .get("trips").get(0)
                 .get("itineraries").get(0)
                 .get("originAirport")
-                .get("city").asText()
-                + "(" +
-                transactionDto.getDetail()
-                        .get("trips").get(0)
-                        .get("itineraries").get(0)
-                        .get("originAirport")
-                        .get("id").asText() + ")", plusJakarta));
+                .get("city").asText().split(" ");
+        terminalTbl.addCell(getDestinationBandara(
+                kota[0] + "(" +
+                        transactionDto.getDetail()
+                                .get("trips").get(0)
+                                .get("itineraries").get(0)
+                                .get("originAirport")
+                                .get("id").asText() + ")", plusJakarta));
 
         // bandara name /airport name
         terminalTbl.addCell(getTerminal(transactionDto.getDetail()
@@ -496,21 +540,39 @@ public class PdfAirlineServiceImpl implements PdfAirlineService {
                 .get("originAirport")
                 .get("name").asText(), plusJakarta).setPaddingTop(-8));
 
-        terminalTbl.addCell(getTerminal("Terminal 1", plusJakarta).setPaddingTop(-12));
+        terminalTbl.addCell(getTerminal("-", plusJakarta).setPaddingTop(-12));
 
         //END Date frame (COL 1)
         //date
-        dateTblEnd.addCell(getDestinationDate(transactionDto.getDetail()
-                .get("trips").get(0)
-                .get("itineraries").get(0)
-                .get("arrivalDate").asText(), jakartaPDLight));
-        //time
-        dateTblEnd.addCell(getDestinationDate(transactionDto.getDetail()
-                .get("trips").get(0)
-                .get("itineraries").get(0)
-                .get("arrivalTime").asText(), jakartaPDLight).setPaddingTop(-3));
+        Date endDate;
+        try {
+            endDate = inputDate.parse(transactionDto.getDetail()
+                    .get("trips").get(0)
+                    .get("itineraries").get(0)
+                    .get("arrivalDate").asText());
+        } catch (ParseException e) {
+            throw new RuntimeException(e);
+        }
+
+        String outputDate = outputFormat.format(endDate);
+
+        dateTblEnd.addCell(getDestinationDate(outputDate, jakartaPDLight));
+        //time arrival
+        Date arrivalTime;
+        try {
+            arrivalTime = inputTime.parse(transactionDto.getDetail()
+                    .get("trips").get(0)
+                    .get("itineraries").get(0)
+                    .get("arrivalTime").asText());
+        } catch (ParseException e) {
+            throw new RuntimeException(e);
+        }
+        String arrivalTimeStr = outputTime.format(arrivalTime);
+
+        dateTblEnd.addCell(getDestinationDate(arrivalTimeStr, jakartaPDLight));
 
         //END Terminal Frame (COL 3)
+
         // end airport city
         terminalTblEnd.addCell(getDestinationBandara(transactionDto.getDetail()
                 .get("trips").get(0)
@@ -530,7 +592,7 @@ public class PdfAirlineServiceImpl implements PdfAirlineService {
                 .get("itineraries").get(0)
                 .get("destinationAirport")
                 .get("name").asText(), plusJakarta).setPaddingTop(-8));
-        terminalTblEnd.addCell(getTerminal("Terminal 1", plusJakarta).setPaddingTop(-12));
+        terminalTblEnd.addCell(getTerminal("-", plusJakarta).setPaddingTop(-12));
 
         int countDestination;
         // destinationloop
@@ -538,20 +600,24 @@ public class PdfAirlineServiceImpl implements PdfAirlineService {
             //START Date frame (COL 1)
             destinationChild.addCell(new Cell().add(dateTbl).setBorder(Border.NO_BORDER));
             //START Point Destination (COL 2)
-            destinationChild.addCell(new Cell().add(startPointImg)
-                    .setBorder(Border.NO_BORDER)
+            destinationChild.addCell(new Cell().add(startPointImg).setBorder(Border.NO_BORDER)
                     .setPaddings(7, 0, 0, 5));
 
             //START Terminal Frame (COL 3)
             destinationChild.addCell(new Cell().add(terminalTbl).setBorder(Border.NO_BORDER));
-
             destinationChild.addCell(new Cell().add("").setBorder(Border.NO_BORDER));
 
             //time flight
-            destinationChild.addCell(new Cell().add(transactionDto.getDetail()
-                            .get("trips").get(0)
-                            .get("duration").asText())
-                    .setBorder(Border.NO_BORDER)
+            int durationFlightRaw = transactionDto.getDetail().get("trips").get(0).get("duration").asInt();
+            int durationFlightHour = 0;
+            int durationFlightMinute =0;
+            while (durationFlightRaw >= 60){
+                    durationFlightHour = durationFlightHour+1;
+                    durationFlightRaw = durationFlightRaw - 60;
+            }
+            durationFlightMinute = durationFlightRaw;
+            String timeFlight = durationFlightHour+"j"+durationFlightMinute+"m";
+            destinationChild.addCell(new Cell().add(timeFlight).setBorder(Border.NO_BORDER)
                     .setFontSize(9)
                     .setFont(jakartaPDLight)
                     .setTextAlignment(TextAlignment.LEFT));
@@ -559,27 +625,20 @@ public class PdfAirlineServiceImpl implements PdfAirlineService {
 
             //END Point Destination (COL 2)
             destinationChild.addCell(new Cell().add("").setBorder(Border.NO_BORDER));
-            destinationChild.addCell(new Cell().add(endPointImg)
-                    .setBorder(Border.NO_BORDER)
+            destinationChild.addCell(new Cell().add(endPointImg).setBorder(Border.NO_BORDER)
                     .setPaddings(7, 0, 0, 5));
             destinationChild.addCell(new Cell().add("").setBorder(Border.NO_BORDER));
 
-            destinationChild.addCell(new Cell().add(dateTblEnd)
-                    .setPaddings(-20, 0, 0, 0)
-                    .setBorder(Border.NO_BORDER));
+            destinationChild.addCell(new Cell().add(dateTblEnd).setBorder(Border.NO_BORDER)
+                    .setPaddings(-20, 0, 0, 0));
             //END Point Destination (COL 2)
-            destinationChild.addCell(new Cell().add("")
-                    .setBorder(Border.NO_BORDER));
-            destinationChild.addCell(new Cell().add(terminalTblEnd)
-                    .setPaddings(-20, 0, 0, 0)
-                    .setBorder(Border.NO_BORDER));
+            destinationChild.addCell(new Cell().add("").setBorder(Border.NO_BORDER));
+            destinationChild.addCell(new Cell().add(terminalTblEnd).setBorder(Border.NO_BORDER).setPaddings(-20, 0, 0, 0)
+            );
         }
 
         Table destinationParent = new Table(new float[]{235});
-        destinationParent.addCell(new Cell().add(destinationChild)
-                .setBorder(Border.NO_BORDER)
-
-        );
+        destinationParent.addCell(new Cell().add(destinationChild).setBorder(Border.NO_BORDER));
 //        Space between destination and Kode Booking
         destinationParent.addCell(new Cell().add("")
                 .setFont(plusJakarta)
@@ -599,7 +658,7 @@ public class PdfAirlineServiceImpl implements PdfAirlineService {
 
             );
             //kode booking
-            destinationParent.addCell(new Cell().add("VFYRSW")
+            destinationParent.addCell(new Cell().add("DUMMY")
                     .setFont(plusJakarta)
                     .setFontSize(20)
                     .setFontColor(new DeviceRgb(0, 189, 23))
@@ -616,7 +675,7 @@ public class PdfAirlineServiceImpl implements PdfAirlineService {
                     .setPaddings(0, 0, 0, 10)
                     .setBorder(Border.NO_BORDER)
             );
-            destinationParent.addCell(new Cell().add("VFYRSW")
+            destinationParent.addCell(new Cell().add("DUMMY")
                     .setFont(plusJakarta)
                     .setFontSize(20)
                     .setFontColor(new DeviceRgb(0, 189, 23))
@@ -631,7 +690,6 @@ public class PdfAirlineServiceImpl implements PdfAirlineService {
         containerTbl.addCell(new Cell().add(destinationParent).setBorder(Border.NO_BORDER));
 
         //  Image Maskapai
-        String maskapaiValid = "Citilink";
 
         Table maskapai = new Table(new float[]{col});
 
@@ -694,15 +752,15 @@ public class PdfAirlineServiceImpl implements PdfAirlineService {
         detailPenumpang.addCell(getHeaderTextCell("Nomor tiket", plusJakarta));
         detailPenumpang.addCell(getHeaderTextCell("Fasilitas", plusJakarta));
 
-        for (int passanger = 1; countPenumpang >= passanger; passanger++){
+        for (int passanger = 1; countPenumpang >= passanger; passanger++) {
             //no.
-            detailPenumpang.addCell(getDetailPenumpangOutput(passanger+"", plusJakarta));
+            detailPenumpang.addCell(getDetailPenumpangOutput(passanger + "", plusJakarta));
             //nama penumpang
             detailPenumpang.addCell(getDetailPenumpangOutput(transactionDto.getDetail().get("trips").get(0).get("passengers").get(0).get("passenger").get("name").asText(), plusJakarta));
             //nomer tiket
             detailPenumpang.addCell(getDetailPenumpangOutput(transactionDto.getDetail().get("trips").get(0).get("passengers").get(0).get("ticketNumber").asText(), plusJakarta));
             //fasilitas
-            detailPenumpang.addCell(getDetailPenumpangOutput("Bagasi 20g", plusJakarta));
+            detailPenumpang.addCell(getDetailPenumpangOutput("dummy", plusJakarta));
         }
 
         container2.addCell(new Cell().add(detailPenumpang).setBorder(Border.NO_BORDER));
@@ -815,8 +873,22 @@ public class PdfAirlineServiceImpl implements PdfAirlineService {
         footerTbl.addCell(new Cell().add(contactNumberTbl).setBorder(Border.NO_BORDER));
 
         eTiketDoc.add(footerTbl);
-
         eTiketDoc.close();
+
+        // export to pdf
+        response.setHeader("Expires", "0");
+        response.setHeader("Cache-Control",
+                "must-revalidate, post-check=0, pre-check=0");
+        response.setHeader("Pragma", "public");
+        // setting the content type
+        response.setContentType("application/pdf");
+        // the contentlength
+        response.setContentLength(baos.size());
+        // write ByteArrayOutputStream to the ServletOutputStream
+        OutputStream os = response.getOutputStream();
+        baos.writeTo(os);
+        os.flush();
+        os.close();
     }
 
     // style
@@ -880,7 +952,7 @@ public class PdfAirlineServiceImpl implements PdfAirlineService {
     public static Cell getDestinationDate(String text, PdfFont font) {
         return new Cell().add(text)
                 .setBorder(Border.NO_BORDER)
-                .setFontSize(10)
+                .setFontSize(9)
                 .setBold()
                 .setFont(font)
                 .setTextAlignment(TextAlignment.RIGHT)

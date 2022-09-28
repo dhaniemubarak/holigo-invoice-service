@@ -8,7 +8,7 @@ import javax.servlet.http.HttpServletResponse;
 import com.lowagie.text.DocumentException;
 
 import id.holigo.services.holigoinvoiceservice.services.PdfAirlineService;
-import id.holigo.services.holigoinvoiceservice.services.PdfHotelEreceipt;
+import id.holigo.services.holigoinvoiceservice.services.pdfHotel.PdfHotelService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -33,29 +33,62 @@ public class InvoiceController {
     private PdfAirlineService pdfAirlineService;
 
     @Autowired
-    private PdfHotelEreceipt pdfHotelEreceipt;
+    private PdfHotelService pdfHotelService;
 
     @GetMapping("/web/v1/invoice/{id}/download")
-    public void downloadReceipt(HttpServletResponse response, @PathVariable("id") UUID id)
-            throws IOException, DocumentException {
+    public void downloadReceipt(HttpServletResponse response, @PathVariable("id") UUID id) throws IOException, DocumentException {
+
         TransactionDto transactionDto = transactionService.getTransactionDetail(id);
+
         if (transactionDto.getTransactionType().equals("AIR")){
-            pdfAirlineService.airlineEreceipt(transactionDto);
-            pdfAirlineService.airlineEticket(transactionDto);
-        }if (transactionDto.getTransactionType().equals("HTL")){
-            pdfHotelEreceipt.eReceiptHotel(transactionDto);
+            response.setContentType("application/pdf");
+            response.addHeader("Content-Disposition",
+                    "attachment;filename=" + "invoice-airline-" + transactionDto.getInvoiceNumber() + ".pdf");
+            pdfAirlineService.airlineEreceipt(transactionDto,response);
+        }else if (transactionDto.getTransactionType().equals("HTL")){
+            response.setContentType("application/pdf");
+            response.addHeader("Content-Disposition",
+                    "attachment;filename=" + "invoice-hotel-" + transactionDto.getInvoiceNumber() + ".pdf");
+            pdfHotelService.eReceiptHotel(transactionDto,response);
         }else {
             response.setContentType("application/pdf");
             response.addHeader("Content-Disposition",
                     "attachment;filename=" + "invoice-" + transactionDto.getInvoiceNumber() + ".pdf");
             pdfService.export(response, transactionDto);
         }
+    }
+    @GetMapping("/web/v1/invoice/{id}/eticket")
+    public void downloadEvoucherEticket(HttpServletResponse response, @PathVariable("id") UUID id) throws IOException {
+
+        TransactionDto transactionDto = transactionService.getTransactionDetail(id);
+        if (transactionDto.getTransactionType().equals("AIR")){
+            response.setContentType("application/pdf");
+            response.addHeader("Content-Disposition",
+                    "attachment;filename=" + "eticket-" + transactionDto.getInvoiceNumber() + ".pdf");
+            pdfAirlineService.airlineEticket(transactionDto,response);
+        }else {
+            System.err.print("transaction type is not AIR");
+        }
+    }
+    @GetMapping("/web/v1/invoice/{id}/evoucher")
+    public void downloadEvoucher(HttpServletResponse response, @PathVariable("id") UUID id) throws IOException, DocumentException {
+
+        TransactionDto transactionDto = transactionService.getTransactionDetail(id);
+
+        if (transactionDto.getTransactionType().equals("HTL")){
+            response.setContentType("application/pdf");
+            response.addHeader("Content-Disposition",
+                    "attachment;filename=" + "eVoucher-" + transactionDto.getInvoiceNumber() + ".pdf");
+            pdfHotelService.eVoucherHotel(transactionDto,response);
+        }else {
+            System.err.print("transaction type is not HTL");
+        }
 
     }
 
+
     @GetMapping("/web/v1/invoice/{id}")
-    public String getInvoice(@PathVariable("id") UUID id, Model model)
-            throws DocumentException, IOException {
+    public String getInvoice(@PathVariable("id") UUID id, Model model) {
 
         TransactionDto transactionDto = transactionService.getTransactionDetail(id);
         model.addAttribute("transactionDto", transactionDto);
@@ -64,7 +97,7 @@ public class InvoiceController {
     }
 
     private String getInvoice(TransactionDto transactionDto) {
-        String invoice = null;
+        String invoice;
         switch (transactionDto.getTransactionType()) {
             default -> {
                 invoice = "prepaid-postpaid-index";
