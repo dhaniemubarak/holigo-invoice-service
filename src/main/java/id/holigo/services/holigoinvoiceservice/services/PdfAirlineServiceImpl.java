@@ -163,14 +163,14 @@ public class PdfAirlineServiceImpl extends HttpServlet implements PdfAirlineServ
 
 //        Detail Pembayaran user
         //        Dummy payment
-        detailPembayaran.addCell(getDetailUserBold("Senin, 12 Februari 2021", plusJakartaDisplayBold));
+        detailPembayaran.addCell(getDetailUserBold("Senin, 12 Dummy 2021", plusJakartaDisplayBold));
         detailPembayaran.addCell(getTextDetail(" ", plusJakartaDisplayBold));
-        detailPembayaran.addCell(getDetailUserBold("13:5 WIB", plusJakartaDisplayBold).setTextAlignment(TextAlignment.CENTER)
+        detailPembayaran.addCell(getDetailUserBold("Dummy WIB", plusJakartaDisplayBold).setTextAlignment(TextAlignment.CENTER)
                 .setPaddings(0, 0, 0, 0));
         detailPembayaran.addCell(getTextDetail(" ", plusJakartaDisplayBold));
 //        Payment method
 //        transactionDto.getPayment().getPaymentService().getName()
-        detailPembayaran.addCell(getDetailUserBold("Mandiri - Virtual Account", plusJakartaDisplayBold));
+        detailPembayaran.addCell(getDetailUserBold("Dummy - Virtual Account", plusJakartaDisplayBold));
 
 
         document.add(detailPembayaranHead);
@@ -463,7 +463,7 @@ public class PdfAirlineServiceImpl extends HttpServlet implements PdfAirlineServ
 
         helpTbl.addCell(new Cell().add(informationImg).setBorder(Border.NO_BORDER));
         Paragraph infoPrg = new Paragraph();
-        infoPrg.add("Waktu yang tertera sesuai dengan waktu hotel setempat").setFixedLeading(10);
+        infoPrg.add("Waktu yang tertera sesuai dengan waktu bandara setempat").setFixedLeading(10);
         helpTbl.addCell(getInfo(infoPrg, plusJakarta));
 
         containerTbl.addCell(new Cell().add(helpTbl).setBorder(Border.NO_BORDER));

@@ -1,6 +1,5 @@
 package id.holigo.services.holigoinvoiceservice.services.pdfHotel;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.itextpdf.io.image.ImageData;
@@ -35,9 +34,9 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 @Service
 @RequiredArgsConstructor
@@ -47,7 +46,7 @@ public class PdfHotelServiceImpl implements PdfHotelService {
     private final ObjectMapper objectMapper;
 
     @Override
-    public void eReceiptHotel(TransactionDto transactionDto, HttpServletResponse response) throws IOException {
+    public void eReceiptHotel(TransactionDto transactionDto, HttpServletResponse response) throws MalformedURLException {
         StylePdfService stylePdfService = new StylePdfService();
 
         //starter pack
@@ -55,8 +54,18 @@ public class PdfHotelServiceImpl implements PdfHotelService {
         PdfDocument pdfDocument = new PdfDocument(new PdfWriter(baos));
         pdfDocument.setDefaultPageSize(PageSize.A4);
         Document document = new Document(pdfDocument);
-        PdfFont plusJakarta = PdfFontFactory.createFont("fonts/PlusJakartaSans-Regular.ttf");
-        PdfFont plusJakartaDisplayBold = PdfFontFactory.createFont("fonts/PlusJakartaDisplay-Bold.otf");
+        PdfFont plusJakarta = null;
+        try {
+            plusJakarta = PdfFontFactory.createFont("fonts/PlusJakartaSans-Regular.ttf");
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        PdfFont plusJakartaDisplayBold = null;
+        try {
+            plusJakartaDisplayBold = PdfFontFactory.createFont("fonts/PlusJakartaDisplay-Bold.otf");
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
         pdfDocument.addNewPage();
 
 //        Image
@@ -132,13 +141,13 @@ public class PdfHotelServiceImpl implements PdfHotelService {
         document.add(stylePdfService.space(pdfDocument));
 
         //        Detail Pembayaran output
-        detailPembayaran.addCell(stylePdfService.getDetailUserBold("Senin, 12 Februari 2021", plusJakartaDisplayBold));
+        detailPembayaran.addCell(stylePdfService.getDetailUserBold("Senin, 12 DUMMY 2021", plusJakartaDisplayBold));
         detailPembayaran.addCell(stylePdfService.getTextDetail(" ", plusJakartaDisplayBold));
-        detailPembayaran.addCell(stylePdfService.getDetailUserBold("13:5 WIB", plusJakartaDisplayBold)
+        detailPembayaran.addCell(stylePdfService.getDetailUserBold("DUMMY WIB", plusJakartaDisplayBold)
                 .setTextAlignment(TextAlignment.CENTER)
                 .setPaddings(0, 0, 0, 0));
         detailPembayaran.addCell(stylePdfService.getTextDetail(" ", plusJakartaDisplayBold));
-        detailPembayaran.addCell(stylePdfService.getDetailUserBold("Mandiri - Virtual Account", plusJakartaDisplayBold));
+        detailPembayaran.addCell(stylePdfService.getDetailUserBold("DUMMY - Virtual Account", plusJakartaDisplayBold));
 
         document.add(detailPembayaranHead);
         document.add(detailPembayaran);
@@ -159,7 +168,12 @@ public class PdfHotelServiceImpl implements PdfHotelService {
         Table deskripsiProduk = new Table(new float[]{150f});
         //nama hotel
         String[] namaHotel = transactionDto.getDetail().get("hotel").get("name").asText().split(" ");
-        deskripsiProduk.addCell(stylePdfService.getDetailProdukOutput(namaHotel[0] + " " + namaHotel[1] + " " + namaHotel[2], plusJakarta));
+        int longNameHtl = namaHotel.length;
+        if (longNameHtl < 3){
+            deskripsiProduk.addCell(stylePdfService.getDetailProdukOutput(namaHotel[0] + " " + namaHotel[1], plusJakarta));
+        }else {
+            deskripsiProduk.addCell(stylePdfService.getDetailProdukOutput(namaHotel[0] + " " + namaHotel[1] + " " + namaHotel[2], plusJakarta));
+        }
         //nama room
         deskripsiProduk.addCell(stylePdfService.getDetailProdukOutput(transactionDto.getDetail().get("room").get("name").asText(), plusJakarta).setFontSize(8).setPaddingTop(-6));
 
@@ -251,10 +265,27 @@ public class PdfHotelServiceImpl implements PdfHotelService {
         // the contentlength
         response.setContentLength(baos.size());
         // write ByteArrayOutputStream to the ServletOutputStream
-        OutputStream os = response.getOutputStream();
-        baos.writeTo(os);
-        os.flush();
-        os.close();
+        OutputStream os = null;
+        try {
+            os = response.getOutputStream();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        try {
+            baos.writeTo(os);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        try {
+            os.flush();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        try {
+            os.close();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
 
@@ -332,6 +363,7 @@ public class PdfHotelServiceImpl implements PdfHotelService {
 
         //TIme FORMATING
         SimpleDateFormat oldTimeFormat = new SimpleDateFormat("HH:mm:ss");
+        SimpleDateFormat oldTimeFormatWithoutSS = new SimpleDateFormat("HH:mm");
         SimpleDateFormat newTimeFormat = new SimpleDateFormat("HH:mm");
 
         // - - - - - HEADER  - - - - -
@@ -413,7 +445,7 @@ public class PdfHotelServiceImpl implements PdfHotelService {
 
         //      1.2.4 Room Class
         hotelProfile.addCell(stylePdfService.logoPositionHtl(bedImg));
-        hotelProfile.addCell(new Cell().add(transactionDto.getDetail().get("room").get("name").asText())
+        hotelProfile.addCell(new Cell().add(transactionDto.getDetail().get("room").get("name").asText().toUpperCase(Locale.ROOT))
                 .setFontSize(12)
                 .setBold()
                 .setFont(plusJakarta)
@@ -429,7 +461,7 @@ public class PdfHotelServiceImpl implements PdfHotelService {
 
         //      1.2.6 User
         hotelProfile.addCell(stylePdfService.logoPositionHtl(userImg));
-        hotelProfile.addCell(stylePdfService.outputHotelBody(transactionDto.getDetail().get("guestAmount").asText() + " Pengunjung", plusJakarta));
+        hotelProfile.addCell(stylePdfService.outputHotelBody(transactionDto.getDetail().get("guestAmount").asText() + " Tamu", plusJakarta));
         hotelProfile.addCell(stylePdfService.smallSpaceInColumn());
         hotelProfile.addCell(stylePdfService.smallSpaceInColumn());
         hotelBody.addCell(new Cell().add(hotelProfile).setBorder(Border.NO_BORDER));
@@ -475,9 +507,8 @@ public class PdfHotelServiceImpl implements PdfHotelService {
         // time Check IN
 
         try {
-            Date timeCheckin = oldTimeFormat.parse(transactionDto.getDetail().get("hotel").get("rules").get(0).get("value").asText());
+            Date timeCheckin = oldTimeFormatWithoutSS.parse(transactionDto.getDetail().get("hotel").get("rules").get(0).get("value").asText());
             dateCheckSplitDesc.addCell(stylePdfService.getCheckTime(newTimeFormat.format(timeCheckin), plusJakarta));
-
         } catch (ParseException e) {
             throw new RuntimeException(e);
         }
@@ -502,7 +533,7 @@ public class PdfHotelServiceImpl implements PdfHotelService {
         dateCheckSplitDesc.addCell(stylePdfService.getHotelBold12(dateCheckOut, plusJakarta));
         // time Check OUT
         try {
-            Date checkOutTime = oldTimeFormat.parse(transactionDto.getDetail().get("hotel").get("rules").get(1).get("value").asText());
+            Date checkOutTime = oldTimeFormatWithoutSS.parse(transactionDto.getDetail().get("hotel").get("rules").get(1).get("value").asText());
             dateCheckSplitDesc.addCell(stylePdfService.getCheckTime(newTimeFormat.format(checkOutTime), plusJakarta));
         } catch (ParseException e) {
             throw new RuntimeException(e);
@@ -516,7 +547,14 @@ public class PdfHotelServiceImpl implements PdfHotelService {
         dateCheckSplitDuration.addCell(new Cell().add(stylePdfService.smallSpaceInColumn()).setBorder(Border.NO_BORDER).setHeight(11.5f));
         dateCheckSplitDuration.addCell(new Cell().add(startImg).setRelativePosition(25, 0, 0, 0).setBorder(Border.NO_BORDER));
         dateCheckSplitDuration.addCell(new Cell().add(lineImg).setRelativePosition(29.5f, 0, 0, 0).setPaddingTop(-2).setBorder(Border.NO_BORDER));
-        int[] duration = {transactionDto.getDetail().get("durations").asInt(), transactionDto.getDetail().get("durations").asInt() - 1};
+        int durationDay = transactionDto.getDetail().get("durations").asInt();
+        int durationNight = 0;
+        if (durationDay == 1){
+            durationNight = 1;
+        }else {
+            durationNight = durationDay -1;
+        }
+        int[] duration = {durationDay, durationNight};
         dateCheckSplitDuration.addCell(new Cell().add(duration[0] + " hari " + duration[1] + " malam").setFontSize(7).setFontColor(new DeviceRgb(71, 71, 71)).setTextAlignment(TextAlignment.CENTER).setBorder(Border.NO_BORDER));
         dateCheckSplitDuration.addCell(new Cell().add(lineImg).setRelativePosition(29.5f, 0, 0, 0).setPaddingBottom(-2).setBorder(Border.NO_BORDER));
         dateCheckSplitDuration.addCell(new Cell().add(endImg).setRelativePosition(25, 0, 0, 0).setBorder(Border.NO_BORDER));
@@ -572,13 +610,9 @@ public class PdfHotelServiceImpl implements PdfHotelService {
 
         List<String> fasilitasList = new ArrayList<>();
         for (HotelFasilitasDto hotelfacility : hotelFasilitasDtoList) {
+            int index = 0;
             hotelfacility.getItems().forEach(facilityFor -> {
-
-                if (facilityFor.length() != facilityFor.length()){
-                    fasilitasList.add(facilityFor + ", ");
-                }else {
-                    fasilitasList.add(facilityFor );
-                }
+                fasilitasList.add(facilityFor+ ", ");
             });
         }
 

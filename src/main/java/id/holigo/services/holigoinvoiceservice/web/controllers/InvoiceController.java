@@ -35,6 +35,7 @@ public class InvoiceController {
     @Autowired
     private PdfHotelService pdfHotelService;
 
+    //GENERAL
     @GetMapping("/web/v1/invoice/{id}/download")
     public void downloadReceipt(HttpServletResponse response, @PathVariable("id") UUID id) throws IOException, DocumentException {
 
@@ -57,6 +58,7 @@ public class InvoiceController {
             pdfService.export(response, transactionDto);
         }
     }
+    //MASKAPAI/AIRLINE
     @GetMapping("/web/v1/invoice/{id}/eticket")
     public void downloadEvoucherEticket(HttpServletResponse response, @PathVariable("id") UUID id) throws IOException {
 
@@ -70,6 +72,7 @@ public class InvoiceController {
             System.err.print("transaction type is not AIR");
         }
     }
+    //HOTEL
     @GetMapping("/web/v1/invoice/{id}/evoucher")
     public void downloadEvoucher(HttpServletResponse response, @PathVariable("id") UUID id) throws IOException, DocumentException {
 
