@@ -302,7 +302,6 @@ public class PdfAirlineServiceImpl extends HttpServlet implements PdfAirlineServ
 
     @Override
     public void airlineEticket(TransactionDto transactionDto, HttpServletResponse response) throws IOException {
-
         //starter pack
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         StylePdfService stylePdfService = new StylePdfService();
