@@ -56,13 +56,13 @@ public class PdfHotelServiceImpl implements PdfHotelService {
         Document document = new Document(pdfDocument);
         PdfFont plusJakarta = null;
         try {
-            plusJakarta = PdfFontFactory.createFont("fonts/PlusJakartaSans-Regular.ttf");
+            plusJakarta = PdfFontFactory.createFont("src/main/resources/static/fonts/PlusJakartaSans-Regular.ttf");
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
         PdfFont plusJakartaDisplayBold = null;
         try {
-            plusJakartaDisplayBold = PdfFontFactory.createFont("fonts/PlusJakartaDisplay-Bold.otf");
+            plusJakartaDisplayBold = PdfFontFactory.createFont("src/main/resources/static/fonts/PlusJakartaDisplay-Bold.otf");
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -300,7 +300,7 @@ public class PdfHotelServiceImpl implements PdfHotelService {
         Document document = new Document(pdfDocument);
         PdfFont plusJakarta = null;
         try {
-            plusJakarta = PdfFontFactory.createFont("fonts/PlusJakartaSans-Regular.ttf");
+            plusJakarta = PdfFontFactory.createFont("src/main/resources/static/fonts/PlusJakartaSans-Regular.ttf");
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

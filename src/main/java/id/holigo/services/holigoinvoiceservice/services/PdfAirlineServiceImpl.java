@@ -46,8 +46,8 @@ public class PdfAirlineServiceImpl extends HttpServlet implements PdfAirlineServ
 
         pdfDocument.setDefaultPageSize(PageSize.A4);
         Document document = new Document(pdfDocument);
-        PdfFont plusJakarta = PdfFontFactory.createFont("fonts/PlusJakartaSans-Regular.ttf");
-        PdfFont plusJakartaDisplayBold = PdfFontFactory.createFont("fonts/PlusJakartaDisplay-Bold.otf");
+        PdfFont plusJakarta = PdfFontFactory.createFont("src/main/resources/static/fonts/PlusJakartaSans-Regular.ttf");
+        PdfFont plusJakartaDisplayBold = PdfFontFactory.createFont("src/main/resources/static/fonts/PlusJakartaDisplay-Bold.otf");
         pdfDocument.addNewPage();
 
 //        Image
@@ -303,10 +303,9 @@ public class PdfAirlineServiceImpl extends HttpServlet implements PdfAirlineServ
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         StylePdfService stylePdfService = new StylePdfService();
 
-        String jakartaPlusDisplayPath = "fonts/PlusJakartaSans-Regular.ttf";
-//        String jakartaPlusDisplayPath = "fonts/PlusJakartaDisplay-Regular.otf";
-        String jakartaPDLightPath = "fonts/PlusJakartaDisplay-Light.otf";
-        String jakartaPDBoldPath = "fonts/PlusJakartaDisplay-Bold.otf";
+        String jakartaPlusDisplayPath = "src/main/resources/static/fonts/PlusJakartaSans-Regular.ttf";
+        String jakartaPDLightPath = "src/main/resources/static/fonts/PlusJakartaDisplay-Light.otf";
+        String jakartaPDBoldPath = "src/main/resources/static/fonts/PlusJakartaDisplay-Bold.otf";
 
         PdfDocument pdfDocument = new PdfDocument(new PdfWriter(baos));
 
