@@ -14,6 +14,7 @@ import com.itextpdf.layout.Document;
 import com.itextpdf.layout.border.Border;
 import com.itextpdf.layout.border.SolidBorder;
 import com.itextpdf.layout.element.*;
+import com.itextpdf.layout.element.Image;
 import com.itextpdf.layout.property.TextAlignment;
 import id.holigo.services.holigoinvoiceservice.services.style.StylePdfService;
 import id.holigo.services.holigoinvoiceservice.web.model.TransactionDto;
@@ -23,6 +24,7 @@ import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletResponse;
+import java.awt.*;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.text.*;
@@ -46,8 +48,10 @@ public class PdfAirlineServiceImpl extends HttpServlet implements PdfAirlineServ
 
         pdfDocument.setDefaultPageSize(PageSize.A4);
         Document document = new Document(pdfDocument);
-        PdfFont plusJakarta = PdfFontFactory.createFont("src/main/resources/static/fonts/PlusJakartaSans-Regular.ttf");
-        PdfFont plusJakartaDisplayBold = PdfFontFactory.createFont("src/main/resources/static/fonts/PlusJakartaDisplay-Bold.otf");
+//        PdfFont plusJakarta = PdfFontFactory.createFont("src/main/resources/static/fonts/PlusJakartaSans-Regular.ttf");
+        PdfFont plusJakarta = PdfFontFactory.createFont();
+//        PdfFont plusJakartaDisplayBold = PdfFontFactory.createFont("src/main/resources/static/fonts/PlusJakartaDisplay-Bold.otf");
+        PdfFont plusJakartaDisplayBold = PdfFontFactory.createFont();
         pdfDocument.addNewPage();
 
 //        Image
@@ -311,9 +315,12 @@ public class PdfAirlineServiceImpl extends HttpServlet implements PdfAirlineServ
 
         pdfDocument.setDefaultPageSize(PageSize.A4);
         Document document = new Document(pdfDocument);
-        PdfFont plusJakarta = PdfFontFactory.createFont(jakartaPlusDisplayPath);
-        PdfFont jakartaPDLight = PdfFontFactory.createFont(jakartaPDLightPath);
-        PdfFont jakartaPDBold = PdfFontFactory.createFont(jakartaPDBoldPath);
+//        PdfFont plusJakarta = PdfFontFactory.createFont(jakartaPlusDisplayPath);
+//        PdfFont jakartaPDLight = PdfFontFactory.createFont(jakartaPDLightPath);
+//        PdfFont jakartaPDBold = PdfFontFactory.createFont(jakartaPDBoldPath);
+        PdfFont plusJakarta = PdfFontFactory.createFont();
+        PdfFont jakartaPDLight = PdfFontFactory.createFont();
+        PdfFont jakartaPDBold = PdfFontFactory.createFont();
 
         //        Image
         ImageData imageDataLogo = ImageDataFactory.create("https://ik.imagekit.io/holigo/invoice/logo_uAoxJeYaC.png?ik-sdk-version=javascript-1.4.3&updatedAt=1663143887020");
