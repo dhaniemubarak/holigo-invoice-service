@@ -15,6 +15,7 @@ import com.itextpdf.layout.border.Border;
 import com.itextpdf.layout.border.SolidBorder;
 import com.itextpdf.layout.element.*;
 import com.itextpdf.layout.property.TextAlignment;
+import id.holigo.services.holigoinvoiceservice.services.style.StylePdfService;
 import id.holigo.services.holigoinvoiceservice.web.model.TransactionDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -36,6 +37,9 @@ public class PdfAirlineServiceImpl extends HttpServlet implements PdfAirlineServ
     public void airlineEreceipt(TransactionDto transactionDto, HttpServletResponse response) throws IOException {
 
 //        PdfWriter pdfWriter = new PdfWriter("airline-invoice.pdf");
+
+        StylePdfService stylePdfService = new StylePdfService();
+
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
         PdfDocument pdfDocument = new PdfDocument(new PdfWriter(baos));
@@ -44,8 +48,6 @@ public class PdfAirlineServiceImpl extends HttpServlet implements PdfAirlineServ
         Document document = new Document(pdfDocument);
         PdfFont plusJakarta = PdfFontFactory.createFont("fonts/PlusJakartaSans-Regular.ttf");
         PdfFont plusJakartaDisplayBold = PdfFontFactory.createFont("fonts/PlusJakartaDisplay-Bold.otf");
-        PdfFont plusJakartaDisplayMedium = PdfFontFactory.createFont("fonts/PlusJakartaDisplay-Medium.otf");
-        PdfFont plusJakartaDisplayLight = PdfFontFactory.createFont("fonts/PlusJakartaDisplay-Light.otf");
         pdfDocument.addNewPage();
 
 //        Image
@@ -86,43 +88,13 @@ public class PdfAirlineServiceImpl extends HttpServlet implements PdfAirlineServ
                 .setFontColor(new DeviceRgb(199, 199, 199))
                 .setFontSize(20).setTextAlignment(TextAlignment.CENTER));
 
-        //      --> HEADER START
-        Table nestedBuktiTable = new Table(new float[]{col150});
-        nestedBuktiTable.addCell(new Cell().add("Bukti Pembayaran")
-                .setBorder(Border.NO_BORDER)
-                .setFontColor(colorTitle)
-                .setFontSize(22).setBold().setFont(plusJakarta)
-                .setPaddings(0, 0, 0, 0));
-        nestedBuktiTable.addCell(new Cell().add("Penerbangan Pesawat")
-                .setBorder(Border.NO_BORDER)
-                .setPaddings(-10, 0, 0, 1)
-                .setFontColor(colorSubTitle)
-                .setFont(plusJakarta).setFontSize(12).setBold());
-
-        Table headerTable = new Table(twoCol);
-        headerTable.setMarginTop(-24);
-        headerTable.addCell(new Cell().add(nestedBuktiTable).setBorder(Border.NO_BORDER));
-//        Logo Holigo
-        headerTable.addCell(new Cell().add(imageLogo).setPaddings(20, 0, 0, 44).setBorder(Border.NO_BORDER));
-
-        document.add(headerTable);
+//        //      --> HEADER START
+        document.add(stylePdfService.headerTitle(plusJakarta, imageLogo, "Bukti Pembayaran", "Penerbangan Pesawat"));
 
 //      --> ID TRANSAKSI START
-        Table idTransaksiTbl = new Table(new float[]{colHalf, colHalf / 2});
-        idTransaksiTbl.addCell(getHeaderTextCell("ID Transaksi", plusJakarta));
-        idTransaksiTbl.addCell(new Cell().add(transactionDto.getInvoiceNumber())
-                .setBorder(Border.NO_BORDER)
-                .setFontSize(12)
-                .setTextAlignment(TextAlignment.CENTER)
-                .setFont(plusJakarta)
-                .setBackgroundColor(new DeviceRgb(209, 244, 206))
-                .setFontColor(new DeviceRgb(32, 34, 33))
-                .setMargins(-2, 0, -2, 0)
-                .setPaddingBottom(-10));
-        idTransaksiTbl.setMarginBottom(8);
+        document.add(stylePdfService.transaksiId(plusJakarta, transactionDto));
+        document.add(stylePdfService.oneLine(pdfDocument));
 
-        document.add(idTransaksiTbl);
-        document.add(oneLine);
 
 //        Detail Pemesanan start
         Table detailPemesananHead = new Table(new float[]{pdfDocument.getDefaultPageSize().getWidth()});
@@ -179,7 +151,7 @@ public class PdfAirlineServiceImpl extends HttpServlet implements PdfAirlineServ
         document.add(brokeLine);
 
 //        Detail Produk Head
-        Table detailProdukTbl = new Table(new float[]{col, col, col, col, col});
+        Table detailProdukTbl = new Table(new float[]{colHalf, col, col, col, col});
         detailProdukTbl.setMarginLeft(20);
         detailProdukTbl.addCell(getHeaderTextCell("No.", plusJakarta));
         detailProdukTbl.addCell(getHeaderTextCell("Produk", plusJakarta));
@@ -329,15 +301,17 @@ public class PdfAirlineServiceImpl extends HttpServlet implements PdfAirlineServ
 
         //starter pack
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        StylePdfService stylePdfService = new StylePdfService();
 
         String jakartaPlusDisplayPath = "fonts/PlusJakartaSans-Regular.ttf";
+//        String jakartaPlusDisplayPath = "fonts/PlusJakartaDisplay-Regular.otf";
         String jakartaPDLightPath = "fonts/PlusJakartaDisplay-Light.otf";
         String jakartaPDBoldPath = "fonts/PlusJakartaDisplay-Bold.otf";
 
         PdfDocument pdfDocument = new PdfDocument(new PdfWriter(baos));
 
         pdfDocument.setDefaultPageSize(PageSize.A4);
-        Document eTiketDoc = new Document(pdfDocument);
+        Document document = new Document(pdfDocument);
         PdfFont plusJakarta = PdfFontFactory.createFont(jakartaPlusDisplayPath);
         PdfFont jakartaPDLight = PdfFontFactory.createFont(jakartaPDLightPath);
         PdfFont jakartaPDBold = PdfFontFactory.createFont(jakartaPDBoldPath);
@@ -365,8 +339,8 @@ public class PdfAirlineServiceImpl extends HttpServlet implements PdfAirlineServ
         ImageData endPointData = ImageDataFactory.create("https://ik.imagekit.io/holigo/invoice/compressed/end-point_iijnQ0Xsb.png?ik-sdk-version=javascript-1.4.3&updatedAt=1663582578673");
         Image endPointImg = new Image(endPointData).scaleAbsolute(10, 40);
 
-        ImageData citilinkData = ImageDataFactory.create("https://ik.imagekit.io/holigo/invoice/compressed/maskapai_logo/Citilink_UiJ89WzRH_1eajJGV_d.png?ik-sdk-version=javascript-1.4.3&updatedAt=1663312097692");
-        Image citilinkImg = new Image(citilinkData).scaleAbsolute(64, 64);
+        ImageData maskapaiImgData = ImageDataFactory.create(transactionDto.getDetail().get("trips").get(0).get("imageUrl").asText());
+        Image maskapaiImg = new Image(maskapaiImgData).scaleAbsolute(64, 64);
 
         //        Size Table Declarartion
         float threeCol = 190f;
@@ -375,6 +349,7 @@ public class PdfAirlineServiceImpl extends HttpServlet implements PdfAirlineServ
         float col150 = col + 150;
         float[] twoCol = {col150, col};
         float[] fullWidth = {threeCol * 3};
+
         //        Color
         Color colorTitle = new DeviceRgb(0, 188, 22);
         Color colorSubTitle = new DeviceRgb(123, 123, 123);
@@ -397,54 +372,16 @@ public class PdfAirlineServiceImpl extends HttpServlet implements PdfAirlineServ
         Table oneLine = new Table(fullWidth);
         oneLine.setBorder(oneLineBd);
 
-        //TIme FORMATING
-        SimpleDateFormat oldTimeFormat = new SimpleDateFormat("hh:mm:ss");
-        SimpleDateFormat newTimeFormat = new SimpleDateFormat("hh:mm");
-
-
         //      --> HEADER START
-        Table nestedBuktiTable = new Table(new float[]{col150});
-        nestedBuktiTable.addCell(new Cell().add("E-ticket")
-                .setBorder(Border.NO_BORDER)
-                .setFontColor(colorTitle)
-                .setFontSize(22)
-                .setBold()
-                .setFont(jakartaPDBold)
-                .setPaddings(0, 0, 0, 0));
-        nestedBuktiTable.addCell(new Cell().add("Penerbangan Pesawat")
-                .setBorder(Border.NO_BORDER)
-                .setPaddings(-10, 0, 0, 1)
-                .setFontColor(colorSubTitle)
-                .setFont(plusJakarta).setFontSize(12).setBold());
+        document.add(stylePdfService.headerTitle(plusJakarta, imageLogo, "E-ticket", "Penerbangan Pesawat"));
 
-        Table headerTable = new Table(twoCol);
-        headerTable.setMarginTop(-24);
-        headerTable.addCell(new Cell().add(nestedBuktiTable).setBorder(Border.NO_BORDER));
 
-//        Logo Holigo
-        headerTable.addCell(new Cell().add(imageLogo).setPaddings(20, 0, 0, 44).setBorder(Border.NO_BORDER));
+        //      --> ID TRANSAKSI START
+        document.add(stylePdfService.transaksiId(plusJakarta, transactionDto));
+        document.add(stylePdfService.oneLine(pdfDocument));
+        document.add(space);
 
-        eTiketDoc.add(headerTable);
-
-//      --> ID TRANSAKSI START
-        Table idTransaksiTbl = new Table(new float[]{colHalf, colHalf / 2});
-        idTransaksiTbl.addCell(getHeaderTextCell("ID Transaksi", plusJakarta));
-        idTransaksiTbl.addCell(new Cell().add(transactionDto.getInvoiceNumber())
-                .setBorder(Border.NO_BORDER)
-                .setFontSize(12)
-                .setTextAlignment(TextAlignment.CENTER)
-                .setFont(plusJakarta)
-                .setBackgroundColor(new DeviceRgb(209, 244, 206))
-                .setFontColor(new DeviceRgb(32, 34, 33))
-                .setMargins(-2, 0, -2, 0)
-                .setPaddings(0, 8, -10, 8));
-        idTransaksiTbl.setMarginBottom(8);
-
-        eTiketDoc.add(idTransaksiTbl);
-        eTiketDoc.add(oneLine);
-        eTiketDoc.add(space);
-
-//        Body / container
+        //        Body / container
         Table containerTbl = new Table(new float[]{155, 0, 305, 102});
 
         //        --HELP/Intruction--
@@ -468,7 +405,7 @@ public class PdfAirlineServiceImpl extends HttpServlet implements PdfAirlineServ
 
         containerTbl.addCell(new Cell().add(helpTbl).setBorder(Border.NO_BORDER));
 
-//        SPACING
+        //        SPACING
         containerTbl.addCell(new Cell().add(" ")
                 .setBorderBottom(Border.NO_BORDER)
                 .setBorderRight(Border.NO_BORDER)
@@ -507,9 +444,9 @@ public class PdfAirlineServiceImpl extends HttpServlet implements PdfAirlineServ
 
         try {
             timeDeparture = inputTime.parse(transactionDto.getDetail()
-                        .get("trips").get(0)
-                        .get("itineraries").get(0)
-                        .get("departureTime").asText());
+                    .get("trips").get(0)
+                    .get("itineraries").get(0)
+                    .get("departureTime").asText());
         } catch (ParseException e) {
             throw new RuntimeException(e);
         }
@@ -610,13 +547,13 @@ public class PdfAirlineServiceImpl extends HttpServlet implements PdfAirlineServ
             //time flight
             int durationFlightRaw = transactionDto.getDetail().get("trips").get(0).get("duration").asInt();
             int durationFlightHour = 0;
-            int durationFlightMinute =0;
-            while (durationFlightRaw >= 60){
-                    durationFlightHour = durationFlightHour+1;
-                    durationFlightRaw = durationFlightRaw - 60;
+            int durationFlightMinute = 0;
+            while (durationFlightRaw >= 60) {
+                durationFlightHour = durationFlightHour + 1;
+                durationFlightRaw = durationFlightRaw - 60;
             }
             durationFlightMinute = durationFlightRaw;
-            String timeFlight = durationFlightHour+"j"+durationFlightMinute+"m";
+            String timeFlight = durationFlightHour + "j" + durationFlightMinute + "m";
             destinationChild.addCell(new Cell().add(timeFlight).setBorder(Border.NO_BORDER)
                     .setFontSize(9)
                     .setFont(jakartaPDLight)
@@ -685,7 +622,6 @@ public class PdfAirlineServiceImpl extends HttpServlet implements PdfAirlineServ
             );
         }
 
-
         //        --FLIGHT INFO--
         containerTbl.addCell(new Cell().add(destinationParent).setBorder(Border.NO_BORDER));
 
@@ -693,21 +629,24 @@ public class PdfAirlineServiceImpl extends HttpServlet implements PdfAirlineServ
 
         Table maskapai = new Table(new float[]{col});
 
-        maskapai.addCell(new Cell().add(citilinkImg.setFixedPosition(1, 500, 630)).setBorder(Border.NO_BORDER));
+//        maskapai.addCell(new Cell().add(maskapaiImg.setFixedPosition(1, 500, 630)).setBorder(Border.NO_BORDER));
+        maskapai.addCell(new Cell().add(maskapaiImg.setRelativePosition(25, 0, 0, 0)).setBorder(Border.NO_BORDER));
 
         maskapai.addCell(getSpaceVer());
-        maskapai.addCell(getSpaceVer());
-        maskapai.addCell(getHelpText("Citilink", jakartaPDBold)
+//        maskapai.addCell(getSpaceVer());
+        String maskapaiName = transactionDto.getDetail().get("trips").get(0).get("itineraries").get(0).get("airlinesName").asText();
+
+        maskapai.addCell(getHelpText(maskapaiName, jakartaPDBold)
                 .setPaddings(0, 0, 0, 0)
                 .setTextAlignment(TextAlignment.RIGHT));
 
-
-        maskapai.addCell(getHelpText("ID-6170", jakartaPDBold)
-                .setPaddings(-5, 0, 0, 0)
+        String flighNumber = transactionDto.getDetail().get("trips").get(0).get("itineraries").get(0).get("flightNumber").asText();
+        maskapai.addCell(getHelpText(flighNumber, jakartaPDBold)
+                .setPaddings(0, 0, 0, 0)
                 .setTextAlignment(TextAlignment.RIGHT)
 
         );
-        maskapai.addCell(getHelpText("Subclass G", jakartaPDBold)
+        maskapai.addCell(getHelpText("Dummy G", jakartaPDBold)
                 .setPaddings(-5, 0, 0, 0)
                 .setTextAlignment(TextAlignment.RIGHT)
 
@@ -721,7 +660,7 @@ public class PdfAirlineServiceImpl extends HttpServlet implements PdfAirlineServ
                 .setPaddings(0, 0, 0, 0));
 
         containerTbl.addCell(new Cell().add(maskapai).setBorder(Border.NO_BORDER));
-        eTiketDoc.add(containerTbl);
+        document.add(containerTbl);
         Table container2;
 //        Detail Penumpang and positioning
         if (countDestination - 1 >= 2) {
@@ -775,7 +714,7 @@ public class PdfAirlineServiceImpl extends HttpServlet implements PdfAirlineServ
                 .setMaxHeight(20)
         );
 
-        eTiketDoc.add(container2);
+        document.add(container2);
 
 //        Syarat dan Ketentuan Maskapai
         Table syaratNketentuanTbl;
@@ -810,7 +749,7 @@ public class PdfAirlineServiceImpl extends HttpServlet implements PdfAirlineServ
                 .setPaddings(0, 0, 0, 10)
                 .setBorder(Border.NO_BORDER));
 
-        eTiketDoc.add(syaratNketentuanTbl);
+        document.add(syaratNketentuanTbl);
 
 
 //      Left Footer
@@ -872,8 +811,8 @@ public class PdfAirlineServiceImpl extends HttpServlet implements PdfAirlineServ
         contactNumberTbl.setBorder(Border.NO_BORDER);
         footerTbl.addCell(new Cell().add(contactNumberTbl).setBorder(Border.NO_BORDER));
 
-        eTiketDoc.add(footerTbl);
-        eTiketDoc.close();
+        document.add(footerTbl);
+        document.close();
 
         // export to pdf
         response.setHeader("Expires", "0");
@@ -981,7 +920,7 @@ public class PdfAirlineServiceImpl extends HttpServlet implements PdfAirlineServ
 
     public static Cell getSpaceVer() {
         return new Cell().add("")
-                .setMinHeight(20)
+                .setMinHeight(10)
                 .setBorder(Border.NO_BORDER);
     }
 
