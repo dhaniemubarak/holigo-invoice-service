@@ -646,9 +646,9 @@ public class PdfHotelServiceImpl implements PdfHotelService {
         fasilitas.setFixedLeading(11);
         detailPemesananTbl.addCell(new Cell().add(fasilitas)
 //                .setPaddings(6, 0, 0, 10)
-                .setFontColor(new DeviceRgb(71, 71, 71)).setFontSize(10)
+                .setRelativePosition(10,3,0,0)
+                .setFontColor(new DeviceRgb(71,71,71)).setFontSize(10)
                 .setBorder(Border.NO_BORDER)
-                .setRelativePosition(7, 0, 0, 0)
                 .setFont(plusJakarta));
 
         // permintaan 2.1.5

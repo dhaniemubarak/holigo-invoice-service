@@ -159,13 +159,16 @@ public class StylePdfService {
     }
 
     public Cell getDetailPemesananOutput(String text,PdfFont font){
-        return new Cell().add(text).setPaddings(0,0,0,10)
+        return new Cell().add(text)
+//                .setPaddings(0,0,0,10)
+                .setRelativePosition(10,1,0,0)
                 .setFontColor(new DeviceRgb(71,71,71)).setFontSize(10)
                 .setBorder(Border.NO_BORDER)
                 .setFont(font);
     }
     public Cell getDetailPemesananAtribut(String text,PdfFont font){
-        return new Cell().add(text).setPaddings(0,0,0,10)
+        return new Cell().add(text)
+                .setRelativePosition(0,0,0,0)
                 .setFontSize(10)
                 .setBorder(Border.NO_BORDER)
                 .setBold()
