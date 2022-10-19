@@ -10,30 +10,43 @@ import com.lowagie.text.DocumentException;
 import id.holigo.services.holigoinvoiceservice.services.PdfAirlineService;
 import id.holigo.services.holigoinvoiceservice.services.pdfHotel.PdfHotelService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import id.holigo.services.holigoinvoiceservice.services.PdfService;
 import id.holigo.services.holigoinvoiceservice.services.transaction.TransactionService;
 import id.holigo.services.holigoinvoiceservice.web.model.TransactionDto;
-import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.RestController;
 
-@RequiredArgsConstructor
-@Controller
+@RestController
 public class InvoiceController {
 
-    @Autowired
-    private final TransactionService transactionService;
+    private TransactionService transactionService;
 
     @Autowired
+    public void setTransactionService(TransactionService transactionService) {
+        this.transactionService = transactionService;
+    }
     private PdfService pdfService;
 
     @Autowired
+    public void setPdfService(PdfService pdfService) {
+        this.pdfService = pdfService;
+    }
+
     private PdfAirlineService pdfAirlineService;
 
     @Autowired
+    public void setPdfAirlineService(PdfAirlineService pdfAirlineService) {
+        this.pdfAirlineService = pdfAirlineService;
+    }
+
     private PdfHotelService pdfHotelService;
+
+    @Autowired
+    public void setPdfHotelService(PdfHotelService pdfHotelService) {
+        this.pdfHotelService = pdfHotelService;
+    }
 
     //GENERAL
     @GetMapping("/web/v1/invoice/{id}/download")
@@ -58,7 +71,6 @@ public class InvoiceController {
             pdfService.export(response, transactionDto);
         }
     }
-    //MASKAPAI/AIRLINE
     @GetMapping("/web/v1/invoice/{id}/eticket")
     public void downloadEvoucherEticket(HttpServletResponse response, @PathVariable("id") UUID id) throws IOException {
 
@@ -74,7 +86,7 @@ public class InvoiceController {
     }
     //HOTEL
     @GetMapping("/web/v1/invoice/{id}/evoucher")
-    public void downloadEvoucher(HttpServletResponse response, @PathVariable("id") UUID id) throws IOException, DocumentException {
+    public void downloadEvoucher(HttpServletResponse response, @PathVariable("id") UUID id) throws IOException {
 
         TransactionDto transactionDto = transactionService.getTransactionDetail(id);
 
@@ -102,9 +114,7 @@ public class InvoiceController {
     private String getInvoice(TransactionDto transactionDto) {
         String invoice;
         switch (transactionDto.getTransactionType()) {
-            default -> {
-                invoice = "prepaid-postpaid-index";
-            }
+            default -> invoice = "prepaid-postpaid-index";
         }
         return invoice;
     }
