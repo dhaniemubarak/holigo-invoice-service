@@ -173,8 +173,10 @@ public class StylePdfService {
     }
 
     public Cell getSyaratKetentuan(String text,PdfFont font){
+
         return new Cell().add(text)
-                .setPaddings(-3,0,-3,10)
+                .setPaddings(0,0,0,10)
+//                .setPaddings(-3,0,-3,10)
                 .setFontColor(new DeviceRgb(97,97,97))
                 .setFontSize(8)
                 .setBorder(Border.NO_BORDER)
@@ -188,7 +190,7 @@ public class StylePdfService {
                 .setFont(pdfFont)
                 .setTextAlignment(TextAlignment.RIGHT)
                 .setFontSize(9)
-                .setPaddings(-4, 0, -4, 0)
+//                .setPaddings(-4, 0, -4, 0)
                 .setFontColor(new DeviceRgb(97, 97, 97));
     }
 
@@ -267,13 +269,14 @@ public class StylePdfService {
 //        Nested table for email
         Table emailHoligo = new Table(new float[]{10, 50});
         emailHoligo.addCell(new Cell().add(imageMail)
-                .setPaddings(5f, 0, 0, 0)
+                                .setRelativePosition(0,1,0,0)
+//                .setPaddings(5f, 0, 0, 0)
                 .setBorder(Border.NO_BORDER)
         );
         emailHoligo.addCell(new Cell().add("cs@holigo.co.id")
                 .setFont(plusJakarta)
                 .setFontSize(7)
-                .setPaddings(0, 0, 0, 5)
+//                .setPaddings(0, 0, 0, 5)
                 .setFontColor(new DeviceRgb(71, 71, 71))
                 .setBorder(Border.NO_BORDER)
         );
@@ -284,19 +287,25 @@ public class StylePdfService {
                 .setFont(plusJakarta)
                 .setFontSize(7)
                 .setFontColor(new DeviceRgb(71, 71, 71))
-                .setPaddings(-7, 0, 0, 2)
-                .setBorder(Border.NO_BORDER));
+                                .setRelativePosition(0,0,0,10)
+//                .setPaddings(-7, 0, 0, 2)
+                .setBorder(Border.NO_BORDER)
+        );
 
 //        Right Footer
         Table contactNumberTbl = new Table(new float[]{10, 50});
-        contactNumberTbl.addCell(new Cell().add(phoneImg).setBorder(Border.NO_BORDER)
-                .setPaddings(-1, 0, 0, 0));
+        contactNumberTbl.addCell(new Cell().add(phoneImg)
+                .setBorder(Border.NO_BORDER)
+                        .setRelativePosition(0,1,0,0)
+//                .setPaddings(-1, 0, 0, 0)
+        );
         contactNumberTbl.addCell(new Cell().add("+6281388882386")
                 .setFont(plusJakarta)
                 .setFontSize(7)
-                .setPaddings(-4, 0, 0, 5)
+//                .setPaddings(-4, 0, 0, 5)
                 .setFontColor(new DeviceRgb(71, 71, 71))
-                .setBorder(Border.NO_BORDER));
+                .setBorder(Border.NO_BORDER)
+        );
 
         contactNumberTbl.setBorder(Border.NO_BORDER);
 

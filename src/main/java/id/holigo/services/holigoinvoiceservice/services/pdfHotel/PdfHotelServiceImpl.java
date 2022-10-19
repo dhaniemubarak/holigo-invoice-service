@@ -24,6 +24,7 @@ import id.holigo.services.holigoinvoiceservice.web.model.HotelFasilitasDto;
 import id.holigo.services.holigoinvoiceservice.web.model.TransactionDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.text.WordUtils;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletResponse;
@@ -171,22 +172,21 @@ public class PdfHotelServiceImpl implements PdfHotelService {
         //nama hotel
         String[] namaHotel = transactionDto.getDetail().get("hotel").get("name").asText().split(" ");
         int longNameHtl = namaHotel.length;
-        if (longNameHtl < 3){
+        if (longNameHtl < 3) {
             deskripsiProduk.addCell(stylePdfService.getDetailProdukOutput(namaHotel[0] + " " + namaHotel[1], plusJakarta));
-        }else {
+        } else {
             deskripsiProduk.addCell(stylePdfService.getDetailProdukOutput(namaHotel[0] + " " + namaHotel[1] + " " + namaHotel[2], plusJakarta));
         }
         //nama room
         deskripsiProduk.addCell(stylePdfService.getDetailProdukOutput(transactionDto.getDetail().get("room").get("name").asText(), plusJakarta).setFontSize(8).setPaddingTop(-6));
 
         double adminAmount;
-        double discount;
+        double discount = 0;
         double fareAmount;
 
-
-        int count = 1;
+        int count = 1; //dummy
         detailProdukTbl.addCell(stylePdfService.getDetailProdukOutput("" + count, plusJakarta));
-        detailProdukTbl.addCell(stylePdfService.getDetailProdukOutput("Hotel", plusJakarta));
+        detailProdukTbl.addCell(stylePdfService.getDetailProdukOutput(transactionDto.getDetail().get("hotel").get("type").asText(), plusJakarta));
         detailProdukTbl.addCell(new Cell().add(deskripsiProduk).setBorder(Border.NO_BORDER));
         detailProdukTbl.addCell(stylePdfService.getDetailProdukOutput("1", plusJakarta).setTextAlignment(TextAlignment.CENTER));
         detailProdukTbl.addCell(stylePdfService.getDetailProdukOutput("Rp " + stylePdfService.getPrice(transactionDto.getFareAmount().floatValue()) + ",-", plusJakarta));
@@ -209,10 +209,7 @@ public class PdfHotelServiceImpl implements PdfHotelService {
             String discountStr = transactionDto.getDetail().get("discountAmount").asText();
             discount = Float.parseFloat(discountStr);
         }
-        {
-            String discountStr = "0";
-            discount = Float.parseFloat(discountStr);
-        }
+
 
 
         document.add(detailProdukTbl);
@@ -438,9 +435,24 @@ public class PdfHotelServiceImpl implements PdfHotelService {
                 .setFontColor(new DeviceRgb(97, 97, 97))
                 .setBorder(Border.NO_BORDER));
 
-        //      1.2.3 phone call
-        hotelProfile.addCell(stylePdfService.logoPositionHtl(phoneHtlImg));
-        hotelProfile.addCell(stylePdfService.outputHotelBody("(+62) dummy", plusJakarta).setFontSize(8));
+        //      1.2.3 Contact Hotel
+        if (transactionDto.getDetail().get("hotel").get("contacts").get(0).get("type").asText().equalsIgnoreCase("website")) {
+            hotelProfile.addCell(stylePdfService.logoPositionHtl(phoneHtlImg));
+        } else if (transactionDto.getDetail().get("hotel").get("contacts").get(0).get("type").asText().equalsIgnoreCase("email")) {
+            hotelProfile.addCell(stylePdfService.logoPositionHtl(phoneHtlImg));
+        } else if (transactionDto.getDetail().get("hotel").get("contacts").get(0).get("type").asText().equalsIgnoreCase("phone")) {
+            hotelProfile.addCell(stylePdfService.logoPositionHtl(phoneHtlImg));
+        }
+
+
+        if (transactionDto.getDetail().get("hotel").get("contacts").get(0).get("type").asText().equalsIgnoreCase("website")) {
+            hotelProfile.addCell(stylePdfService.outputHotelBody(transactionDto.getDetail().get("hotel").get("contacts").get(0).get("detail").asText(), plusJakarta).setFontSize(8));
+        } else if (transactionDto.getDetail().get("hotel").get("contacts").get(0).get("type").asText().equalsIgnoreCase("email")) {
+            hotelProfile.addCell(stylePdfService.outputHotelBody(transactionDto.getDetail().get("hotel").get("contacts").get(0).get("detail").asText(), plusJakarta).setFontSize(8));
+        } else if (transactionDto.getDetail().get("hotel").get("contacts").get(0).get("type").asText().equalsIgnoreCase("phone")) {
+            hotelProfile.addCell(stylePdfService.outputHotelBody(transactionDto.getDetail().get("hotel").get("contacts").get(0).get("detail").asText(), plusJakarta).setFontSize(8));
+        }
+
 
         //      1.2.3,5 space
         hotelProfile.addCell(stylePdfService.outputHotelBody("\n", plusJakarta));
@@ -448,12 +460,12 @@ public class PdfHotelServiceImpl implements PdfHotelService {
 
         //      1.2.4 Room Class
         hotelProfile.addCell(stylePdfService.logoPositionHtl(bedImg));
-        hotelProfile.addCell(new Cell().add(transactionDto.getDetail().get("room").get("name").asText().toUpperCase(Locale.ROOT))
+        hotelProfile.addCell(new Cell().add(WordUtils.capitalizeFully(transactionDto.getDetail().get("room").get("name").asText()))
                 .setFontSize(12)
                 .setBold()
                 .setFont(plusJakarta)
                 .setBorder(Border.NO_BORDER)
-                .setPaddings(-1, 0, -1, 0)
+//                .setPaddings(-1, 0, -1, 0)
                 .setRelativePosition(0, 0, 0, 2));
 
         //      1.2.5 Room
@@ -552,10 +564,10 @@ public class PdfHotelServiceImpl implements PdfHotelService {
         dateCheckSplitDuration.addCell(new Cell().add(lineImg).setRelativePosition(29.5f, 0, 0, 0).setPaddingTop(-2).setBorder(Border.NO_BORDER));
         int durationDay = transactionDto.getDetail().get("durations").asInt();
         int durationNight = 0;
-        if (durationDay == 1){
+        if (durationDay == 1) {
             durationNight = 1;
-        }else {
-            durationNight = durationDay -1;
+        } else {
+            durationNight = durationDay - 1;
         }
         int[] duration = {durationDay, durationNight};
         dateCheckSplitDuration.addCell(new Cell().add(duration[0] + " hari " + duration[1] + " malam").setFontSize(7).setFontColor(new DeviceRgb(71, 71, 71)).setTextAlignment(TextAlignment.CENTER).setBorder(Border.NO_BORDER));
@@ -597,7 +609,8 @@ public class PdfHotelServiceImpl implements PdfHotelService {
         // tipe kamar 2.1.3
         detailPemesananTbl.addCell(stylePdfService.getDetailPemesananAtribut("Tipe kamar", plusJakarta));
         detailPemesananTbl.addCell(stylePdfService.getDetailPemesananAtribut(":", plusJakarta));
-        detailPemesananTbl.addCell(stylePdfService.getDetailPemesananOutput(transactionDto.getDetail().get("room").get("name").asText(), plusJakarta));
+
+        detailPemesananTbl.addCell(stylePdfService.getDetailPemesananOutput(WordUtils.capitalizeFully(transactionDto.getDetail().get("room").get("name").asText()), plusJakarta));
 
         // fasilitas 2.1.4
         detailPemesananTbl.addCell(stylePdfService.getDetailPemesananAtribut("Fasilitas", plusJakarta));
@@ -615,32 +628,36 @@ public class PdfHotelServiceImpl implements PdfHotelService {
         for (HotelFasilitasDto hotelfacility : hotelFasilitasDtoList) {
             int index = 0;
             hotelfacility.getItems().forEach(facilityFor -> {
-                fasilitasList.add(facilityFor+ ", ");
+                fasilitasList.add(facilityFor + ", ");
             });
         }
 
         Paragraph fasilitas = new Paragraph();
+        String fasilitasText = "";
 
         for (int count = 0; count <= 10; count++) {
-            String fasilitasText = fasilitasList.get(count);
-            fasilitas.add(fasilitasText);
+            String fasilitasTextPart = fasilitasList.get(count);
+            fasilitasText = fasilitasText + fasilitasTextPart;
         }
-
+        StringBuilder sb = new StringBuilder(fasilitasText);
+        sb.deleteCharAt(fasilitasText.length() - 2);
+        fasilitas.add(sb.toString());
 
         fasilitas.setFixedLeading(11);
         detailPemesananTbl.addCell(new Cell().add(fasilitas)
-                .setPaddings(6, 0, 0, 10)
+//                .setPaddings(6, 0, 0, 10)
                 .setFontColor(new DeviceRgb(71, 71, 71)).setFontSize(10)
                 .setBorder(Border.NO_BORDER)
+                .setRelativePosition(7, 0, 0, 0)
                 .setFont(plusJakarta));
 
         // permintaan 2.1.5
         detailPemesananTbl.addCell(stylePdfService.getDetailPemesananAtribut("Permintaan khusus", plusJakarta));
         detailPemesananTbl.addCell(stylePdfService.getDetailPemesananAtribut(":", plusJakarta));
-        if (transactionDto.getDetail().get("guest").get("note") != null)  {
-            if (transactionDto.getDetail().get("guest").get("note").asText().equals("") ){
+        if (transactionDto.getDetail().get("guest").get("note") != null) {
+            if (transactionDto.getDetail().get("guest").get("note").asText().equals("")) {
                 detailPemesananTbl.addCell(stylePdfService.getDetailPemesananOutput(" - ", plusJakarta));
-            }else {
+            } else {
                 detailPemesananTbl.addCell(stylePdfService.getDetailPemesananOutput(transactionDto.getDetail().get("guest").get("note").asText(), plusJakarta));
             }
 

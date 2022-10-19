@@ -96,6 +96,13 @@
 			<version>7.0.4</version>
 			<type>pom</type>
 		</dependency>
+
+<!--		String Capitalize-->
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-text</artifactId>
+			<version>1.9</version>
+		</dependency>
 	</dependencies>
 	<dependencyManagement>
 		<dependencies>
