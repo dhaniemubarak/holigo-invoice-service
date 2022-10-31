@@ -5,6 +5,7 @@ import lombok.Data;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.sql.Timestamp;
 import java.util.UUID;
 
 @Data
@@ -38,5 +39,7 @@ public class PaymentDtoForUser implements Serializable {
     private String detailType;
 
     private String detailRoute;
+
+    private Timestamp updatedAt;
 
 }

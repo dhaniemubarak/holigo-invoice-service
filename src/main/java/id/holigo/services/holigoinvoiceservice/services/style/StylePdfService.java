@@ -14,27 +14,27 @@ import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 
 public class StylePdfService {
-    public Paragraph space(PdfDocument pdfDocument){
+    public Paragraph space(PdfDocument pdfDocument) {
         return new Paragraph("\n");
     }
 
-    public Table oneLine(PdfDocument pdfDocument){
+    public Table oneLine(PdfDocument pdfDocument) {
         //        Line Header
         Border oneLineBd = new SolidBorder(Color.BLACK, 1f / 4f);
-        Table oneLine = new Table(new float[] {pdfDocument.getDefaultPageSize().getWidth()});
+        Table oneLine = new Table(new float[]{pdfDocument.getDefaultPageSize().getWidth()});
         oneLine.setBorder(oneLineBd);
 
         return oneLine;
     }
 
-    public Table smallSpace(PdfDocument pdfDocument){
+    public Table smallSpace(PdfDocument pdfDocument) {
         Table smallSpace = new Table(new float[]{pdfDocument.getDefaultPageSize().getWidth()});
         smallSpace.addCell(new Cell().add("").setBorder(Border.NO_BORDER));
         smallSpace.addCell(new Cell().add("").setBorder(Border.NO_BORDER));
         return smallSpace;
     }
 
-    public Table brokeLine(PdfDocument pdfDocument){
+    public Table brokeLine(PdfDocument pdfDocument) {
         //        Border Line putus
         Table brokeLine = new Table(new float[]{pdfDocument.getDefaultPageSize().getWidth()});
         brokeLine.addCell(new Cell().add(" - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -")
@@ -45,6 +45,7 @@ public class StylePdfService {
         return brokeLine;
 
     }
+
     public Cell getHeaderTextCell(String textVelue, PdfFont plusJakarta) {
         return new Cell().add(textVelue)
                 .setBorder(Border.NO_BORDER)
@@ -84,9 +85,11 @@ public class StylePdfService {
                 .setFont(plusJakarta)
                 .setFontColor(new DeviceRgb(97, 97, 97));
     }
+
     public Paragraph spaceInColumn() {
         return new Paragraph("\n");
     }
+
     public Cell getInfo(Paragraph text, PdfFont font) {
         return new Cell().add(text)
                 .setFont(font)
@@ -95,6 +98,7 @@ public class StylePdfService {
                 .setPaddings(8, 0, 0, 5)
                 .setBorder(Border.NO_BORDER);
     }
+
     public Cell logoPositionHtl(Image image) {
         return new Cell().add(image)
                 .setRelativePosition(5, 2, 0, 0)
@@ -117,7 +121,7 @@ public class StylePdfService {
                 .setHeight(3);
     }
 
-    public Paragraph getSpacePara(float height){
+    public Paragraph getSpacePara(float height) {
         Paragraph spaceMaxWidth = new Paragraph();
         spaceMaxWidth.add(" ");
         spaceMaxWidth.setHeight(height);
@@ -132,7 +136,7 @@ public class StylePdfService {
                 .setFontColor(new DeviceRgb(199, 199, 199))
 //                .setFixedPosition(1,27,386,pdfDocument.getDefaultPageSize().getWidth())
                 .setFontSize(20).setTextAlignment(TextAlignment.CENTER)
-                .setPaddings(-10,-10,-10,-10));
+                .setPaddings(-10, -10, -10, -10));
         return brokeLine;
     }
 
@@ -158,29 +162,30 @@ public class StylePdfService {
                 .setPaddings(-4, 0, -4, 0);
     }
 
-    public Cell getDetailPemesananOutput(String text,PdfFont font){
+    public Cell getDetailPemesananOutput(String text, PdfFont font) {
         return new Cell().add(text)
 //                .setPaddings(0,0,0,10)
-                .setRelativePosition(10,1,0,0)
-                .setFontColor(new DeviceRgb(71,71,71)).setFontSize(10)
+                .setRelativePosition(10, 1, 0, 0)
+                .setFontColor(new DeviceRgb(71, 71, 71)).setFontSize(10)
                 .setBorder(Border.NO_BORDER)
                 .setFont(font);
     }
-    public Cell getDetailPemesananAtribut(String text,PdfFont font){
+
+    public Cell getDetailPemesananAtribut(String text, PdfFont font) {
         return new Cell().add(text)
-                .setRelativePosition(0,0,0,0)
+                .setRelativePosition(0, 0, 0, 0)
                 .setFontSize(10)
                 .setBorder(Border.NO_BORDER)
                 .setBold()
                 .setFont(font);
     }
 
-    public Cell getSyaratKetentuan(String text,PdfFont font){
+    public Cell getSyaratKetentuan(String text, PdfFont font) {
 
         return new Cell().add(text)
-                .setPaddings(0,0,0,10)
+                .setPaddings(0, 0, 0, 10)
 //                .setPaddings(-3,0,-3,10)
-                .setFontColor(new DeviceRgb(97,97,97))
+                .setFontColor(new DeviceRgb(97, 97, 97))
                 .setFontSize(8)
                 .setBorder(Border.NO_BORDER)
                 .setFont(font);
@@ -210,23 +215,30 @@ public class StylePdfService {
     }
 
 
-    public Table headerTitle(PdfFont plusJakarta, Image imageLogo, String title, String subTitle){
+    public Table headerTitle(PdfFont plusJakarta, Image imageLogo, String title, String subTitle) {
 
         Table nestedBuktiTable = new Table(new float[]{350f});
         nestedBuktiTable.addCell(new Cell().add(title)
                 .setBorder(Border.NO_BORDER)
-                .setFontColor(new DeviceRgb(0, 188, 22))
-                .setFontSize(22).setBold().setFont(plusJakarta)
-                .setPaddings(0, 0, 0, 0));
+                        .setFontColor(new DeviceRgb(0, 188, 22))
+                        .setFontSize(22).setBold().setFont(plusJakarta)
+                        .setRelativePosition(0, 5, 0, 0)
+                        .setPaddings(0, 0, 0, 0)
+        );
         nestedBuktiTable.addCell(new Cell().add(subTitle)
                 .setBorder(Border.NO_BORDER)
-                .setPaddings(-10, 0, 0, 1)
+//                .setPaddings(-10, 0, 0, 1)
+                .setRelativePosition(0, 0, 1, 3)
                 .setFontColor(new DeviceRgb(123, 123, 123))
                 .setFont(plusJakarta).setFontSize(12).setBold());
-        Table headerTable = new Table(new float[] {350f, 200f});
+        Table headerTable = new Table(new float[]{350f, 200f});
         headerTable.setMarginTop(-24);
         headerTable.addCell(new Cell().add(nestedBuktiTable).setBorder(Border.NO_BORDER));
-        headerTable.addCell(new Cell().add(imageLogo).setPaddings(20, 0, 0, 44).setBorder(Border.NO_BORDER));
+        headerTable.addCell(new Cell().add(imageLogo)
+                        .setRelativePosition(20,0,0,0)
+//                        .setPaddings(20, 0, 0, 44)
+                .setBorder(Border.NO_BORDER)
+        );
 
         return headerTable;
     }
@@ -247,7 +259,7 @@ public class StylePdfService {
         return idTransaksiTbl;
     }
 
-    public Table footer(PdfFont plusJakarta, PdfDocument pdfDocument, Image imageMail, Image phoneImg){
+    public Table footer(PdfFont plusJakarta, PdfDocument pdfDocument, Image imageMail, Image phoneImg) {
         //      Left Footer
         float defaultSizeWidth = pdfDocument.getDefaultPageSize().getWidth();
         Table footerTbl = new Table(new float[]{defaultSizeWidth / 2, 100});
@@ -272,42 +284,42 @@ public class StylePdfService {
 //        Nested table for email
         Table emailHoligo = new Table(new float[]{10, 50});
         emailHoligo.addCell(new Cell().add(imageMail)
-                                .setRelativePosition(0,1,0,0)
+                        .setRelativePosition(0, 1, 0, 0)
 //                .setPaddings(5f, 0, 0, 0)
-                .setBorder(Border.NO_BORDER)
+                        .setBorder(Border.NO_BORDER)
         );
         emailHoligo.addCell(new Cell().add("cs@holigo.co.id")
-                .setFont(plusJakarta)
-                .setFontSize(7)
+                        .setFont(plusJakarta)
+                        .setFontSize(7)
 //                .setPaddings(0, 0, 0, 5)
-                .setFontColor(new DeviceRgb(71, 71, 71))
-                .setBorder(Border.NO_BORDER)
+                        .setFontColor(new DeviceRgb(71, 71, 71))
+                        .setBorder(Border.NO_BORDER)
         );
         footerTbl.addCell(new Cell().add(emailHoligo)
                 .setBorder(Border.NO_BORDER)
         );
         footerTbl.addCell(new Cell().add("Jl. Bukit Golf 1 P17 Kec. Serpong Utara, Kota Tangerang Selatan, Banten 15310 Indonesia")
-                .setFont(plusJakarta)
-                .setFontSize(7)
-                .setFontColor(new DeviceRgb(71, 71, 71))
-                                .setRelativePosition(0,0,0,10)
+                        .setFont(plusJakarta)
+                        .setFontSize(7)
+                        .setFontColor(new DeviceRgb(71, 71, 71))
+                        .setRelativePosition(0, 0, 0, 10)
 //                .setPaddings(-7, 0, 0, 2)
-                .setBorder(Border.NO_BORDER)
+                        .setBorder(Border.NO_BORDER)
         );
 
 //        Right Footer
         Table contactNumberTbl = new Table(new float[]{10, 50});
         contactNumberTbl.addCell(new Cell().add(phoneImg)
-                .setBorder(Border.NO_BORDER)
-                        .setRelativePosition(0,1,0,0)
+                        .setBorder(Border.NO_BORDER)
+                        .setRelativePosition(0, 1, 0, 0)
 //                .setPaddings(-1, 0, 0, 0)
         );
         contactNumberTbl.addCell(new Cell().add("+6281388882386")
-                .setFont(plusJakarta)
-                .setFontSize(7)
+                        .setFont(plusJakarta)
+                        .setFontSize(7)
 //                .setPaddings(-4, 0, 0, 5)
-                .setFontColor(new DeviceRgb(71, 71, 71))
-                .setBorder(Border.NO_BORDER)
+                        .setFontColor(new DeviceRgb(71, 71, 71))
+                        .setBorder(Border.NO_BORDER)
         );
 
         contactNumberTbl.setBorder(Border.NO_BORDER);
