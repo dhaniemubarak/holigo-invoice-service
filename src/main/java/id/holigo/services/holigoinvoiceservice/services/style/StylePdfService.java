@@ -9,11 +9,16 @@ import com.itextpdf.layout.border.SolidBorder;
 import com.itextpdf.layout.element.*;
 import com.itextpdf.layout.property.TextAlignment;
 import id.holigo.services.holigoinvoiceservice.web.model.TransactionDto;
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 
 public class StylePdfService {
+
     public Paragraph space(PdfDocument pdfDocument) {
         return new Paragraph("\n");
     }
@@ -243,9 +248,11 @@ public class StylePdfService {
         return headerTable;
     }
 
-    public Table transaksiId(PdfFont plusJakarta, TransactionDto transactionDto) {
+    public Table transaksiId(String idTransaksi,PdfFont plusJakarta, TransactionDto transactionDto) {
+
+
         Table idTransaksiTbl = new Table(new float[]{100f, 50f});
-        idTransaksiTbl.addCell(getHeaderTextCell("ID Transaksi", plusJakarta));
+        idTransaksiTbl.addCell(getHeaderTextCell(idTransaksi, plusJakarta));
         idTransaksiTbl.addCell(new Cell().add(transactionDto.getInvoiceNumber().toString())
                 .setBorder(Border.NO_BORDER)
                 .setFontSize(12)

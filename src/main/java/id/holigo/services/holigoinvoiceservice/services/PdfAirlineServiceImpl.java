@@ -20,6 +20,7 @@ import id.holigo.services.holigoinvoiceservice.services.style.StylePdfService;
 import id.holigo.services.holigoinvoiceservice.web.model.TransactionDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServlet;
@@ -96,7 +97,8 @@ public class PdfAirlineServiceImpl extends HttpServlet implements PdfAirlineServ
         document.add(stylePdfService.headerTitle(plusJakarta, imageLogo, "Bukti Pembayaran", "Penerbangan Pesawat"));
 
 //      --> ID TRANSAKSI START
-        document.add(stylePdfService.transaksiId(plusJakarta, transactionDto));
+//        String transactionId = messageSource.getMessage("invoice.id-transaksi",null, LocaleContextHolder.getLocale());
+        document.add(stylePdfService.transaksiId("ID Transaksi",plusJakarta, transactionDto));
         document.add(stylePdfService.oneLine(pdfDocument));
 
 
@@ -382,7 +384,7 @@ public class PdfAirlineServiceImpl extends HttpServlet implements PdfAirlineServ
 
 
         //      --> ID TRANSAKSI START
-        document.add(stylePdfService.transaksiId(plusJakarta, transactionDto));
+        document.add(stylePdfService.transaksiId("ID Transaksi",plusJakarta, transactionDto));
         document.add(stylePdfService.oneLine(pdfDocument));
         document.add(space);
 
@@ -738,16 +740,16 @@ public class PdfAirlineServiceImpl extends HttpServlet implements PdfAirlineServ
         holigoLink.setBold();
         Paragraph ketentuanPrg = new Paragraph();
         ketentuanPrg.setFixedLeading(11);
-        ketentuanPrg.add("• Untuk penerbangan domestik dan internasional, penumpang wajib memperhatikan dan melengkapi persyaratan perjalanan, seperti dokumen ");
+        ketentuanPrg.add("- Untuk penerbangan domestik dan internasional, penumpang wajib memperhatikan dan melengkapi persyaratan perjalanan, seperti dokumen ");
         ketentuanPrg.add("kesehatan terkait COVID-19, ketentuan paspor & visa, kartu identitas, dan ketentuan transit/koneksi. Ketentuan regulasi tiap negara dapat berubah");
         ketentuanPrg.add("sewaktu-waktu tanpa pemberitahuan sebelumnya. Penumpang sepenuhnya bertanggung jawab terhadap pemenuhan kelengkapan persyaratan ");
         ketentuanPrg.add("perjalanan yang dibutuhkan pada saat keberangkatan dan/atau saat kedatangan. Untuk informasi lebih lanjut, silakan cek\n");
         ketentuanPrg.add(holigoLink);
         ketentuanPrg.add("\n");
-        ketentuanPrg.add("• Penumpang diharapkan tiba di terminal keberangkatan selambat-lambatnya 4 (empat) jam sebelum waktu keberangkatan pada penerbangan domestik dan internasional untuk melakukan check-in.\n");
-        ketentuanPrg.add("• Check-in ditutup 60 menit sebelum waktu keberangkatan.\n");
-        ketentuanPrg.add("• Penumpang diharapkan tiba di gerbang keberangkatan (Boarding Gate) 45 menit sebelum waktu keberangkatan.\n");
-        ketentuanPrg.add("• Penumpang wajib membawa KTP atau Kartu Keluarga (hard/soft copy untuk penumpang anak dan bayi).\n");
+        ketentuanPrg.add("- Penumpang diharapkan tiba di terminal keberangkatan selambat-lambatnya 4 (empat) jam sebelum waktu keberangkatan pada penerbangan domestik dan internasional untuk melakukan check-in.\n");
+        ketentuanPrg.add("- Check-in ditutup 60 menit sebelum waktu keberangkatan.\n");
+        ketentuanPrg.add("- Penumpang diharapkan tiba di gerbang keberangkatan (Boarding Gate) 45 menit sebelum waktu keberangkatan.\n");
+        ketentuanPrg.add("- Penumpang wajib membawa KTP atau Kartu Keluarga (hard/soft copy untuk penumpang anak dan bayi).\n");
 
 
         syaratNketentuanTbl.addCell(getSyaratKetentuan(ketentuanPrg, plusJakarta)

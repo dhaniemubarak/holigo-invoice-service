@@ -25,6 +25,9 @@ import id.holigo.services.holigoinvoiceservice.web.model.TransactionDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.text.WordUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletResponse;
@@ -45,6 +48,9 @@ import java.util.Locale;
 public class PdfHotelServiceImpl implements PdfHotelService {
 
     private final ObjectMapper objectMapper;
+
+    @Autowired
+    private final MessageSource messageSource;
 
     @Override
     public void eReceiptHotel(TransactionDto transactionDto, HttpServletResponse response) throws MalformedURLException {
@@ -88,24 +94,35 @@ public class PdfHotelServiceImpl implements PdfHotelService {
         float[] twoCol = {350f, 200f};
 
         // - - - - - HEADER  - - - - -
-        document.add(stylePdfService.headerTitle(plusJakarta, imageLogo, "Bukti Pembayaran", "Hotel"));
+        String title = messageSource.getMessage("invoice.title-ereceipt", null, LocaleContextHolder.getLocale());
+        String subTitle = messageSource.getMessage("invoice.subtitle-ereceipt", null, LocaleContextHolder.getLocale());
+        document.add(stylePdfService.headerTitle(plusJakarta, imageLogo, title, subTitle));
 
         //--> ID TRANSAKSI
-        document.add(stylePdfService.transaksiId(plusJakarta, transactionDto));
+
+        String transactionId = messageSource.getMessage("invoice.id-transaksi",null, LocaleContextHolder.getLocale());
+        document.add(stylePdfService.transaksiId(transactionId,plusJakarta, transactionDto));
         document.add(stylePdfService.oneLine(pdfDocument));
 
         // - - - - - Body Part  - - - - -
 
         //        Detail Pemesanan buyer
         Table detailPemesananHead = new Table(new float[]{pdfDocument.getDefaultPageSize().getWidth()});
-        detailPemesananHead.addCell(stylePdfService.getHeaderTextCell("Detail Pemesanan", plusJakarta));
+        String bookingDetails = messageSource.getMessage("invoice.bookings-detail",null,LocaleContextHolder.getLocale());
+        detailPemesananHead.addCell(stylePdfService.getHeaderTextCell(bookingDetails, plusJakarta));
         Table tblDetailPemesanan = new Table(new float[]{col, 30, col, 30, col});
         tblDetailPemesanan.setMarginLeft(8);
-        tblDetailPemesanan.addCell(stylePdfService.getTextDetail("Nama Lengkap", plusJakarta));
+        // nama lengkap detail pemesanan
+        String fullName = messageSource.getMessage("invoice.full-name",null,LocaleContextHolder.getLocale());
+        tblDetailPemesanan.addCell(stylePdfService.getTextDetail(fullName, plusJakarta));
         tblDetailPemesanan.addCell(stylePdfService.getTextDetail("", plusJakarta));
-        tblDetailPemesanan.addCell(stylePdfService.getTextDetail("Email", plusJakarta));
+        // email detail pemesanan
+        String email = messageSource.getMessage("invoice.email-ereceipt",null,LocaleContextHolder.getLocale());
+        tblDetailPemesanan.addCell(stylePdfService.getTextDetail(email, plusJakarta));
         tblDetailPemesanan.addCell(stylePdfService.getTextDetail("", plusJakarta));
-        tblDetailPemesanan.addCell(stylePdfService.getTextDetail("Nomor Ponsel", plusJakarta));
+        // nomor telpon detail pemesanan
+        String phoneNumber = messageSource.getMessage("invoice.phone-number-ereceipt",null,LocaleContextHolder.getLocale());
+        tblDetailPemesanan.addCell(stylePdfService.getTextDetail(phoneNumber, plusJakarta));
 
 
         tblDetailPemesanan.addCell(stylePdfService.getDetailUserBold(
@@ -137,16 +154,19 @@ public class PdfHotelServiceImpl implements PdfHotelService {
         try {
             if (transactionDto.getPayment() != null && transactionDto.getPayment().getStatus().toString().equalsIgnoreCase("PAID")) {
                 Table detailPembayaranHead = new Table(new float[]{pdfDocument.getDefaultPageSize().getWidth()});
-                detailPembayaranHead.addCell(stylePdfService.getHeaderTextCell("Detail Pembayaran", plusJakarta));
-
+                //detail pembayaran
+                String paymentDetail = messageSource.getMessage("invoice.payment-detail-ereceipt",null,LocaleContextHolder.getLocale());
+                detailPembayaranHead.addCell(stylePdfService.getHeaderTextCell(paymentDetail, plusJakarta));
                 Table detailPembayaran = new Table(new float[]{150, 10, 60, 20, col});
                 detailPembayaran.setMarginLeft(8);
-                detailPembayaran.addCell(stylePdfService.getTextDetail("Waktu pembayaran", plusJakarta));
+                // waktu pembayaran
+                String paymentTimeDetail = messageSource.getMessage("invoice.payment-time-ereceipt",null,LocaleContextHolder.getLocale());
+                detailPembayaran.addCell(stylePdfService.getTextDetail(paymentTimeDetail, plusJakarta));
                 detailPembayaran.addCell(stylePdfService.getTextDetail(" ", plusJakarta));
                 detailPembayaran.addCell(stylePdfService.getTextDetail(" ", plusJakarta));
                 detailPembayaran.addCell(stylePdfService.getTextDetail(" ", plusJakarta));
-                detailPembayaran.addCell(stylePdfService.getTextDetail("Metode pembayaran", plusJakarta));
-
+                String paymentMethod = messageSource.getMessage("invoice.payment-method-ereceipt",null,LocaleContextHolder.getLocale());
+                detailPembayaran.addCell(stylePdfService.getTextDetail(paymentMethod, plusJakarta));
 
                 document.add(stylePdfService.space(pdfDocument));
 
@@ -154,7 +174,7 @@ public class PdfHotelServiceImpl implements PdfHotelService {
                 DateFormat outputDatePayment = new SimpleDateFormat("E, dd MMM yyyy");
                 DateFormat outputTimePayment = new SimpleDateFormat("HH:mm");
                 //Payment timestamp to date
-                Date paymentDate = null;
+                Date paymentDate;
                 try {
                     paymentDate = inputDatePayment.parse(transactionDto.getPayment().getUpdatedAt().toString());
                 } catch (ParseException e) {
@@ -189,10 +209,14 @@ public class PdfHotelServiceImpl implements PdfHotelService {
         Table detailProdukTbl = new Table(new float[]{colHalf, colHalf, col + colHalf, col, col});
         detailProdukTbl.setMarginLeft(20);
         detailProdukTbl.addCell(stylePdfService.getHeaderTextCell("No.", plusJakarta));
-        detailProdukTbl.addCell(stylePdfService.getHeaderTextCell("Produk", plusJakarta));
-        detailProdukTbl.addCell(stylePdfService.getHeaderTextCell("Deskripsi", plusJakarta));
-        detailProdukTbl.addCell(stylePdfService.getHeaderTextCell("Jumlah", plusJakarta).setTextAlignment(TextAlignment.CENTER));
-        detailProdukTbl.addCell(stylePdfService.getHeaderTextCell("Harga", plusJakarta));
+        String product = messageSource.getMessage("invoice.product-name-ereceipt",null,LocaleContextHolder.getLocale());
+        detailProdukTbl.addCell(stylePdfService.getHeaderTextCell(product, plusJakarta));
+        String desctiptionProduct = messageSource.getMessage("invoice.product-description-ereceipt",null,LocaleContextHolder.getLocale());
+        detailProdukTbl.addCell(stylePdfService.getHeaderTextCell(desctiptionProduct, plusJakarta));
+        String quantity = messageSource.getMessage("invoice.product-count-ereceipt",null,LocaleContextHolder.getLocale());
+        detailProdukTbl.addCell(stylePdfService.getHeaderTextCell(quantity, plusJakarta).setTextAlignment(TextAlignment.CENTER));
+        String price = messageSource.getMessage("invoice.product-price-ereceipt",null,LocaleContextHolder.getLocale());
+        detailProdukTbl.addCell(stylePdfService.getHeaderTextCell(price, plusJakarta));
 
 //        Detail Produk output
         Table deskripsiProduk = new Table(new float[]{150f});
@@ -250,7 +274,7 @@ public class PdfHotelServiceImpl implements PdfHotelService {
         nestedPrice.addCell(stylePdfService.getDetailProdukOutput("Rp " + stylePdfService.getPrice(fareAmount) + ",-", plusJakarta));
 //        nestedPrice.addCell(stylePdf.getHeaderTextCell("Biaya Jasa", plusJakarta));
 //        nestedPrice.addCell(stylePdf.getDetailProdukOutput("Rp " + stylePdf.getPrice(adminAmount) + ",-", plusJakarta));
-        System.out.println("discout amount : " + transactionDto.getDiscountAmount().toString());
+
         if (transactionDto.getDiscountAmount() != null && transactionDto.getDiscountAmount().doubleValue() > 0) {
 
             nestedPrice.addCell(stylePdfService.getHeaderTextCell("Discount", plusJakarta));
@@ -402,16 +426,17 @@ public class PdfHotelServiceImpl implements PdfHotelService {
         Image star1Img = new Image(star1ImgData).scaleAbsolute(58, 10);
 
         //TIme FORMATING
-        SimpleDateFormat oldTimeFormat = new SimpleDateFormat("HH:mm:ss");
         SimpleDateFormat oldTimeFormatWithoutSS = new SimpleDateFormat("HH:mm");
         SimpleDateFormat newTimeFormat = new SimpleDateFormat("HH:mm");
 
         // - - - - - HEADER  - - - - -
-        document.add(stylePdfService.headerTitle(plusJakarta, imageLogo, "Voucher", "Pemesanan Hotel"));
-
+        String titleVoucher = messageSource.getMessage("invoice.header-title-voucher",null,LocaleContextHolder.getLocale());
+        String subTitleVoucher = messageSource.getMessage("invoice.header-subTitle-voucher",null,LocaleContextHolder.getLocale());
+        document.add(stylePdfService.headerTitle(plusJakarta, imageLogo,titleVoucher , subTitleVoucher));
 
         //--> ID TRANSAKSI
-        document.add(stylePdfService.transaksiId(plusJakarta, transactionDto));
+        String transactionId = messageSource.getMessage("invoice.id-transaksi",null, LocaleContextHolder.getLocale());
+        document.add(stylePdfService.transaksiId(transactionId,plusJakarta, transactionDto));
         document.add(stylePdfService.oneLine(pdfDocument));
         document.add(stylePdfService.spaceInColumn());
 
@@ -423,15 +448,20 @@ public class PdfHotelServiceImpl implements PdfHotelService {
         helpTbl.addCell(new Cell().add(ticketHelpImg).setBorder(Border.NO_BORDER));
         Paragraph ticketPrg = new Paragraph();
         ticketPrg.setFixedLeading(10);
-        ticketPrg.add("Tunjukan identitas diri dan bukti pemesanan saat check-in");
+        String intruction1 = messageSource.getMessage("invoice.intruction1-voucher",null,LocaleContextHolder.getLocale());
+        ticketPrg.add(intruction1);
+
         helpTbl.addCell(stylePdfService.getInfo(ticketPrg, plusJakarta));
         helpTbl.addCell(new Cell().add(timeImg).setBorder(Border.NO_BORDER));
         Paragraph timePrg = new Paragraph();
-        timePrg.add("Check-in sesuai dengan waktu yang tertera pada bukti pemesanan").setFixedLeading(10);
+        String intruction2 = messageSource.getMessage("invoice.intruction2-voucher",null,LocaleContextHolder.getLocale());
+        timePrg.add(intruction2).setFixedLeading(10);
+
         helpTbl.addCell(stylePdfService.getInfo(timePrg, plusJakarta));
         helpTbl.addCell(new Cell().add(informationImg).setBorder(Border.NO_BORDER));
         Paragraph infoPrg = new Paragraph();
-        infoPrg.add("Waktu yang tertera sesuai dengan waktu hotel setempat").setFixedLeading(10);
+        String intruction3 = messageSource.getMessage("invoice.intruction3-voucher",null,LocaleContextHolder.getLocale());
+        infoPrg.add(intruction3).setFixedLeading(10);
         helpTbl.addCell(stylePdfService.getInfo(infoPrg, plusJakarta));
 
         //      1.1 Closer
@@ -504,20 +534,25 @@ public class PdfHotelServiceImpl implements PdfHotelService {
 
         //      1.2.5 Room
         hotelProfile.addCell(stylePdfService.logoPositionHtl(roomImg));
-        hotelProfile.addCell(stylePdfService.outputHotelBody(transactionDto.getDetail().get("roomAmount").asText() + " kamar", plusJakarta));
+        String roomHotel = messageSource.getMessage("invoice.hotel-room-voucher",null,LocaleContextHolder.getLocale());
+        hotelProfile.addCell(stylePdfService.outputHotelBody(transactionDto.getDetail().get("roomAmount").asText() +" "+
+                roomHotel, plusJakarta));
         hotelProfile.addCell(stylePdfService.smallSpaceInColumn());
         hotelProfile.addCell(stylePdfService.smallSpaceInColumn());
 
         //      1.2.6 User
         hotelProfile.addCell(stylePdfService.logoPositionHtl(userImg));
-        hotelProfile.addCell(stylePdfService.outputHotelBody(transactionDto.getDetail().get("guestAmount").asText() + " Tamu", plusJakarta));
+        String guestHotel = messageSource.getMessage("invoice.hotel-guest-voucher",null,LocaleContextHolder.getLocale());
+        hotelProfile.addCell(stylePdfService.outputHotelBody(transactionDto.getDetail().get("guestAmount").asText() +" "+
+                guestHotel, plusJakarta));
         hotelProfile.addCell(stylePdfService.smallSpaceInColumn());
         hotelProfile.addCell(stylePdfService.smallSpaceInColumn());
         hotelBody.addCell(new Cell().add(hotelProfile).setBorder(Border.NO_BORDER));
 
         //      1.2.7 Kode Booking
         hotelBody.addCell(new Cell().add(" ").setHeight(15).setBorder(Border.NO_BORDER));
-        hotelBody.addCell(new Cell().add("Kode Booking").setFontSize(9).setFontColor(new DeviceRgb(97, 97, 97)).setBorder(Border.NO_BORDER).setRelativePosition(10, 0, 0, 0));
+        String bookingCode = messageSource.getMessage("invoice.booking-code-voucher",null,LocaleContextHolder.getLocale());
+        hotelBody.addCell(new Cell().add(bookingCode).setFontSize(9).setFontColor(new DeviceRgb(97, 97, 97)).setBorder(Border.NO_BORDER).setRelativePosition(10, 0, 0, 0));
         if (transactionDto.getDetail().get("voucherCode") != null) {
             hotelBody.addCell(new Cell().add(transactionDto.getDetail().get("voucherCode").asText()).setFontSize(20).setFontColor(new DeviceRgb(0, 189, 23)).setBorder(Border.NO_BORDER).setRelativePosition(12, 0, 0, 0).setPaddings(-5, 0, -5, 0));
         }
@@ -604,14 +639,15 @@ public class PdfHotelServiceImpl implements PdfHotelService {
             durationNight = durationDay - 1;
         }
         int[] duration = {durationDay, durationNight};
-        dateCheckSplitDuration.addCell(new Cell().add(duration[0] + " hari " + duration[1] + " malam").setFontSize(7).setFontColor(new DeviceRgb(71, 71, 71)).setTextAlignment(TextAlignment.CENTER).setBorder(Border.NO_BORDER));
+        String day = messageSource.getMessage("invoice.duration-day-voucher",null,LocaleContextHolder.getLocale());
+        String night = messageSource.getMessage("invoice.duration-night-voucher",null,LocaleContextHolder.getLocale());
+        dateCheckSplitDuration.addCell(new Cell().add(duration[0] +" "+day+" "+ duration[1] +" "+night).setFontSize(7).setFontColor(new DeviceRgb(71, 71, 71)).setTextAlignment(TextAlignment.CENTER).setBorder(Border.NO_BORDER));
         dateCheckSplitDuration.addCell(new Cell().add(lineImg).setRelativePosition(29.5f, 0, 0, 0).setPaddingBottom(-2).setBorder(Border.NO_BORDER));
         dateCheckSplitDuration.addCell(new Cell().add(endImg).setRelativePosition(25, 0, 0, 0).setBorder(Border.NO_BORDER));
         //closer in COL 2
         dateCheckSplit.addCell(new Cell().add(dateCheckSplitDuration).setBorder(Border.NO_BORDER));
-
-
         dateCheck.addCell(new Cell().add(dateCheckSplit).setBorder(Border.NO_BORDER));
+
         //image Hotel
         dateCheck.addCell(new Cell().add(hotelImg).setBorder(Border.NO_BORDER).setRelativePosition(40, 0, 0, 0));
         // closer 1.3
@@ -622,7 +658,8 @@ public class PdfHotelServiceImpl implements PdfHotelService {
         // - - - - - BODY 2  - - - - -
         Table body2 = new Table(new float[]{pdfDocument.getDefaultPageSize().getWidth()});
         Paragraph titledetail = new Paragraph();
-        titledetail.add("Detail Pemesanan");
+        String bookingsDetail = messageSource.getMessage("invoice.bookings-detail",null,LocaleContextHolder.getLocale());
+        titledetail.add(bookingsDetail);
         body2.addCell(stylePdfService.getHotelBold12(titledetail, plusJakarta).setTextAlignment(TextAlignment.LEFT));
 
         //       2.1 Detail Pemesanan
@@ -631,23 +668,27 @@ public class PdfHotelServiceImpl implements PdfHotelService {
         document.add(stylePdfService.brokeLineEvoucher(pdfDocument));
         document.add(stylePdfService.getSpacePara(0));
         Table detailPemesananTbl = new Table(new float[]{130, 10, 300});
-        // nama 2.1.1
-        detailPemesananTbl.addCell(stylePdfService.getDetailPemesananAtribut("Nama Lengkap", plusJakarta));
+        // nama lengkap 2.1.1
+        String fullName = messageSource.getMessage("invoice.full-name",null,LocaleContextHolder.getLocale());
+        detailPemesananTbl.addCell(stylePdfService.getDetailPemesananAtribut(fullName, plusJakarta));
         detailPemesananTbl.addCell(stylePdfService.getDetailPemesananAtribut(":", plusJakarta));
         detailPemesananTbl.addCell(stylePdfService.getDetailPemesananOutput(transactionDto.getDetail().get("guest").get("name").asText(), plusJakarta));
         // jumlah tamu 2.1.2
-        detailPemesananTbl.addCell(stylePdfService.getDetailPemesananAtribut("Jumlah tamu", plusJakarta));
+        String guestAmount = messageSource.getMessage("invoice.booking-guest-voucher",null,LocaleContextHolder.getLocale());
+        detailPemesananTbl.addCell(stylePdfService.getDetailPemesananAtribut(guestAmount, plusJakarta));
         detailPemesananTbl.addCell(stylePdfService.getDetailPemesananAtribut(":", plusJakarta));
         detailPemesananTbl.addCell(stylePdfService.getDetailPemesananOutput(transactionDto.getDetail().get("guestAmount") + " orang", plusJakarta));
 
         // tipe kamar 2.1.3
-        detailPemesananTbl.addCell(stylePdfService.getDetailPemesananAtribut("Tipe kamar", plusJakarta));
+        String roomType = messageSource.getMessage("invoice.booking-roomType-voucher",null,LocaleContextHolder.getLocale());
+        detailPemesananTbl.addCell(stylePdfService.getDetailPemesananAtribut(roomType, plusJakarta));
         detailPemesananTbl.addCell(stylePdfService.getDetailPemesananAtribut(":", plusJakarta));
 
         detailPemesananTbl.addCell(stylePdfService.getDetailPemesananOutput(WordUtils.capitalizeFully(transactionDto.getDetail().get("room").get("name").asText()), plusJakarta));
 
         // fasilitas 2.1.4
-        detailPemesananTbl.addCell(stylePdfService.getDetailPemesananAtribut("Fasilitas", plusJakarta));
+        String facility = messageSource.getMessage("invoice.booking-facilities-voucher",null,LocaleContextHolder.getLocale());
+        detailPemesananTbl.addCell(stylePdfService.getDetailPemesananAtribut(facility, plusJakarta));
         detailPemesananTbl.addCell(stylePdfService.getDetailPemesananAtribut(":", plusJakarta));
 
         List<HotelFasilitasDto> hotelFasilitasDtoList = null;
@@ -686,7 +727,8 @@ public class PdfHotelServiceImpl implements PdfHotelService {
                 .setFont(plusJakarta));
 
         // permintaan 2.1.5
-        detailPemesananTbl.addCell(stylePdfService.getDetailPemesananAtribut("Permintaan khusus", plusJakarta));
+        String request = messageSource.getMessage("invoice.booking-request-voucher",null,LocaleContextHolder.getLocale());
+        detailPemesananTbl.addCell(stylePdfService.getDetailPemesananAtribut(request, plusJakarta));
         detailPemesananTbl.addCell(stylePdfService.getDetailPemesananAtribut(":", plusJakarta));
         if (transactionDto.getDetail().get("guest").get("note") != null) {
             if (transactionDto.getDetail().get("guest").get("note").asText().equals("")) {
@@ -694,7 +736,6 @@ public class PdfHotelServiceImpl implements PdfHotelService {
             } else {
                 detailPemesananTbl.addCell(stylePdfService.getDetailPemesananOutput(transactionDto.getDetail().get("guest").get("note").asText(), plusJakarta));
             }
-
         } else {
             detailPemesananTbl.addCell(stylePdfService.getDetailPemesananOutput(" - ", plusJakarta));
         }
@@ -706,14 +747,21 @@ public class PdfHotelServiceImpl implements PdfHotelService {
         // 3.1 Syarat dan Ketentuan
         Table term = new Table(new float[]{pdfDocument.getDefaultPageSize().getWidth()});
         term.addCell(new Cell().add(stylePdfService.getSpacePara(5)).setBorder(Border.NO_BORDER));
-        term.addCell(new Cell().add("* Syarat dan Ketentuan " + transactionDto.getDetail().get("hotel").get("name").asText()).setBorder(Border.NO_BORDER).setFontSize(7).setFont(plusJakarta));
-        term.addCell(stylePdfService.getSyaratKetentuan("Tidak bisa refund & reschedule", plusJakarta));
-        term.addCell(stylePdfService.getSyaratKetentuan("• Pemesanan kamar ini tidak bisa di-refund atau di-reschedule. Jika tidak datang ke akomodasi untuk check-in, kamu akan dianggap no-show dan tidak diberikan pengembalian dana.", plusJakarta));
-        term.addCell(stylePdfService.getSyaratKetentuan("• Nominal dari penggunaan Holi Point atau promo tidak bisa di-refund.", plusJakarta));
-        term.addCell(stylePdfService.getSyaratKetentuan("Catatan", plusJakarta));
-        term.addCell(stylePdfService.getSyaratKetentuan("• Saat check-in, tanda pengenal resmi yang dikeluarkan pemerintah dan kartu kredit atau setoran tunai mungkin diperlukan untuk kebutuhan biaya tak terduga." + "Terpenuhinya permintaan khusus bergantung pada ketersediaan pada saat check-in dan mungkin memerlukan biaya tambahan", plusJakarta));
-        term.addCell(stylePdfService.getSyaratKetentuan("• Biaya tambahan seperti parkir, deposit, telepon, layanan kamar ditangani langsung antara tamu dan hotel. Tamu tambahan di kamar juga mungkin memerlukan biaya tambahan yang bervariasi tergantung pada kebijakan akomodasi\n", plusJakarta));
+        String termCondition =  messageSource.getMessage("invoice.term-condition-voucher",null,LocaleContextHolder.getLocale());
+        term.addCell(new Cell().add(termCondition + transactionDto.getDetail().get("hotel").get("name").asText()).setBorder(Border.NO_BORDER).setFontSize(7).setFont(plusJakarta));
+        String term1 =  messageSource.getMessage("invoice.term-1-voucher",null,LocaleContextHolder.getLocale());
+        term.addCell(stylePdfService.getSyaratKetentuan(term1, plusJakarta));
+        String term2 =  messageSource.getMessage("invoice.term-2-voucher",null,LocaleContextHolder.getLocale());
+        term.addCell(stylePdfService.getSyaratKetentuan(term2, plusJakarta));
+        String term3 =  messageSource.getMessage("invoice.term-3-voucher",null,LocaleContextHolder.getLocale());
+        term.addCell(stylePdfService.getSyaratKetentuan(term3, plusJakarta));
 
+        String condition =  messageSource.getMessage("invoice.condition-voucher",null,LocaleContextHolder.getLocale());
+        term.addCell(stylePdfService.getSyaratKetentuan(condition, plusJakarta));
+        String condition1 =  messageSource.getMessage("invoice.condition-1-voucher",null,LocaleContextHolder.getLocale());
+        term.addCell(stylePdfService.getSyaratKetentuan( condition1, plusJakarta));
+        String condition2 =  messageSource.getMessage("invoice.condition-2-voucher",null,LocaleContextHolder.getLocale());
+        term.addCell(stylePdfService.getSyaratKetentuan(condition2, plusJakarta));
 
         document.add(stylePdfService.brokeLineEvoucher(pdfDocument));
         document.add(term);
