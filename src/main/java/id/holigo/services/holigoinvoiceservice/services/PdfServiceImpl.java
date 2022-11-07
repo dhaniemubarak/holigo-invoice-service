@@ -21,7 +21,6 @@ import com.lowagie.text.pdf.ColumnText;
 import com.lowagie.text.pdf.PdfContentByte;
 import com.lowagie.text.pdf.PdfWriter;
 import java.awt.Color;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Service;
@@ -32,10 +31,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 @Service
 public class PdfServiceImpl implements PdfService {
-
-        @Autowired
         private final MessageSource messageSource;
-
         public void export(HttpServletResponse response, TransactionDto transactionDto) throws DocumentException, IOException {
 
                 SimpleDateFormat sdf = new SimpleDateFormat("dd MMM yyyy HH:mm");
@@ -69,27 +65,15 @@ public class PdfServiceImpl implements PdfService {
                 int startingPoint = 620;
                 int endingPoint = 340;
                 switch (transactionDto.getTransactionType()) {
-                        case "PUL":
+                        case "PUL", "PR", "PD" -> {
                                 titleLbl = messageSource.getMessage("invoice.prepaid-pulsa", null,
-                                                LocaleContextHolder.getLocale());
+                                        LocaleContextHolder.getLocale());
                                 getFareText += getPrice(transactionDto.getFareAmount());
                                 getTotalFareText += getPrice(transactionDto.getFareAmount());
-                                break;
-                        case "PR":
-                                titleLbl = messageSource.getMessage("invoice.prepaid-pulsa", null,
-                                                LocaleContextHolder.getLocale());
-                                getFareText += getPrice(transactionDto.getFareAmount());
-                                getTotalFareText += getPrice(transactionDto.getFareAmount());
-                                break;
-                        case "PD":
-                                titleLbl = messageSource.getMessage("invoice.prepaid-pulsa", null,
-                                                LocaleContextHolder.getLocale());
-                                getFareText += getPrice(transactionDto.getFareAmount());
-                                getTotalFareText += getPrice(transactionDto.getFareAmount());
-                                break;
-                        case "PRA":
+                        }
+                        case "PRA" -> {
                                 titleLbl = messageSource.getMessage("invoice.prepaid-electricity", null,
-                                                LocaleContextHolder.getLocale());
+                                        LocaleContextHolder.getLocale());
                                 serialNumberLbl = "invoice.token-number";
                                 customerNumberLbl = "invoice.customer-number";
                                 fareLbl = "invoice.kwh";
@@ -99,53 +83,52 @@ public class PdfServiceImpl implements PdfService {
                                 getTotalFareText += getPrice(transactionDto.getFareAmount());
                                 startingPoint = 620;
                                 endingPoint = 260;
-                                break;
-                        case "PAS":
+                        }
+                        case "PAS" -> {
                                 titleLbl = messageSource.getMessage("invoice.prepaid-electricity", null,
-                                                LocaleContextHolder.getLocale());
+                                        LocaleContextHolder.getLocale());
                                 serialNumberText = transactionDto.getDetail().get("standMeter").asText();
                                 productText = transactionDto.getDetail().get("productName").asText();
                                 startingPoint = 620;
                                 endingPoint = 180;
                                 getFareText += getPrice(transactionDto.getFareAmount());
                                 getTotalFareText += getPrice(transactionDto.getFareAmount());
-                                break;
-                        case "CC":
+                        }
+                        case "CC" -> {
                                 titleLbl = messageSource.getMessage("invoice.postpaid-cc", null,
-                                                LocaleContextHolder.getLocale());
+                                        LocaleContextHolder.getLocale());
                                 serialNumberLbl = "invoice.reference";
                                 customerNumberLbl = "invoice.card-number";
                                 serialNumberText = transactionDto.getDetail().get("reference").asText();
                                 fareLbl = "invoice.admin-fee";
                                 getFareText += getPrice(BigDecimal
-                                                .valueOf(transactionDto.getDetail().get("adminAmount").asLong()));
+                                        .valueOf(transactionDto.getDetail().get("adminAmount").asLong()));
                                 getTotalFareText += getPrice(transactionDto.getFareAmount());
-                                break;
-                        case "DWAL":
+                        }
+                        case "DWAL" -> {
                                 titleLbl = messageSource.getMessage("invoice.digital-wallet", null,
-                                                LocaleContextHolder.getLocale());
+                                        LocaleContextHolder.getLocale());
                                 getFareText += getPrice(transactionDto.getFareAmount());
                                 getTotalFareText += getPrice(transactionDto.getFareAmount());
-                                break;
-                        case "EWAL":
+                        }
+                        case "EWAL" -> {
                                 titleLbl = messageSource.getMessage("invoice.ewallet", null,
-                                                LocaleContextHolder.getLocale());
+                                        LocaleContextHolder.getLocale());
                                 getFareText += getPrice(transactionDto.getFareAmount());
                                 getTotalFareText += getPrice(transactionDto.getFareAmount());
-                                break;
-                        case "GAME":
+                        }
+                        case "GAME" -> {
                                 titleLbl = messageSource.getMessage("invoice.prepaid-game", null,
-                                                LocaleContextHolder.getLocale());
+                                        LocaleContextHolder.getLocale());
                                 getFareText += getPrice(transactionDto.getFareAmount());
                                 getTotalFareText += getPrice(transactionDto.getFareAmount());
-                                break;
-                        default:
+                        }
+                        default -> {
                                 getFareText += getPrice(transactionDto.getFareAmount());
                                 getTotalFareText += getPrice(transactionDto.getFareAmount());
                                 serialNumberText = transactionDto.getDetail().get("serialNumber").asText();
                                 customerNumberLbl = "invoice.customer-number";
-                                break;
-
+                        }
                 }
 
                 Document document = new Document(PageSize.A4);
@@ -250,64 +233,62 @@ public class PdfServiceImpl implements PdfService {
                                                 + "\n",
                                 detailLbl));
                 switch (transactionDto.getTransactionType()) {
-                        case "PRA":
+                        case "PRA" -> {
                                 ct.addText(new Phrase(40,
-                                                messageSource.getMessage("invoice.customer-name", null,
-                                                                LocaleContextHolder.getLocale()) + "\n",
-                                                detailLbl));
+                                        messageSource.getMessage("invoice.customer-name", null,
+                                                LocaleContextHolder.getLocale()) + "\n",
+                                        detailLbl));
                                 ct.addText(new Phrase(40,
-                                                messageSource.getMessage("invoice.power-electricity", null,
-                                                                LocaleContextHolder.getLocale())
-                                                                + "\n",
-                                                detailLbl));
+                                        messageSource.getMessage("invoice.power-electricity", null,
+                                                LocaleContextHolder.getLocale())
+                                                + "\n",
+                                        detailLbl));
                                 ct.addText(new Phrase(40,
-                                                messageSource.getMessage(fareLbl, null, LocaleContextHolder.getLocale())
-                                                                + "\n",
-                                                detailLbl));
+                                        messageSource.getMessage(fareLbl, null, LocaleContextHolder.getLocale())
+                                                + "\n",
+                                        detailLbl));
                                 ct.addText(new Phrase(40,
-                                                messageSource.getMessage(serialNumberLbl, null,
-                                                                LocaleContextHolder.getLocale()) + "\n",
-                                                detailLbl));
-                                break;
-                        case "PAS":
+                                        messageSource.getMessage(serialNumberLbl, null,
+                                                LocaleContextHolder.getLocale()) + "\n",
+                                        detailLbl));
+                        }
+                        case "PAS" -> {
                                 ct.addText(new Phrase(40,
-                                                messageSource.getMessage("invoice.customer-name", null,
-                                                                LocaleContextHolder.getLocale()) + "\n",
-                                                detailLbl));
+                                        messageSource.getMessage("invoice.customer-name", null,
+                                                LocaleContextHolder.getLocale()) + "\n",
+                                        detailLbl));
                                 ct.addText(new Phrase(40,
-                                                messageSource.getMessage("invoice.power-electricity", null,
-                                                                LocaleContextHolder.getLocale())
-                                                                + "\n",
-                                                detailLbl));
+                                        messageSource.getMessage("invoice.power-electricity", null,
+                                                LocaleContextHolder.getLocale())
+                                                + "\n",
+                                        detailLbl));
                                 ct.addText(new Phrase(40,
-                                                messageSource.getMessage("invoice.period", null,
-                                                                LocaleContextHolder.getLocale()) + "\n",
-                                                detailLbl));
+                                        messageSource.getMessage("invoice.period", null,
+                                                LocaleContextHolder.getLocale()) + "\n",
+                                        detailLbl));
                                 ct.addText(new Phrase(40,
-                                                messageSource.getMessage("invoice.stand-meter", null,
-                                                                LocaleContextHolder.getLocale()) + "\n",
-                                                detailLbl));
+                                        messageSource.getMessage("invoice.stand-meter", null,
+                                                LocaleContextHolder.getLocale()) + "\n",
+                                        detailLbl));
                                 ct.addText(new Phrase(40,
-                                                messageSource.getMessage("invoice.bill-amount", null,
-                                                                LocaleContextHolder.getLocale()) + "\n",
-                                                detailLbl));
+                                        messageSource.getMessage("invoice.bill-amount", null,
+                                                LocaleContextHolder.getLocale()) + "\n",
+                                        detailLbl));
                                 ct.addText(new Phrase(40,
-                                                messageSource.getMessage("invoice.admin-fee", null,
-                                                                LocaleContextHolder.getLocale()) + "\n",
-                                                detailLbl));
-                                break;
-
-                        default:
+                                        messageSource.getMessage("invoice.admin-fee", null,
+                                                LocaleContextHolder.getLocale()) + "\n",
+                                        detailLbl));
+                        }
+                        default -> {
                                 ct.addText(new Phrase(40,
-                                                messageSource.getMessage(fareLbl, null, LocaleContextHolder.getLocale())
-                                                                + "\n",
-                                                detailLbl));
+                                        messageSource.getMessage(fareLbl, null, LocaleContextHolder.getLocale())
+                                                + "\n",
+                                        detailLbl));
                                 ct.addText(new Phrase(40,
-                                                messageSource.getMessage(serialNumberLbl, null,
-                                                                LocaleContextHolder.getLocale()) + "\n",
-                                                detailLbl));
-
-                                break;
+                                        messageSource.getMessage(serialNumberLbl, null,
+                                                LocaleContextHolder.getLocale()) + "\n",
+                                        detailLbl));
+                        }
                 }
 
                 ct.addText(new Phrase(40,
@@ -325,43 +306,43 @@ public class PdfServiceImpl implements PdfService {
                 ct.addText(new Phrase(40, customerNumberText + "\n", detailValue));
 
                 switch (transactionDto.getTransactionType()) {
-                        case "PRA":
+                        case "PRA" -> {
                                 ct.addText(new Phrase(40, getFareText + "\n", detailValue));
                                 ct.addText(new Phrase(40,
-                                                transactionDto.getDetail().get("tariffAdjustment").asText() + "\n",
-                                                detailValue));
+                                        transactionDto.getDetail().get("tariffAdjustment").asText() + "\n",
+                                        detailValue));
                                 ct.addText(new Phrase(40, transactionDto.getDetail().get("kwh").asText() + "\n",
-                                                detailValue));
+                                        detailValue));
                                 ct.addText(new Phrase(40, serialNumberText + "\n", detailValue));
-                                break;
-                        case "PAS":
+                        }
+                        case "PAS" -> {
                                 String rupiah = messageSource.getMessage("invoice.rupiah", null,
-                                                LocaleContextHolder.getLocale())
-                                                + " ";
+                                        LocaleContextHolder.getLocale())
+                                        + " ";
                                 ct.addText(new Phrase(40,
-                                                transactionDto.getDetail().get("customerName").asText() + "\n",
-                                                detailValue));
+                                        transactionDto.getDetail().get("customerName").asText() + "\n",
+                                        detailValue));
                                 ct.addText(new Phrase(40,
-                                                transactionDto.getDetail().get("tariffAdjustment").asText() + "\n",
-                                                detailValue));
+                                        transactionDto.getDetail().get("tariffAdjustment").asText() + "\n",
+                                        detailValue));
                                 ct.addText(new Phrase(40, transactionDto.getDetail().get("period").asText() + "\n",
-                                                detailValue));
+                                        detailValue));
                                 ct.addText(new Phrase(40, serialNumberText + "\n", detailValue));
                                 ct.addText(new Phrase(40, rupiah + getPrice(BigDecimal
-                                                .valueOf(Double.parseDouble((transactionDto.getDetail()
-                                                                .get("billAmount").asText()))))
-                                                + "\n",
-                                                detailValue));
+                                        .valueOf(Double.parseDouble((transactionDto.getDetail()
+                                                .get("billAmount").asText()))))
+                                        + "\n",
+                                        detailValue));
                                 ct.addText(new Phrase(40, rupiah + getPrice(BigDecimal
-                                                .valueOf(Double.parseDouble(transactionDto.getDetail()
-                                                                .get("adminAmount").asText())))
-                                                + "\n",
-                                                detailValue));
-                                break;
-                        default:
+                                        .valueOf(Double.parseDouble(transactionDto.getDetail()
+                                                .get("adminAmount").asText())))
+                                        + "\n",
+                                        detailValue));
+                        }
+                        default -> {
                                 ct.addText(new Phrase(40, getFareText + "\n", detailValue));
                                 ct.addText(new Phrase(40, serialNumberText + "\n", detailValue));
-                                break;
+                        }
                 }
 
                 ct.addText(new Phrase(40, infoText + "\n", detailValue));
@@ -417,60 +398,36 @@ public class PdfServiceImpl implements PdfService {
         private String getProduct(String indexProduct) {
                 String product = indexProduct.split("\\|")[1] + " " + indexProduct.split("\\|")[2];
                 if (product.length() > 30) {
-                        product.substring(0, 28);
+                        product = product.substring(0, 28);
                         product += product + "...";
                 }
                 return product;
         }
 
         private String getStatus(OrderStatusEnum status) {
-                String result = "";
-                switch (status) {
-                        case PROCESS_BOOK:
-                                result = messageSource.getMessage("invoice.status-process-book", null,
-                                                LocaleContextHolder.getLocale());
-                                break;
-                        case BOOKED:
-                                result = messageSource.getMessage("invoice.status-booked", null,
-                                                LocaleContextHolder.getLocale());
-                                break;
-                        case BOOK_FAILED:
-                                result = messageSource.getMessage("invoice.status-book-failed", null,
-                                                LocaleContextHolder.getLocale());
-                                break;
-                        case PROCESS_ISSUED:
-                                result = messageSource.getMessage("invoice.status-process-issued", null,
-                                                LocaleContextHolder.getLocale());
-                                break;
-                        case WAITING_ISSUED:
-                                result = messageSource.getMessage("invoice.status-waiting-issued", null,
-                                                LocaleContextHolder.getLocale());
-                                break;
-                        case ISSUED:
-                                result = messageSource.getMessage("invoice.status-issued", null,
-                                                LocaleContextHolder.getLocale());
-                                break;
-                        case RETRYING_ISSUED:
-                                result = messageSource.getMessage("invoice.status-retrying-issued", null,
-                                                LocaleContextHolder.getLocale());
-                                break;
-                        case ISSUED_FAILED:
-                                result = messageSource.getMessage("invoice.status-issued-failed", null,
-                                                LocaleContextHolder.getLocale());
-                                break;
-                        case ORDER_EXPIRED:
-                                result = messageSource.getMessage("invoice.status-order-expired", null,
-                                                LocaleContextHolder.getLocale());
-                                break;
-                        case ORDER_CANCELED:
-                                result = messageSource.getMessage("invoice.status-order-canceled", null,
-                                                LocaleContextHolder.getLocale());
-                                break;
-                        default:
-                                result = "";
-                                break;
-                }
-                return result;
+                return switch (status) {
+                        case PROCESS_BOOK -> messageSource.getMessage("invoice.status-process-book", null,
+                                LocaleContextHolder.getLocale());
+                        case BOOKED -> messageSource.getMessage("invoice.status-booked", null,
+                                LocaleContextHolder.getLocale());
+                        case BOOK_FAILED -> messageSource.getMessage("invoice.status-book-failed", null,
+                                LocaleContextHolder.getLocale());
+                        case PROCESS_ISSUED -> messageSource.getMessage("invoice.status-process-issued", null,
+                                LocaleContextHolder.getLocale());
+                        case WAITING_ISSUED -> messageSource.getMessage("invoice.status-waiting-issued", null,
+                                LocaleContextHolder.getLocale());
+                        case ISSUED -> messageSource.getMessage("invoice.status-issued", null,
+                                LocaleContextHolder.getLocale());
+                        case RETRYING_ISSUED -> messageSource.getMessage("invoice.status-retrying-issued", null,
+                                LocaleContextHolder.getLocale());
+                        case ISSUED_FAILED -> messageSource.getMessage("invoice.status-issued-failed", null,
+                                LocaleContextHolder.getLocale());
+                        case ORDER_EXPIRED -> messageSource.getMessage("invoice.status-order-expired", null,
+                                LocaleContextHolder.getLocale());
+                        case ORDER_CANCELED -> messageSource.getMessage("invoice.status-order-canceled", null,
+                                LocaleContextHolder.getLocale());
+                        default -> "";
+                };
         }
 
         private String getPrice(BigDecimal price) {
