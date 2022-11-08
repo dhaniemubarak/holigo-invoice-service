@@ -7,6 +7,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import com.lowagie.text.DocumentException;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -17,6 +18,7 @@ import id.holigo.services.holigoinvoiceservice.services.transaction.TransactionS
 import id.holigo.services.holigoinvoiceservice.web.model.TransactionDto;
 import lombok.RequiredArgsConstructor;
 
+@Slf4j
 @RequiredArgsConstructor
 @Controller
 public class InvoiceController {
@@ -38,9 +40,7 @@ public class InvoiceController {
     }
 
     @GetMapping("/web/v1/invoice/{id}")
-    public String getInvoice(@PathVariable("id") UUID id, Model model)
-            throws DocumentException, IOException {
-
+    public String getInvoice(@PathVariable("id") UUID id, Model model) {
         TransactionDto transactionDto = transactionService.getTransactionDetail(id);
         model.addAttribute("transactionDto", transactionDto);
         model.addAttribute("media", "screen");
@@ -48,12 +48,7 @@ public class InvoiceController {
     }
 
     private String getInvoice(TransactionDto transactionDto) {
-        String invoice;
-        switch (transactionDto.getTransactionType()) {
-            default:
-                invoice = "prepaid-postpaid-index";
-                break;
-        }
-        return invoice;
+        log.info("TransactionDto -> {}", transactionDto);
+        return "prepaid-postpaid-index";
     }
 }

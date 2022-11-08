@@ -13,7 +13,7 @@ import id.holigo.services.holigoinvoiceservice.web.model.TransactionDto;
 @FeignClient(name = "holigo-transaction-service")
 public interface TransactionServiceFeignClient {
 
-    public static final String TRANSACTION_DETAIL_BY_ID = "/api/v1/transactions/{id}";
+    String TRANSACTION_DETAIL_BY_ID = "/api/v1/transactions/{id}";
 
     @RequestMapping(method = RequestMethod.GET, value = TRANSACTION_DETAIL_BY_ID)
     ResponseEntity<TransactionDto> getTransactionDetail(@PathVariable UUID id);
