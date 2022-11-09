@@ -119,7 +119,6 @@ public class StylePdfService {
         return df.format(price);
     }
 
-
     public Cell smallSpaceInColumn() {
         return new Cell().add("")
                 .setBorder(Border.NO_BORDER)
@@ -336,5 +335,12 @@ public class StylePdfService {
         return footerTbl;
     }
 
+    public Cell disclaimer(String text,PdfFont pdfFont){
+        return new Cell().add(text)
+                .setBorder(Border.NO_BORDER)
+                .setFont(pdfFont)
+                .setFontSize(10)
+                .setFontColor(new DeviceRgb(97,97,97));
+    }
 
 }

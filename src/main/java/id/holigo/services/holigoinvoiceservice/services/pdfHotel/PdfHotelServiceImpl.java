@@ -88,7 +88,6 @@ public class PdfHotelServiceImpl implements PdfHotelService {
         Image phoneImg = new Image(phoneData).scaleAbsolute(9, 8);
 
 //        Size Table Declarartion
-
         float col = 200f;
         float colHalf = 100f;
         float[] twoCol = {350f, 200f};
@@ -99,7 +98,6 @@ public class PdfHotelServiceImpl implements PdfHotelService {
         document.add(stylePdfService.headerTitle(plusJakarta, imageLogo, title, subTitle));
 
         //--> ID TRANSAKSI
-
         String transactionId = messageSource.getMessage("invoice.id-transaksi", null, LocaleContextHolder.getLocale());
         document.add(stylePdfService.transaksiId(transactionId, plusJakarta, transactionDto));
         document.add(stylePdfService.oneLine(pdfDocument));

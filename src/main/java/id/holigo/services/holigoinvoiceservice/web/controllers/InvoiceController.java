@@ -23,7 +23,6 @@ public class InvoiceController {
 
     @RequestMapping(name = "/web/v1/invoice/{id}", method = RequestMethod.GET)
     public String getInvoice(@PathVariable("id") UUID id, Model model) {
-
         TransactionDto transactionDto = transactionService.getTransactionDetail(id);
         model.addAttribute("transactionDto", transactionDto);
         model.addAttribute("media", "screen");
