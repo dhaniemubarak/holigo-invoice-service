@@ -90,6 +90,14 @@ public class StylePdfService {
                 .setFont(plusJakarta)
                 .setFontColor(new DeviceRgb(97, 97, 97));
     }
+    public Cell getDetailProdukOutputPricing(String text, PdfFont plusJakarta) {
+        return new Cell().add(text)
+                .setBorder(Border.NO_BORDER)
+                .setFontSize(11)
+                .setTextAlignment(TextAlignment.RIGHT)
+                .setFont(plusJakarta)
+                .setFontColor(new DeviceRgb(97, 97, 97));
+    }
 
     public Paragraph spaceInColumn() {
         return new Paragraph("\n");
