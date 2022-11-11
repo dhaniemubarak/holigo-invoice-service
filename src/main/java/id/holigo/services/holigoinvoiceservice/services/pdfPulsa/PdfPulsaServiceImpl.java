@@ -201,7 +201,8 @@ public class PdfPulsaServiceImpl implements PdfPulsaService {
         Table deskripsiProduk = new Table(new float[]{150f});
         double adminAmount = 0;
         double discount = transactionDto.getDiscountAmount().doubleValue();
-        double fareAmount;
+        double serviceFeeAmoung = transactionDto.getPayment().getServiceFeeAmount().doubleValue();
+        double billAmount = transactionDto.getDetail().get("billAmount").doubleValue();
 
         int count = 1; //dummy
         detailProdukTbl.addCell(stylePdfService.getDetailProdukOutput("" + count, plusJakarta)); //col 1
@@ -211,9 +212,6 @@ public class PdfPulsaServiceImpl implements PdfPulsaService {
         detailProdukTbl.addCell(stylePdfService.getDetailProdukOutput(produkName + " " + produkName2, plusJakarta)); //col 3
         detailProdukTbl.addCell(stylePdfService.getDetailProdukOutput("1", plusJakarta).setTextAlignment(TextAlignment.CENTER)); // col 4
         detailProdukTbl.addCell(stylePdfService.getDetailProdukOutput("Rp " + stylePdfService.getPrice(transactionDto.getFareAmount().floatValue()) + ",- ", plusJakarta)); // col5
-
-        String fareAmountStr = transactionDto.getFareAmount().toString();
-        fareAmount = Float.parseFloat(fareAmountStr);
 
         // pricing on produk
         if (transactionDto.getDetail().get("adminAmount") != null) {
@@ -232,14 +230,12 @@ public class PdfPulsaServiceImpl implements PdfPulsaService {
 
         document.add(detailProdukTbl);
         document.add(stylePdfService.brokeLine(pdfDocument));
-
-
 //        Bill / Price / harga
         Table priceTable = new Table(twoCol);
         Table nestedPrice = new Table(new float[]{col / 2, col - 50});
         Table bungkusNestedPrice = new Table(new float[]{250});
         nestedPrice.addCell(stylePdfService.getHeaderTextCell("Sub Total", plusJakarta));
-        nestedPrice.addCell(stylePdfService.getDetailProdukOutputPricing("Rp " + stylePdfService.getPrice(fareAmount) + ",-", plusJakarta));
+        nestedPrice.addCell(stylePdfService.getDetailProdukOutputPricing("Rp " + stylePdfService.getPrice(billAmount) + ",-", plusJakarta));
         //kalau tidak ada admin amount, teks biaya jasa hilang
         if (transactionDto.getDiscountAmount() != null && transactionDto.getAdminAmount().doubleValue() > 0) {
             String biayaJasa = messageSource.getMessage("invoice.generic-admin-amount", null, LocaleContextHolder.getLocale());
@@ -267,10 +263,18 @@ public class PdfPulsaServiceImpl implements PdfPulsaService {
             nestedPrice.addCell(stylePdfService.getHeaderTextCell(" ", plusJakarta));
             nestedPrice.addCell(stylePdfService.getDetailProdukOutput(" ", plusJakarta));
         }
+        //kalau tidak ada service amount, teks service amount hilang
+        if (transactionDto.getPayment().getServiceFeeAmount() != null && transactionDto.getPayment().getServiceFeeAmount().doubleValue() > 0) {
+            String serviceAmount = messageSource.getMessage("invoice.generic-biaya-layanan",null,LocaleContextHolder.getLocale());
+            nestedPrice.addCell(stylePdfService.getHeaderTextCell(serviceAmount, plusJakarta));
+            nestedPrice.addCell(stylePdfService.getDetailProdukOutput("Rp " + stylePdfService.getPrice(serviceFeeAmoung) + ",-", plusJakarta));
+        } else {
+            nestedPrice.addCell(stylePdfService.getHeaderTextCell(" ", plusJakarta));
+            nestedPrice.addCell(stylePdfService.getDetailProdukOutput(" ", plusJakarta));
+        }
 
         bungkusNestedPrice.addCell(new Cell().add(nestedPrice).setBorder(Border.NO_BORDER));
-        double billAmount = transactionDto.getDetail().get("billAmount").doubleValue();
-        double serviceFeeAmoung = transactionDto.getPayment().getServiceFeeAmount().doubleValue();
+        //final price
         double finalPrice = billAmount + adminAmount + serviceFeeAmoung - discount;
         bungkusNestedPrice.addCell(new Cell().add("- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -").setBold().setBorder(Border.NO_BORDER));
         Table totalTable = new Table(new float[]{100, 150});
