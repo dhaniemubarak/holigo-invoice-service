@@ -44,7 +44,7 @@ public class PdfPulsaServiceImpl implements PdfPulsaService {
     private final MessageSource messageSource;
 
     @Override
-    public void invoicePulsa(TransactionDto transactionDto, HttpServletResponse response, StylePdfService stylePdfService) throws MalformedURLException {
+    public void invoicePulsa(TransactionDto transactionDto, HttpServletResponse response, StylePdfService stylePdfService, String type) throws MalformedURLException {
         //starter pack
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         PdfDocument pdfDocument = new PdfDocument(new PdfWriter(baos));
@@ -77,10 +77,21 @@ public class PdfPulsaServiceImpl implements PdfPulsaService {
 //        Size Table Declarartion
         float col = 200f;
         float colHalf = 100f;
-        float[] twoCol = {350f, 200f};
+        float[] twoCol = {300f, 250f};
         // - - - - - HEADER  - - - - -
         String title = messageSource.getMessage("invoice.generic-title", null, LocaleContextHolder.getLocale());
-        String subTitle = messageSource.getMessage("invoice.subtitle-pulsa", null, LocaleContextHolder.getLocale());
+        String subTitle = "";
+        switch (type) {
+            case "PUL" -> {
+                subTitle = messageSource.getMessage("invoice.subtitle-pulsa", null, LocaleContextHolder.getLocale());
+            }
+            case "PD" -> {
+                subTitle = messageSource.getMessage("invoice.subtitle-paket-data", null, LocaleContextHolder.getLocale());
+            }
+            case "PR" -> {
+                subTitle = messageSource.getMessage("invoice.subtitle-paket-roaming", null, LocaleContextHolder.getLocale());
+            }
+        }
         document.add(stylePdfService.headerTitle(plusJakarta, imageLogo, title, subTitle));
 
         //--> ID TRANSAKSI
@@ -93,7 +104,7 @@ public class PdfPulsaServiceImpl implements PdfPulsaService {
         disclaimer.addCell(new Cell().add("").setHeight(3).setBorder(Border.NO_BORDER));
         disclaimer.addCell(new Cell().add("").setHeight(3).setBorder(Border.NO_BORDER));
         String disclaimerContain = messageSource.getMessage("invoice.generic-disclaimer", null, LocaleContextHolder.getLocale());
-        disclaimer.addCell(stylePdfService.disclaimer(disclaimerContain,plusJakarta));
+        disclaimer.addCell(stylePdfService.disclaimer(disclaimerContain, plusJakarta));
         document.add(disclaimer);
 
         Table invoiceNumber = new Table(new float[]{165});
@@ -197,7 +208,7 @@ public class PdfPulsaServiceImpl implements PdfPulsaService {
         detailProdukTbl.addCell(stylePdfService.getDetailProdukOutput(transactionDto.getDetail().get("serviceName").asText(), plusJakarta)); //col 2
         String produkName = transactionDto.getDetail().get("productName").asText();
         String produkName2 = transactionDto.getDetail().get("nominalName").asText();
-        detailProdukTbl.addCell(stylePdfService.getDetailProdukOutput(produkName+" "+produkName2, plusJakarta)); //col 3
+        detailProdukTbl.addCell(stylePdfService.getDetailProdukOutput(produkName + " " + produkName2, plusJakarta)); //col 3
         detailProdukTbl.addCell(stylePdfService.getDetailProdukOutput("1", plusJakarta).setTextAlignment(TextAlignment.CENTER)); // col 4
         detailProdukTbl.addCell(stylePdfService.getDetailProdukOutput("Rp " + stylePdfService.getPrice(transactionDto.getFareAmount().floatValue()) + ",- ", plusJakarta)); // col5
 
@@ -228,21 +239,40 @@ public class PdfPulsaServiceImpl implements PdfPulsaService {
         Table nestedPrice = new Table(new float[]{col / 2, col - 50});
         Table bungkusNestedPrice = new Table(new float[]{250});
         nestedPrice.addCell(stylePdfService.getHeaderTextCell("Sub Total", plusJakarta));
-
-        nestedPrice.addCell(stylePdfService.getDetailProdukOutput("Rp " + stylePdfService.getPrice(fareAmount) + ",-", plusJakarta));
-
-        //kalau tidak ada discount teks discount hilang
-        if (transactionDto.getDiscountAmount() != null && transactionDto.getDiscountAmount().doubleValue() > 0) {
-            String discountStr = messageSource.getMessage("invoice.generic-discount",null,LocaleContextHolder.getLocale());
-            nestedPrice.addCell(stylePdfService.getHeaderTextCell(discountStr, plusJakarta));
-            nestedPrice.addCell(stylePdfService.getDetailProdukOutput("Rp - " + stylePdfService.getPrice(discount) + ",-", plusJakarta));
+        nestedPrice.addCell(stylePdfService.getDetailProdukOutputPricing("Rp " + stylePdfService.getPrice(fareAmount) + ",-", plusJakarta));
+        //kalau tidak ada admin amount, teks biaya jasa hilang
+        if (transactionDto.getDiscountAmount() != null && transactionDto.getAdminAmount().doubleValue() > 0) {
+            String biayaJasa = messageSource.getMessage("invoice.generic-admin-amount", null, LocaleContextHolder.getLocale());
+            nestedPrice.addCell(stylePdfService.getHeaderTextCell(biayaJasa, plusJakarta));
+            nestedPrice.addCell(stylePdfService.getDetailProdukOutputPricing("Rp " + stylePdfService.getPrice(adminAmount) + ",-", plusJakarta));
         } else {
             nestedPrice.addCell(stylePdfService.getHeaderTextCell(" ", plusJakarta));
             nestedPrice.addCell(stylePdfService.getDetailProdukOutput(" ", plusJakarta));
         }
+        //kalau tidak ada biaya layanan, teks biaya layanan hilang
+        if (transactionDto.getDiscountAmount() != null && transactionDto.getPayment().getServiceFeeAmount().doubleValue() > 0) {
+            String biayaLayanan = messageSource.getMessage("invoice.generic-biaya-layanan", null, LocaleContextHolder.getLocale());
+            nestedPrice.addCell(stylePdfService.getHeaderTextCell(biayaLayanan, plusJakarta));
+            nestedPrice.addCell(stylePdfService.getDetailProdukOutputPricing("Rp " + stylePdfService.getPrice(transactionDto.getPayment().getServiceFeeAmount().doubleValue()) + ",-", plusJakarta));
+        } else {
+            nestedPrice.addCell(stylePdfService.getHeaderTextCell(" ", plusJakarta));
+            nestedPrice.addCell(stylePdfService.getDetailProdukOutput(" ", plusJakarta));
+        }
+        //kalau tidak ada discount teks discount hilang
+        if (transactionDto.getDiscountAmount() != null && transactionDto.getDiscountAmount().doubleValue() > 0) {
+            String discountStr = messageSource.getMessage("invoice.generic-discount", null, LocaleContextHolder.getLocale());
+            nestedPrice.addCell(stylePdfService.getHeaderTextCell(discountStr, plusJakarta));
+            nestedPrice.addCell(stylePdfService.getDetailProdukOutputPricing("Rp -" + stylePdfService.getPrice(discount) + ",-", plusJakarta));
+        } else {
+            nestedPrice.addCell(stylePdfService.getHeaderTextCell(" ", plusJakarta));
+            nestedPrice.addCell(stylePdfService.getDetailProdukOutput(" ", plusJakarta));
+        }
+
         bungkusNestedPrice.addCell(new Cell().add(nestedPrice).setBorder(Border.NO_BORDER));
-        double finalPrice = fareAmount + adminAmount - discount;
-        bungkusNestedPrice.addCell(new Cell().add(" - - - - - - - - - - - - - - - - - - - - - - - -").setBold().setBorder(Border.NO_BORDER));
+        double billAmount = transactionDto.getDetail().get("billAmount").doubleValue();
+        double serviceFeeAmoung = transactionDto.getPayment().getServiceFeeAmount().doubleValue();
+        double finalPrice = billAmount + adminAmount + serviceFeeAmoung - discount;
+        bungkusNestedPrice.addCell(new Cell().add("- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -").setBold().setBorder(Border.NO_BORDER));
         Table totalTable = new Table(new float[]{100, 150});
         totalTable.addCell(stylePdfService.getHeaderTextCell("Total", plusJakarta));
         totalTable.addCell(new Cell().add("Rp " + stylePdfService.getPrice(finalPrice) + ",-")

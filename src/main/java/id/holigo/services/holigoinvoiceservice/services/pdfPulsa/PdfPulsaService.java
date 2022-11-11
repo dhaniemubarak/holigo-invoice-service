@@ -7,6 +7,6 @@ import javax.servlet.http.HttpServletResponse;
 import java.net.MalformedURLException;
 
 public interface PdfPulsaService {
-    void invoicePulsa(TransactionDto transactionDto, HttpServletResponse response, StylePdfService stylePdfService) throws MalformedURLException;
+    void invoicePulsa(TransactionDto transactionDto, HttpServletResponse response, StylePdfService stylePdfService, String type) throws MalformedURLException;
 
 }

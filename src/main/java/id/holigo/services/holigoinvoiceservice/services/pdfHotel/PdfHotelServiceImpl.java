@@ -90,7 +90,7 @@ public class PdfHotelServiceImpl implements PdfHotelService {
 //        Size Table Declarartion
         float col = 200f;
         float colHalf = 100f;
-        float[] twoCol = {350f, 200f};
+        float[] twoCol = {300f, 250f};
 
         // - - - - - HEADER  - - - - -
         String title = messageSource.getMessage("invoice.title-ereceipt", null, LocaleContextHolder.getLocale());
@@ -266,7 +266,8 @@ public class PdfHotelServiceImpl implements PdfHotelService {
 
 //        Bill / Price / harga
         Table priceTable = new Table(twoCol);
-        Table nestedPrice = new Table(new float[]{col / 2, col - 50});
+        Table nestedPrice = new Table(new float[]{100, 150});
+        Table bungkusNestedPrice = new Table(new float[]{250});
         nestedPrice.addCell(stylePdfService.getHeaderTextCell("Sub Total", plusJakarta));
 
         nestedPrice.addCell(stylePdfService.getDetailProdukOutput("Rp " + stylePdfService.getPrice(fareAmount) + ",-", plusJakarta));
@@ -281,11 +282,13 @@ public class PdfHotelServiceImpl implements PdfHotelService {
             nestedPrice.addCell(stylePdfService.getHeaderTextCell(" ", plusJakarta));
             nestedPrice.addCell(stylePdfService.getDetailProdukOutput(" ", plusJakarta));
         }
+        bungkusNestedPrice.addCell(new Cell().add(nestedPrice).setBorder(Border.NO_BORDER));
+
         double finalPrice = fareAmount + adminAmount - discount;
-        nestedPrice.addCell(stylePdfService.getDetailProdukOutput("- - - - - - - - - ", plusJakarta).setBold());
-        nestedPrice.addCell(stylePdfService.getDetailProdukOutput(" - - - - - - - - - - - - - - - - -", plusJakarta).setPaddingLeft(-25f).setBold());
-        nestedPrice.addCell(stylePdfService.getHeaderTextCell("Total", plusJakarta));
-        nestedPrice.addCell(new Cell().add("Rp " + stylePdfService.getPrice(finalPrice) + ",-")
+        bungkusNestedPrice.addCell(new Cell().add("- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -").setBold().setBorder(Border.NO_BORDER));
+        Table totalTable = new Table(new float[]{100, 150});
+        totalTable.addCell(stylePdfService.getHeaderTextCell("Total", plusJakarta));
+        totalTable.addCell(new Cell().add("Rp " + stylePdfService.getPrice(finalPrice) + ",-")
                 .setPaddings(0, 5, 0, 5)
                 .setBackgroundColor(new DeviceRgb(209, 244, 206))
                 .setTextAlignment(TextAlignment.CENTER)
@@ -294,13 +297,28 @@ public class PdfHotelServiceImpl implements PdfHotelService {
                 .setBorder(Border.NO_BORDER)
                 .setFontColor(Color.BLACK));
 
+        bungkusNestedPrice.addCell(new Cell().add(totalTable).setBorder(Border.NO_BORDER));
+//        nestedPrice.addCell(stylePdfService.getDetailProdukOutput("- - - - - - - - - ", plusJakarta).setBold());
+//        nestedPrice.addCell(stylePdfService.getDetailProdukOutput(" - - - - - - - - - - - - - - - - -", plusJakarta).setPaddingLeft(-25f).setBold());
+//        nestedPrice.addCell(stylePdfService.getHeaderTextCell("Total", plusJakarta));
+//        nestedPrice.addCell(new Cell().add("Rp " + stylePdfService.getPrice(finalPrice) + ",-")
+//                .setPaddings(0, 5, 0, 5)
+//                .setBackgroundColor(new DeviceRgb(209, 244, 206))
+//                .setTextAlignment(TextAlignment.CENTER)
+//                .setFont(plusJakarta)
+//                .setFontSize(12)
+//                .setBorder(Border.NO_BORDER)
+//                .setFontColor(Color.BLACK));
+
 //        Paid Logo, logo position
         if (statusPayment) {
             priceTable.addCell(new Cell().add(imagePaid).setPaddings(10, 0, 0, 100).setBorder(Border.NO_BORDER));
         } else {
             priceTable.addCell(new Cell().add("").setPaddings(10, 0, 0, 100).setBorder(Border.NO_BORDER));
         }
-        priceTable.addCell(new Cell().add(nestedPrice).setBorder(Border.NO_BORDER));
+//        priceTable.addCell(new Cell().add(nestedPrice).setBorder(Border.NO_BORDER));
+        priceTable.addCell(new Cell().add(bungkusNestedPrice).setBorder(Border.NO_BORDER));
+
         priceTable.setTextAlignment(TextAlignment.CENTER);
 
         document.add(priceTable);
