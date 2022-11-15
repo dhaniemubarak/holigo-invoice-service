@@ -1,4 +1,4 @@
-package id.holigo.services.holigoinvoiceservice.services.pdfPln;
+package id.holigo.services.holigoinvoiceservice.services.pdfPDAM;
 
 import com.itextpdf.io.image.ImageData;
 import com.itextpdf.io.image.ImageDataFactory;
@@ -32,19 +32,19 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.net.MalformedURLException;
 import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class PLnPostServiceImpl implements PlnPostService {
-
+public class PdamServceImpl implements PdamServce {
     @Autowired
     private final MessageSource messageSource;
 
     @Override
-    public void invoicePLNPost(TransactionDto transactionDto, HttpServletResponse response, StylePdfService stylePdfService) throws MalformedURLException {
+    public void invoicePDAM(TransactionDto transactionDto, HttpServletResponse response, StylePdfService stylePdfService) throws MalformedURLException {
         //starter pack
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         PdfDocument pdfDocument = new PdfDocument(new PdfWriter(baos));
@@ -79,7 +79,7 @@ public class PLnPostServiceImpl implements PlnPostService {
 
         // - - - - - HEADER  - - - - -
         String title = messageSource.getMessage("invoice.generic-title", null, LocaleContextHolder.getLocale());
-        String subTitle = messageSource.getMessage("invoice.plnpost-subtitle", null, LocaleContextHolder.getLocale());
+        String subTitle = messageSource.getMessage("invoice.pam-subtitle", null, LocaleContextHolder.getLocale());
         document.add(stylePdfService.headerTitle(plusJakarta, imageLogo, title, subTitle));
         //--> ID TRANSAKSI
         String transactionId = messageSource.getMessage("invoice.id-transaksi", null, LocaleContextHolder.getLocale());
@@ -110,40 +110,48 @@ public class PLnPostServiceImpl implements PlnPostService {
         tblDetailPemesanan.addCell(stylePdfService.getTextDetail(namaCustomer, plusJakarta)); //col 1
         tblDetailPemesanan.addCell(stylePdfService.getTextDetail("", plusJakarta));
 
-        String meterNumber = messageSource.getMessage("invoice.plnpost-meterNumber", null, LocaleContextHolder.getLocale());
+        String meterNumber = messageSource.getMessage("invoice.generic-nomor-pelanggan", null, LocaleContextHolder.getLocale());
         tblDetailPemesanan.addCell(stylePdfService.getTextDetail(meterNumber, plusJakarta)); //col 2
         tblDetailPemesanan.addCell(stylePdfService.getTextDetail("", plusJakarta));
 
-        String idPelanggan = messageSource.getMessage("invoice.generic-id-pelanggan", null, LocaleContextHolder.getLocale());
+        String idPelanggan = messageSource.getMessage("invoice.pam-biller", null, LocaleContextHolder.getLocale());
         tblDetailPemesanan.addCell(stylePdfService.getTextDetail(idPelanggan, plusJakarta)); //col 3
         // pemesanan output
         tblDetailPemesanan.addCell(stylePdfService.getDetailUserBold(transactionDto.getDetail().get("customerName").asText(), plusJakartaDisplayBold)); //col 1
         tblDetailPemesanan.addCell(stylePdfService.getTextDetail("", plusJakarta));
         tblDetailPemesanan.addCell(stylePdfService.getDetailUserBold(transactionDto.getDetail().get("standMeter").asText(), plusJakartaDisplayBold)); //col 2
         tblDetailPemesanan.addCell(stylePdfService.getTextDetail("", plusJakarta));
-        tblDetailPemesanan.addCell(stylePdfService.getDetailUserBold(transactionDto.getDetail().get("customerNumber").asText(), plusJakartaDisplayBold)); //col 3
+        tblDetailPemesanan.addCell(stylePdfService.getDetailUserBold(transactionDto.getDetail().get("productName").asText(), plusJakartaDisplayBold)); //col 3
 
         // PART 2 nama detail pemesanan
-        String reference = messageSource.getMessage("invoice.generic-reference", null, LocaleContextHolder.getLocale());
-        tblDetailPemesanan.addCell(stylePdfService.getTextDetail(reference, plusJakarta)); //col 1
-        tblDetailPemesanan.addCell(stylePdfService.getTextDetail("", plusJakarta));
+        Table tblDetailPemesanan2 = new Table(new float[]{150, 30, 150});
+        tblDetailPemesanan2.setMarginLeft(8);
 
-        String rate = messageSource.getMessage("invoice.generic-rate", null, LocaleContextHolder.getLocale());
-        tblDetailPemesanan.addCell(stylePdfService.getTextDetail(rate, plusJakarta)); //col 2
-        tblDetailPemesanan.addCell(stylePdfService.getTextDetail("", plusJakarta));
+        String reference = messageSource.getMessage("invoice.stand-meter", null, LocaleContextHolder.getLocale());
+        tblDetailPemesanan2.addCell(stylePdfService.getTextDetail(reference, plusJakarta)); //col 1
+        tblDetailPemesanan2.addCell(stylePdfService.getTextDetail("", plusJakarta));
 
-        tblDetailPemesanan.addCell(stylePdfService.getTextDetail("", plusJakarta));
-        // pemesanan output
-        tblDetailPemesanan.addCell(stylePdfService.getDetailUserBold(transactionDto.getDetail().get("reference").asText(), plusJakartaDisplayBold)); //col 1
-        tblDetailPemesanan.addCell(stylePdfService.getTextDetail("", plusJakarta));
-        tblDetailPemesanan.addCell(stylePdfService.getDetailUserBold(transactionDto.getDetail().get("tariffAdjustment").asText(), plusJakartaDisplayBold)); //col 2
-        tblDetailPemesanan.addCell(stylePdfService.getTextDetail("", plusJakarta));
+        String periode = messageSource.getMessage("invoice.generic-period", null, LocaleContextHolder.getLocale());
+        tblDetailPemesanan2.addCell(stylePdfService.getTextDetail(periode, plusJakarta)); //col 2
 
-        tblDetailPemesanan.addCell(stylePdfService.getTextDetail("", plusJakarta));
+        // OUTPUT PART 2
+        tblDetailPemesanan2.addCell(stylePdfService.getDetailUserBold(transactionDto.getDetail().get("standMeter").asText(), plusJakartaDisplayBold)); //col 1
+        tblDetailPemesanan2.addCell(stylePdfService.getTextDetail("", plusJakarta));
+        //disini
+        DateFormat inputDatePeriode = new SimpleDateFormat("yyyyMM");
+        DateFormat outputDatePeriode = new SimpleDateFormat("MMMM yyyy");
+        Date periodeDate;
+        try {
+            periodeDate = inputDatePeriode.parse(transactionDto.getDetail().get("period").asText());
+        } catch (ParseException e) {
+            throw new RuntimeException(e);
+        }
+        tblDetailPemesanan2.addCell(stylePdfService.getDetailUserBold(outputDatePeriode.format(periodeDate), plusJakartaDisplayBold)); //col 2
 
         document.add(stylePdfService.smallSpace(pdfDocument));
         document.add(detailPemesananHead);
         document.add(tblDetailPemesanan);
+        document.add(tblDetailPemesanan2);
 
 
         //        Detail Pembayaran output
@@ -216,8 +224,8 @@ public class PLnPostServiceImpl implements PlnPostService {
         double serviceFeeAmoung = transactionDto.getPayment().getServiceFeeAmount().doubleValue();
         int count = 1; //dummy
         detailProdukTbl.addCell(stylePdfService.getDetailProdukOutput("" + count, plusJakarta)); //col 1
-        detailProdukTbl.addCell(stylePdfService.getDetailProdukOutput(transactionDto.getDetail().get("productName").asText(), plusJakarta)); //col 2
-        String produkName = transactionDto.getDetail().get("serviceName").asText();
+        detailProdukTbl.addCell(stylePdfService.getDetailProdukOutput(transactionDto.getDetail().get("serviceName").asText(), plusJakarta)); //col 2
+        String produkName = transactionDto.getDetail().get("productName").asText();
         detailProdukTbl.addCell(stylePdfService.getDetailProdukOutput(produkName, plusJakarta)); //col 3
 //        detailProdukTbl.addCell(stylePdfService.getDetailProdukOutput("1", plusJakarta).setTextAlignment(TextAlignment.CENTER)); // col 4
         double billAmount = transactionDto.getDetail().get("billAmount").doubleValue();// col5

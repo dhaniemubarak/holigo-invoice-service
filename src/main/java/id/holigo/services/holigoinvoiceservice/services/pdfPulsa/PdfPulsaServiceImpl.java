@@ -91,6 +91,9 @@ public class PdfPulsaServiceImpl implements PdfPulsaService {
             case "PR" -> {
                 subTitle = messageSource.getMessage("invoice.subtitle-paket-roaming", null, LocaleContextHolder.getLocale());
             }
+            case "GAME" -> {
+                subTitle = messageSource.getMessage("invoice.subtitle-game", null, LocaleContextHolder.getLocale());
+            }
         }
         document.add(stylePdfService.headerTitle(plusJakarta, imageLogo, title, subTitle));
 
@@ -120,7 +123,15 @@ public class PdfPulsaServiceImpl implements PdfPulsaService {
         Table tblDetailPemesanan = new Table(new float[]{150});
         tblDetailPemesanan.setMarginLeft(8);
         // nomor telpon detail pemesanan
-        String phoneNumber = messageSource.getMessage("invoice.phone-number", null, LocaleContextHolder.getLocale());
+        String phoneNumber = "";
+        switch (type) {
+            case "PUL", "PD", "PR" -> {
+                phoneNumber = messageSource.getMessage("invoice.phone-number", null, LocaleContextHolder.getLocale());
+            }
+            case "GAME" -> {
+                phoneNumber = messageSource.getMessage("invoice.game-id", null, LocaleContextHolder.getLocale());
+            }
+        }
         tblDetailPemesanan.addCell(stylePdfService.getTextDetail(phoneNumber, plusJakarta));
 
         tblDetailPemesanan.addCell(stylePdfService.getDetailUserBold(
@@ -265,7 +276,7 @@ public class PdfPulsaServiceImpl implements PdfPulsaService {
         }
         //kalau tidak ada service amount, teks service amount hilang
         if (transactionDto.getPayment().getServiceFeeAmount() != null && transactionDto.getPayment().getServiceFeeAmount().doubleValue() > 0) {
-            String serviceAmount = messageSource.getMessage("invoice.generic-biaya-layanan",null,LocaleContextHolder.getLocale());
+            String serviceAmount = messageSource.getMessage("invoice.generic-biaya-layanan", null, LocaleContextHolder.getLocale());
             nestedPrice.addCell(stylePdfService.getHeaderTextCell(serviceAmount, plusJakarta));
             nestedPrice.addCell(stylePdfService.getDetailProdukOutput("Rp " + stylePdfService.getPrice(serviceFeeAmoung) + ",-", plusJakarta));
         } else {

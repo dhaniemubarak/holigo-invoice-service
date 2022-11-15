@@ -40,7 +40,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Locale;
 
 @Service
 @RequiredArgsConstructor
@@ -464,19 +463,19 @@ public class PdfHotelServiceImpl implements PdfHotelService {
         helpTbl.addCell(new Cell().add(ticketHelpImg).setBorder(Border.NO_BORDER));
         Paragraph ticketPrg = new Paragraph();
         ticketPrg.setFixedLeading(10);
-        String intruction1 = messageSource.getMessage("invoice.intruction1-voucher", null, LocaleContextHolder.getLocale());
+        String intruction1 = messageSource.getMessage("invoice.instruction1-voucher", null, LocaleContextHolder.getLocale());
         ticketPrg.add(intruction1);
 
         helpTbl.addCell(stylePdfService.getInfo(ticketPrg, plusJakarta));
         helpTbl.addCell(new Cell().add(timeImg).setBorder(Border.NO_BORDER));
         Paragraph timePrg = new Paragraph();
-        String intruction2 = messageSource.getMessage("invoice.intruction2-voucher", null, LocaleContextHolder.getLocale());
+        String intruction2 = messageSource.getMessage("invoice.instruction2-voucher", null, LocaleContextHolder.getLocale());
         timePrg.add(intruction2).setFixedLeading(10);
 
         helpTbl.addCell(stylePdfService.getInfo(timePrg, plusJakarta));
         helpTbl.addCell(new Cell().add(informationImg).setBorder(Border.NO_BORDER));
         Paragraph infoPrg = new Paragraph();
-        String intruction3 = messageSource.getMessage("invoice.intruction3-voucher", null, LocaleContextHolder.getLocale());
+        String intruction3 = messageSource.getMessage("invoice.instruction3-voucher", null, LocaleContextHolder.getLocale());
         infoPrg.add(intruction3).setFixedLeading(10);
         helpTbl.addCell(stylePdfService.getInfo(infoPrg, plusJakarta));
 
@@ -717,7 +716,6 @@ public class PdfHotelServiceImpl implements PdfHotelService {
 
         List<String> fasilitasList = new ArrayList<>();
         for (HotelFasilitasDto hotelfacility : hotelFasilitasDtoList) {
-            int index = 0;
             hotelfacility.getItems().forEach(facilityFor -> fasilitasList.add(facilityFor + ", "));
         }
 

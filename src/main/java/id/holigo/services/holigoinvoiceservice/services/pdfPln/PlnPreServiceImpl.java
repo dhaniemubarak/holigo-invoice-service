@@ -66,15 +66,14 @@ public class PlnPreServiceImpl implements PlnPreService {
         //image Data
         ImageData imageDataLogo = ImageDataFactory.create("https://ik.imagekit.io/holigo/invoice/logo_uAoxJeYaC.png?ik-sdk-version=javascript-1.4.3&updatedAt=1663143887020");
         Image imageLogo = new Image(imageDataLogo).scaleAbsolute(168, 56);
-        ImageData imageDataPaid = ImageDataFactory.create("https://ik.imagekit.io/holigo/invoice/holigo-paid_ahXX6qW67gl.png?ik-sdk-version=javascript-1.4.3&updatedAt=1663143805976");
-        Image imagePaid = new Image(imageDataPaid).scaleAbsolute(128, 128);
+//        ImageData imageDataPaid = ImageDataFactory.create("https://ik.imagekit.io/holigo/invoice/holigo-paid_ahXX6qW67gl.png?ik-sdk-version=javascript-1.4.3&updatedAt=1663143805976");
+//        Image imagePaid = new Image(imageDataPaid).scaleAbsolute(128, 128);
         ImageData imageDataEmail = ImageDataFactory.create("https://ik.imagekit.io/holigo/invoice/mail-huge_hktWHMzK0.png?ik-sdk-version=javascript-1.4.3&updatedAt=1663143472868");
         Image imageMail = new Image(imageDataEmail).scaleAbsolute(9, 8);
         ImageData phoneData = ImageDataFactory.create("https://ik.imagekit.io/holigo/invoice/phone-huge_MSWlXRVSC.png?ik-sdk-version=javascript-1.4.3&updatedAt=1663143417375");
         Image phoneImg = new Image(phoneData).scaleAbsolute(9, 8);
 
         float col = 200f;
-        float colHalf = 100f;
         float[] twoCol = {350f, 200f};
 
         // - - - - - HEADER  - - - - -
@@ -106,7 +105,7 @@ public class PlnPreServiceImpl implements PlnPreService {
         Table tblDetailPemesanan = new Table(new float[]{150, 30, 150, 30, 150});
         tblDetailPemesanan.setMarginLeft(8);
         // PART 1 nama detail pemesanan
-        String namaCustomer = messageSource.getMessage("invoice.plnpost-name", null, LocaleContextHolder.getLocale());//col 1
+        String namaCustomer = messageSource.getMessage("invoice.generic-name", null, LocaleContextHolder.getLocale());//col 1
         tblDetailPemesanan.addCell(stylePdfService.getTextDetail(namaCustomer, plusJakarta));
         tblDetailPemesanan.addCell(stylePdfService.getTextDetail("", plusJakarta));
 
@@ -195,7 +194,6 @@ public class PlnPreServiceImpl implements PlnPreService {
         detailProdukTbl.addCell(stylePdfService.getHeaderTextCell(price, plusJakarta)); //col5
 
 //        Detail Produk output
-        double fareAmount;
         int count = 1; //dummy
         detailProdukTbl.addCell(stylePdfService.getDetailProdukOutput("" + count, plusJakarta)); //col 1
         detailProdukTbl.addCell(stylePdfService.getDetailProdukOutput(transactionDto.getDetail().get("productName").asText(), plusJakarta)); //col 2
@@ -208,16 +206,13 @@ public class PlnPreServiceImpl implements PlnPreService {
         detailProdukTbl.addCell(stylePdfService.getDetailProdukOutput
                 ("Rp " + stylePdfService.getPrice(billAmount) + ",- ", plusJakarta)); // col5
 
-        String fareAmountStr = transactionDto.getFareAmount().toString();
-        fareAmount = Float.parseFloat(fareAmountStr);
-
         document.add(detailProdukTbl);
         document.add(stylePdfService.brokeLine(pdfDocument));
 
 //        Bill / Price / harga
 
         // checking 0 or not
-        double adminAmount = 0;
+        double adminAmount;
         if (transactionDto.getAdminAmount() != null) {
             adminAmount = transactionDto.getAdminAmount().doubleValue();
         } else {

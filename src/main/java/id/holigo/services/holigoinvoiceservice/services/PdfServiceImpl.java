@@ -23,9 +23,6 @@ import com.lowagie.text.pdf.PdfContentByte;
 import com.lowagie.text.pdf.PdfWriter;
 
 import java.awt.Color;
-
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Service;
@@ -145,6 +142,7 @@ public class PdfServiceImpl implements PdfService {
                 getFareText += getPrice(transactionDto.getFareAmount());
                 getTotalFareText += getPrice(transactionDto.getFareAmount());
             }
+
             default -> {
                 getFareText += getPrice(transactionDto.getFareAmount());
                 getTotalFareText += getPrice(transactionDto.getFareAmount());

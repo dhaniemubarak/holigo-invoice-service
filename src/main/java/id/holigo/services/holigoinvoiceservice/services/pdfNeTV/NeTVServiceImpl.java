@@ -75,7 +75,6 @@ public class NeTVServiceImpl implements NeTVService {
         Image phoneImg = new Image(phoneData).scaleAbsolute(9, 8);
 
         float col = 200f;
-        float colHalf = 100f;
         float[] twoCol = {350f, 200f};
 
         // - - - - - HEADER  - - - - -
@@ -107,7 +106,7 @@ public class NeTVServiceImpl implements NeTVService {
         Table tblDetailPemesanan = new Table(new float[]{150, 30, 150, 30, 150});
         tblDetailPemesanan.setMarginLeft(8);
         // PART 1 nama detail pemesanan
-        String namaCustomer = messageSource.getMessage("invoice.netv-name", null, LocaleContextHolder.getLocale());
+        String namaCustomer = messageSource.getMessage("invoice.generic-name", null, LocaleContextHolder.getLocale());
         tblDetailPemesanan.addCell(stylePdfService.getTextDetail(namaCustomer, plusJakarta)); //col 1
         tblDetailPemesanan.addCell(stylePdfService.getTextDetail("", plusJakarta));
 
@@ -115,7 +114,7 @@ public class NeTVServiceImpl implements NeTVService {
         tblDetailPemesanan.addCell(stylePdfService.getTextDetail(meterNumber, plusJakarta)); //col 2
         tblDetailPemesanan.addCell(stylePdfService.getTextDetail("", plusJakarta));
 
-        String idPelanggan = messageSource.getMessage("invoice.netv-nomor-pelanggan", null, LocaleContextHolder.getLocale());
+        String idPelanggan = messageSource.getMessage("invoice.generic-nomor-pelanggan", null, LocaleContextHolder.getLocale());
         tblDetailPemesanan.addCell(stylePdfService.getTextDetail(idPelanggan, plusJakarta)); //col 3
 
         // pemesanan output
@@ -217,7 +216,6 @@ public class NeTVServiceImpl implements NeTVService {
         detailProdukTbl.addCell(stylePdfService.getHeaderTextCell(price, plusJakarta)); //col5
 
 //        Detail Produk output
-        double fareAmount;
         int count = 1; //dummy
         detailProdukTbl.addCell(stylePdfService.getDetailProdukOutput("" + count, plusJakarta)); //col 1
         detailProdukTbl.addCell(stylePdfService.getDetailProdukOutput(transactionDto.getDetail().get("serviceName").asText(), plusJakarta)); //col 2
@@ -228,16 +226,13 @@ public class NeTVServiceImpl implements NeTVService {
         double billAmount = transactionDto.getDetail().get("billAmount").doubleValue();// col5
         detailProdukTbl.addCell(stylePdfService.getDetailProdukOutput("Rp " + stylePdfService.getPrice(billAmount) + ",- ", plusJakarta));
 
-        String fareAmountStr = transactionDto.getFareAmount().toString();
-        fareAmount = Float.parseFloat(fareAmountStr);
-
         document.add(detailProdukTbl);
         document.add(stylePdfService.brokeLine(pdfDocument));
 
 //        Bill / Price / harga
 
         // checking 0 or not
-        double adminAmount = 0;
+        double adminAmount;
         if (transactionDto.getAdminAmount() != null) {
             adminAmount = transactionDto.getAdminAmount().doubleValue();
         } else {
