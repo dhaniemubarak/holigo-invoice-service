@@ -63,15 +63,16 @@ public class StylePdfService {
 
 
     public Cell getTextDetail(String textVelue, PdfFont plusJakarta) {
-        return new Cell().add(textVelue)
+        Cell cell = new Cell().add(textVelue)
                 .setBorder(Border.NO_BORDER)
                 .setFontSize(9)
                 .setFont(plusJakarta)
                 .setFontColor(new DeviceRgb(97, 97, 97));
+        return cell;
     }
 
     public Cell getDetailUserBold(String textVelue, PdfFont plusJakarta) {
-        return new Cell().add(textVelue)
+        Cell cell = new Cell().add(textVelue)
                 .setBorder(Border.NO_BORDER)
                 .setFontSize(9)
                 .setBold()
@@ -80,6 +81,8 @@ public class StylePdfService {
                 .setBackgroundColor(new DeviceRgb(209, 244, 206))
                 .setPaddings(0, 0, 0, 7)
                 .setFontColor(new DeviceRgb(32, 34, 33));
+        cell.setNextRenderer(new RoundedBorderCellRenderer(cell,true));
+        return cell;
     }
 
     public Cell getDetailProdukOutput(String text, PdfFont plusJakarta) {
@@ -257,10 +260,9 @@ public class StylePdfService {
 
     public Table transaksiId(String idTransaksi,PdfFont plusJakarta, TransactionDto transactionDto) {
 
-
         Table idTransaksiTbl = new Table(new float[]{100f, 50f});
         idTransaksiTbl.addCell(getHeaderTextCell(idTransaksi, plusJakarta));
-        idTransaksiTbl.addCell(new Cell().add(transactionDto.getInvoiceNumber())
+        Cell cell = new Cell().add(transactionDto.getInvoiceNumber())
                 .setBorder(Border.NO_BORDER)
                 .setFontSize(12)
                 .setTextAlignment(TextAlignment.CENTER)
@@ -268,7 +270,9 @@ public class StylePdfService {
                 .setBackgroundColor(new DeviceRgb(209, 244, 206))
                 .setFontColor(new DeviceRgb(32, 34, 33))
                 .setMargins(-2, 0, -2, 0)
-                .setPaddingBottom(-10));
+                .setPaddingBottom(-10);
+        cell.setNextRenderer(new RoundedBorderCellRenderer(cell,true));
+        idTransaksiTbl.addCell(cell);
         idTransaksiTbl.setMarginBottom(8);
         return idTransaksiTbl;
     }
@@ -351,4 +355,18 @@ public class StylePdfService {
                 .setFontColor(new DeviceRgb(97,97,97));
     }
 
+    public Cell totalOutput(Double finalPrice ,PdfFont pdfFont){
+        Cell cell = new Cell().add("Rp " + getPrice(finalPrice) + ",-")
+                .setPaddings(0, 5, 0, 5)
+                .setBackgroundColor(new DeviceRgb(209, 244, 206))
+                .setTextAlignment(TextAlignment.CENTER)
+                .setFont(pdfFont)
+                .setFontSize(12)
+                .setBorder(Border.NO_BORDER)
+                .setFontColor(Color.BLACK);
+
+        cell.setNextRenderer(new RoundedBorderCellRenderer(cell,true));
+
+        return cell;
+    }
 }

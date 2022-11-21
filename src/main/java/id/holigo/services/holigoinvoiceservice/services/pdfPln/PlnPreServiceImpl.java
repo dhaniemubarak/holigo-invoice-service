@@ -16,6 +16,7 @@ import com.itextpdf.layout.element.Cell;
 import com.itextpdf.layout.element.Image;
 import com.itextpdf.layout.element.Table;
 import com.itextpdf.layout.property.TextAlignment;
+import id.holigo.services.holigoinvoiceservice.services.style.RoundedBorderCellRenderer;
 import id.holigo.services.holigoinvoiceservice.services.style.StylePdfService;
 import id.holigo.services.holigoinvoiceservice.web.model.TransactionDto;
 import lombok.RequiredArgsConstructor;
@@ -66,8 +67,8 @@ public class PlnPreServiceImpl implements PlnPreService {
         //image Data
         ImageData imageDataLogo = ImageDataFactory.create("https://ik.imagekit.io/holigo/invoice/logo_uAoxJeYaC.png?ik-sdk-version=javascript-1.4.3&updatedAt=1663143887020");
         Image imageLogo = new Image(imageDataLogo).scaleAbsolute(168, 56);
-//        ImageData imageDataPaid = ImageDataFactory.create("https://ik.imagekit.io/holigo/invoice/holigo-paid_ahXX6qW67gl.png?ik-sdk-version=javascript-1.4.3&updatedAt=1663143805976");
-//        Image imagePaid = new Image(imageDataPaid).scaleAbsolute(128, 128);
+        ImageData imageDataPaid = ImageDataFactory.create("https://ik.imagekit.io/holigo/invoice/holigo-paid_ahXX6qW67gl.png?ik-sdk-version=javascript-1.4.3&updatedAt=1663143805976");
+        Image imagePaid = new Image(imageDataPaid).scaleAbsolute(128, 128);
         ImageData imageDataEmail = ImageDataFactory.create("https://ik.imagekit.io/holigo/invoice/mail-huge_hktWHMzK0.png?ik-sdk-version=javascript-1.4.3&updatedAt=1663143472868");
         Image imageMail = new Image(imageDataEmail).scaleAbsolute(9, 8);
         ImageData phoneData = ImageDataFactory.create("https://ik.imagekit.io/holigo/invoice/phone-huge_MSWlXRVSC.png?ik-sdk-version=javascript-1.4.3&updatedAt=1663143417375");
@@ -189,7 +190,7 @@ public class PlnPreServiceImpl implements PlnPreService {
         String desctiptionProduct = messageSource.getMessage("invoice.generic-deskripsi", null, LocaleContextHolder.getLocale());//col3
         detailProdukTbl.addCell(stylePdfService.getHeaderTextCell(desctiptionProduct, plusJakarta));
         String quantity = messageSource.getMessage("invoice.plnpre-kwhQty", null, LocaleContextHolder.getLocale());//col4
-        detailProdukTbl.addCell(stylePdfService.getHeaderTextCell(quantity, plusJakarta).setTextAlignment(TextAlignment.CENTER));
+        detailProdukTbl.addCell(stylePdfService.getHeaderTextCell(quantity, plusJakarta));
         String price = messageSource.getMessage("invoice.generic-price", null, LocaleContextHolder.getLocale());
         detailProdukTbl.addCell(stylePdfService.getHeaderTextCell(price, plusJakarta)); //col5
 
@@ -200,8 +201,7 @@ public class PlnPreServiceImpl implements PlnPreService {
         String produkName = transactionDto.getDetail().get("nominalName").asText(); //col 3
         detailProdukTbl.addCell(stylePdfService.getDetailProdukOutput(produkName, plusJakarta));
         detailProdukTbl.addCell(stylePdfService.getDetailProdukOutput // col 4
-                        (transactionDto.getDetail().get("kwh").asText(), plusJakarta)
-                .setTextAlignment(TextAlignment.CENTER));
+                        (transactionDto.getDetail().get("kwh").asText(), plusJakarta));
         double billAmount = transactionDto.getDetail().get("billAmount").doubleValue();
         detailProdukTbl.addCell(stylePdfService.getDetailProdukOutput
                 ("Rp " + stylePdfService.getPrice(billAmount) + ",- ", plusJakarta)); // col5
@@ -269,14 +269,7 @@ public class PlnPreServiceImpl implements PlnPreService {
         bungkusNestedPrice.addCell(new Cell().add(" - - - - - - - - - - - - - - - - - - - - - - - -").setBold().setBorder(Border.NO_BORDER));
         Table totalTable = new Table(new float[]{100, 150});
         totalTable.addCell(stylePdfService.getHeaderTextCell("Total", plusJakarta));
-        totalTable.addCell(new Cell().add("Rp " + stylePdfService.getPrice(finalPrice) + ",-")
-                .setPaddings(0, 5, 0, 5)
-                .setBackgroundColor(new DeviceRgb(209, 244, 206))
-                .setTextAlignment(TextAlignment.CENTER)
-                .setFont(plusJakarta)
-                .setFontSize(12)
-                .setBorder(Border.NO_BORDER)
-                .setFontColor(Color.BLACK));
+        totalTable.addCell(stylePdfService.totalOutput(finalPrice,plusJakarta));
 
         bungkusNestedPrice.addCell(new Cell().add(totalTable).setBorder(Border.NO_BORDER));
 
@@ -289,13 +282,16 @@ public class PlnPreServiceImpl implements PlnPreService {
                             .setRelativePosition(10,0,0,0)
                     .setFont(plusJakarta).setFontColor(new DeviceRgb(97,97,97)).setFontSize(8));
 
-            stroomToken.addCell(new Cell().add(transactionDto.getDetail().get("token").asText())
+            Cell cell = new Cell().add(transactionDto.getDetail().get("token").asText())
                     .setBorder(Border.NO_BORDER)
-                            .setBackgroundColor(new DeviceRgb(209, 244, 206))
+                    .setBackgroundColor(new DeviceRgb(209, 244, 206))
 //                    .setRelativePosition(5,0,0,0)
                     .setPaddingLeft(5)
                     .setBold()
-                    .setFont(plusJakarta).setFontSize(8));
+                    .setFont(plusJakarta).setFontSize(8);
+            cell.setNextRenderer(new RoundedBorderCellRenderer(cell,true));
+            stroomToken.addCell(cell);
+            stroomToken.addCell(new Cell().add(imagePaid).setBorder(Border.NO_BORDER));
 
             priceTable.addCell(new Cell().add(stroomToken).setBorder(Border.NO_BORDER));
         } else {

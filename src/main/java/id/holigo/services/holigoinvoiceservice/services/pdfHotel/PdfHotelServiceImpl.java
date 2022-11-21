@@ -211,7 +211,7 @@ public class PdfHotelServiceImpl implements PdfHotelService {
         String desctiptionProduct = messageSource.getMessage("invoice.product-description-ereceipt", null, LocaleContextHolder.getLocale());
         detailProdukTbl.addCell(stylePdfService.getHeaderTextCell(desctiptionProduct, plusJakarta));
         String quantity = messageSource.getMessage("invoice.product-count-ereceipt", null, LocaleContextHolder.getLocale());
-        detailProdukTbl.addCell(stylePdfService.getHeaderTextCell(quantity, plusJakarta).setTextAlignment(TextAlignment.CENTER));
+        detailProdukTbl.addCell(stylePdfService.getHeaderTextCell(quantity, plusJakarta)); //col 4
         String price = messageSource.getMessage("invoice.product-price-ereceipt", null, LocaleContextHolder.getLocale());
         detailProdukTbl.addCell(stylePdfService.getHeaderTextCell(price, plusJakarta));
 
@@ -236,7 +236,7 @@ public class PdfHotelServiceImpl implements PdfHotelService {
         detailProdukTbl.addCell(stylePdfService.getDetailProdukOutput("" + count, plusJakarta));
         detailProdukTbl.addCell(stylePdfService.getDetailProdukOutput(transactionDto.getDetail().get("hotel").get("type").asText(), plusJakarta));
         detailProdukTbl.addCell(new Cell().add(deskripsiProduk).setBorder(Border.NO_BORDER));
-        detailProdukTbl.addCell(stylePdfService.getDetailProdukOutput("1", plusJakarta).setTextAlignment(TextAlignment.CENTER));
+        detailProdukTbl.addCell(stylePdfService.getDetailProdukOutput("1", plusJakarta));
         detailProdukTbl.addCell(stylePdfService.getDetailProdukOutput("Rp " + stylePdfService.getPrice(transactionDto.getFareAmount().floatValue()) + ",- ", plusJakarta));
 
 

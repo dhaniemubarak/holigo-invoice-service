@@ -204,7 +204,7 @@ public class PdfPulsaServiceImpl implements PdfPulsaService {
         String desctiptionProduct = messageSource.getMessage("invoice.generic-deskripsi", null, LocaleContextHolder.getLocale());
         detailProdukTbl.addCell(stylePdfService.getHeaderTextCell(desctiptionProduct, plusJakarta));
         String quantity = messageSource.getMessage("invoice.generic-quantity", null, LocaleContextHolder.getLocale());
-        detailProdukTbl.addCell(stylePdfService.getHeaderTextCell(quantity, plusJakarta).setTextAlignment(TextAlignment.CENTER));
+        detailProdukTbl.addCell(stylePdfService.getHeaderTextCell(quantity, plusJakarta));
         String price = messageSource.getMessage("invoice.generic-price", null, LocaleContextHolder.getLocale());
         detailProdukTbl.addCell(stylePdfService.getHeaderTextCell(price, plusJakarta));
 
@@ -221,7 +221,7 @@ public class PdfPulsaServiceImpl implements PdfPulsaService {
         String produkName = transactionDto.getDetail().get("productName").asText();
         String produkName2 = transactionDto.getDetail().get("nominalName").asText();
         detailProdukTbl.addCell(stylePdfService.getDetailProdukOutput(produkName + " " + produkName2, plusJakarta)); //col 3
-        detailProdukTbl.addCell(stylePdfService.getDetailProdukOutput("1", plusJakarta).setTextAlignment(TextAlignment.CENTER)); // col 4
+        detailProdukTbl.addCell(stylePdfService.getDetailProdukOutput("1", plusJakarta)); // col 4
         detailProdukTbl.addCell(stylePdfService.getDetailProdukOutput("Rp " + stylePdfService.getPrice(transactionDto.getFareAmount().floatValue()) + ",- ", plusJakarta)); // col5
 
         // pricing on produk
@@ -257,7 +257,7 @@ public class PdfPulsaServiceImpl implements PdfPulsaService {
             nestedPrice.addCell(stylePdfService.getDetailProdukOutput(" ", plusJakarta));
         }
         //kalau tidak ada biaya layanan, teks biaya layanan hilang
-        if (transactionDto.getDiscountAmount() != null && transactionDto.getPayment().getServiceFeeAmount().doubleValue() > 0) {
+        if (transactionDto.getPayment().getServiceFeeAmount()  != null && transactionDto.getPayment().getServiceFeeAmount().doubleValue() > 0) {
             String biayaLayanan = messageSource.getMessage("invoice.generic-biaya-layanan", null, LocaleContextHolder.getLocale());
             nestedPrice.addCell(stylePdfService.getHeaderTextCell(biayaLayanan, plusJakarta));
             nestedPrice.addCell(stylePdfService.getDetailProdukOutputPricing("Rp " + stylePdfService.getPrice(transactionDto.getPayment().getServiceFeeAmount().doubleValue()) + ",-", plusJakarta));
@@ -274,15 +274,7 @@ public class PdfPulsaServiceImpl implements PdfPulsaService {
             nestedPrice.addCell(stylePdfService.getHeaderTextCell(" ", plusJakarta));
             nestedPrice.addCell(stylePdfService.getDetailProdukOutput(" ", plusJakarta));
         }
-        //kalau tidak ada service amount, teks service amount hilang
-        if (transactionDto.getPayment().getServiceFeeAmount() != null && transactionDto.getPayment().getServiceFeeAmount().doubleValue() > 0) {
-            String serviceAmount = messageSource.getMessage("invoice.generic-biaya-layanan", null, LocaleContextHolder.getLocale());
-            nestedPrice.addCell(stylePdfService.getHeaderTextCell(serviceAmount, plusJakarta));
-            nestedPrice.addCell(stylePdfService.getDetailProdukOutput("Rp " + stylePdfService.getPrice(serviceFeeAmoung) + ",-", plusJakarta));
-        } else {
-            nestedPrice.addCell(stylePdfService.getHeaderTextCell(" ", plusJakarta));
-            nestedPrice.addCell(stylePdfService.getDetailProdukOutput(" ", plusJakarta));
-        }
+
 
         bungkusNestedPrice.addCell(new Cell().add(nestedPrice).setBorder(Border.NO_BORDER));
         //final price
@@ -290,14 +282,7 @@ public class PdfPulsaServiceImpl implements PdfPulsaService {
         bungkusNestedPrice.addCell(new Cell().add("- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -").setBold().setBorder(Border.NO_BORDER));
         Table totalTable = new Table(new float[]{100, 150});
         totalTable.addCell(stylePdfService.getHeaderTextCell("Total", plusJakarta));
-        totalTable.addCell(new Cell().add("Rp " + stylePdfService.getPrice(finalPrice) + ",-")
-                .setPaddings(0, 5, 0, 5)
-                .setBackgroundColor(new DeviceRgb(209, 244, 206))
-                .setTextAlignment(TextAlignment.CENTER)
-                .setFont(plusJakarta)
-                .setFontSize(12)
-                .setBorder(Border.NO_BORDER)
-                .setFontColor(Color.BLACK));
+        totalTable.addCell(stylePdfService.totalOutput(finalPrice,plusJakarta));
 
         bungkusNestedPrice.addCell(new Cell().add(totalTable).setBorder(Border.NO_BORDER));
 

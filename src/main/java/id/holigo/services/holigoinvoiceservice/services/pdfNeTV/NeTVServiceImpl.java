@@ -210,7 +210,7 @@ public class NeTVServiceImpl implements NeTVService {
         detailProdukTbl.addCell(stylePdfService.getHeaderTextCell(desctiptionProduct, plusJakarta)); //col3
         String quantity = messageSource.getMessage("invoice.netv-provider", null, LocaleContextHolder.getLocale());
 
-        detailProdukTbl.addCell(stylePdfService.getHeaderTextCell(quantity, plusJakarta).setTextAlignment(TextAlignment.CENTER)); //col4
+        detailProdukTbl.addCell(stylePdfService.getHeaderTextCell(quantity, plusJakarta)); //col4
         String price = messageSource.getMessage("invoice.generic-price", null, LocaleContextHolder.getLocale());
 
         detailProdukTbl.addCell(stylePdfService.getHeaderTextCell(price, plusJakarta)); //col5
@@ -222,7 +222,7 @@ public class NeTVServiceImpl implements NeTVService {
         String produkName = transactionDto.getDetail().get("serviceName").asText();
         detailProdukTbl.addCell(stylePdfService.getDetailProdukOutput(produkName, plusJakarta)); //col 3
         String provider = transactionDto.getDetail().get("productName").asText();
-        detailProdukTbl.addCell(stylePdfService.getDetailProdukOutput(provider, plusJakarta).setTextAlignment(TextAlignment.CENTER)); // col 4
+        detailProdukTbl.addCell(stylePdfService.getDetailProdukOutput(provider, plusJakarta)); // col 4
         double billAmount = transactionDto.getDetail().get("billAmount").doubleValue();// col5
         detailProdukTbl.addCell(stylePdfService.getDetailProdukOutput("Rp " + stylePdfService.getPrice(billAmount) + ",- ", plusJakarta));
 
@@ -277,14 +277,7 @@ public class NeTVServiceImpl implements NeTVService {
         bungkusNestedPrice.addCell(new Cell().add(" - - - - - - - - - - - - - - - - - - - - - - - -").setBold().setBorder(Border.NO_BORDER));
         Table totalTable = new Table(new float[]{100, 150});
         totalTable.addCell(stylePdfService.getHeaderTextCell("Total", plusJakarta));
-        totalTable.addCell(new Cell().add("Rp " + stylePdfService.getPrice(finalPrice) + ",-")
-                .setPaddings(0, 5, 0, 5)
-                .setBackgroundColor(new DeviceRgb(209, 244, 206))
-                .setTextAlignment(TextAlignment.CENTER)
-                .setFont(plusJakarta)
-                .setFontSize(12)
-                .setBorder(Border.NO_BORDER)
-                .setFontColor(Color.BLACK));
+        totalTable.addCell(stylePdfService.totalOutput(finalPrice,plusJakarta));
 
         bungkusNestedPrice.addCell(new Cell().add(totalTable).setBorder(Border.NO_BORDER));
 
