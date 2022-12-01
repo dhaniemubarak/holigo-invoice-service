@@ -19,6 +19,7 @@ import com.itextpdf.layout.element.Image;
 import com.itextpdf.layout.element.Paragraph;
 import com.itextpdf.layout.element.Table;
 import com.itextpdf.layout.property.TextAlignment;
+import id.holigo.services.holigoinvoiceservice.services.style.RoundedBorderCellRenderer;
 import id.holigo.services.holigoinvoiceservice.services.style.StylePdfService;
 import id.holigo.services.holigoinvoiceservice.web.model.HotelFasilitasDto;
 import id.holigo.services.holigoinvoiceservice.web.model.TransactionDto;
@@ -287,14 +288,16 @@ public class PdfHotelServiceImpl implements PdfHotelService {
         bungkusNestedPrice.addCell(new Cell().add("- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -").setBold().setBorder(Border.NO_BORDER));
         Table totalTable = new Table(new float[]{100, 150});
         totalTable.addCell(stylePdfService.getHeaderTextCell("Total", plusJakarta));
-        totalTable.addCell(new Cell().add("Rp " + stylePdfService.getPrice(finalPrice) + ",-")
+        Cell totalCell = new Cell().add("Rp " + stylePdfService.getPrice(finalPrice) + ",-")
                 .setPaddings(0, 5, 0, 5)
                 .setBackgroundColor(new DeviceRgb(209, 244, 206))
                 .setTextAlignment(TextAlignment.CENTER)
                 .setFont(plusJakarta)
                 .setFontSize(12)
                 .setBorder(Border.NO_BORDER)
-                .setFontColor(Color.BLACK));
+                .setFontColor(Color.BLACK);
+        totalCell.setNextRenderer(new RoundedBorderCellRenderer(totalCell,true));
+        totalTable.addCell(totalCell);
 
         bungkusNestedPrice.addCell(new Cell().add(totalTable).setBorder(Border.NO_BORDER));
 //        nestedPrice.addCell(stylePdfService.getDetailProdukOutput("- - - - - - - - - ", plusJakarta).setBold());

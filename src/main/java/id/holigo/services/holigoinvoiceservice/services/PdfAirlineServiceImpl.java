@@ -16,6 +16,7 @@ import com.itextpdf.layout.border.SolidBorder;
 import com.itextpdf.layout.element.*;
 import com.itextpdf.layout.element.Image;
 import com.itextpdf.layout.property.TextAlignment;
+import id.holigo.services.holigoinvoiceservice.services.style.RoundedBorderCellRenderer;
 import id.holigo.services.holigoinvoiceservice.services.style.StylePdfService;
 import id.holigo.services.holigoinvoiceservice.web.model.TransactionDto;
 import lombok.RequiredArgsConstructor;
@@ -115,11 +116,11 @@ public class PdfAirlineServiceImpl extends HttpServlet implements PdfAirlineServ
 
 //        Detail Pemesanan buyer
 
-        tblDetailPemesanan.addCell(getDetailUserBold(transactionDto.getDetail().get("contactPerson").get("name").asText(), plusJakartaDisplayBold));
+        tblDetailPemesanan.addCell(stylePdfService.getDetailUserBold(transactionDto.getDetail().get("contactPerson").get("name").asText(), plusJakartaDisplayBold));
         tblDetailPemesanan.addCell(new Cell().add("").setBorder(Border.NO_BORDER));
-        tblDetailPemesanan.addCell(getDetailUserBold(transactionDto.getDetail().get("contactPerson").get("email").asText(), plusJakartaDisplayBold));
+        tblDetailPemesanan.addCell(stylePdfService.getDetailUserBold(transactionDto.getDetail().get("contactPerson").get("email").asText(), plusJakartaDisplayBold));
         tblDetailPemesanan.addCell(new Cell().add("").setBorder(Border.NO_BORDER));
-        tblDetailPemesanan.addCell(getDetailUserBold(transactionDto.getDetail().get("contactPerson").get("phoneNumber").asText(), plusJakartaDisplayBold));
+        tblDetailPemesanan.addCell(stylePdfService.getDetailUserBold(transactionDto.getDetail().get("contactPerson").get("phoneNumber").asText(), plusJakartaDisplayBold));
 
 
 //        Header Detail Pembayaran
@@ -141,14 +142,14 @@ public class PdfAirlineServiceImpl extends HttpServlet implements PdfAirlineServ
 
 //        Detail Pembayaran user
         //        Dummy payment
-        detailPembayaran.addCell(getDetailUserBold("Senin, 12 Dummy 2021", plusJakartaDisplayBold));
+        detailPembayaran.addCell(stylePdfService.getDetailUserBold("Senin, 12 Dummy 2021", plusJakartaDisplayBold));
         detailPembayaran.addCell(getTextDetail(" ", plusJakartaDisplayBold));
-        detailPembayaran.addCell(getDetailUserBold("Dummy WIB", plusJakartaDisplayBold).setTextAlignment(TextAlignment.CENTER)
+        detailPembayaran.addCell(stylePdfService.getDetailUserBold("Dummy WIB", plusJakartaDisplayBold).setTextAlignment(TextAlignment.CENTER)
                 .setPaddings(0, 0, 0, 0));
         detailPembayaran.addCell(getTextDetail(" ", plusJakartaDisplayBold));
 //        Payment method
 //        transactionDto.getPayment().getPaymentService().getName()
-        detailPembayaran.addCell(getDetailUserBold("Dummy - Virtual Account", plusJakartaDisplayBold));
+        detailPembayaran.addCell(stylePdfService.getDetailUserBold("Dummy - Virtual Account", plusJakartaDisplayBold));
 
 
         document.add(detailPembayaranHead);
@@ -179,7 +180,7 @@ public class PdfAirlineServiceImpl extends HttpServlet implements PdfAirlineServ
         detailProdukTbl.addCell(getDetailProdukOutput("" + count, plusJakarta));
         detailProdukTbl.addCell(getDetailProdukOutput("Tiket pesawat", plusJakarta));
         detailProdukTbl.addCell(new Cell().add(deskripsiProduk).setBorder(Border.NO_BORDER));
-        detailProdukTbl.addCell(getDetailProdukOutput("" + transactionDto.getDetail().get("trips").size(), plusJakarta).setTextAlignment(TextAlignment.CENTER));
+        detailProdukTbl.addCell(getDetailProdukOutput("" + transactionDto.getDetail().get("trips").size(), plusJakarta).setTextAlignment(TextAlignment.LEFT));
         detailProdukTbl.addCell(getDetailProdukOutput("Rp " + getPrice(transactionDto.getFareAmount().floatValue()) + ",-", plusJakarta));
 
         // pricing
@@ -208,14 +209,16 @@ public class PdfAirlineServiceImpl extends HttpServlet implements PdfAirlineServ
         nestedPrice.addCell(getDetailProdukOutput("- - - - - - - - - ", plusJakarta).setBold());
         nestedPrice.addCell(getDetailProdukOutput("  - - - - - - - - - - - - - - - - -", plusJakarta).setPaddingLeft(-23f).setBold());
         nestedPrice.addCell(getHeaderTextCell("Total", plusJakarta));
-        nestedPrice.addCell(new Cell().add("Rp " + getPrice(finalPrice) + ",-")
+        Cell totalCell = new Cell().add("Rp " + stylePdfService.getPrice(finalPrice) + ",-")
                 .setPaddings(0, 5, 0, 5)
                 .setBackgroundColor(new DeviceRgb(209, 244, 206))
                 .setTextAlignment(TextAlignment.CENTER)
                 .setFont(plusJakarta)
                 .setFontSize(12)
                 .setBorder(Border.NO_BORDER)
-                .setFontColor(Color.BLACK));
+                .setFontColor(Color.BLACK);
+        totalCell.setNextRenderer(new RoundedBorderCellRenderer(totalCell,true));
+        nestedPrice.addCell(totalCell);  
 
 //        Paid Logo, logo position
         priceTable.addCell(new Cell().add(imagePaid).setPaddings(10, 0, 0, 100).setBorder(Border.NO_BORDER));
@@ -353,13 +356,7 @@ public class PdfAirlineServiceImpl extends HttpServlet implements PdfAirlineServ
         float threeCol = 190f;
         float col = 200f;
         float colHalf = 100f;
-        float col150 = col + 150;
-        float[] twoCol = {col150, col};
         float[] fullWidth = {threeCol * 3};
-
-        //        Color
-        Color colorTitle = new DeviceRgb(0, 188, 22);
-        Color colorSubTitle = new DeviceRgb(123, 123, 123);
 
         //        Space
         Paragraph space = new Paragraph("\n");
@@ -422,7 +419,6 @@ public class PdfAirlineServiceImpl extends HttpServlet implements PdfAirlineServ
         Table destinationChild = new Table(new float[]{115, 10, 140});
 
         Table dateTbl = new Table(new float[]{30});
-        Table terminalTbl = new Table(new float[]{115});
         Table dateTblEnd = new Table(new float[]{30});
         Table terminalTblEnd = new Table(new float[]{115});
 
@@ -462,6 +458,7 @@ public class PdfAirlineServiceImpl extends HttpServlet implements PdfAirlineServ
         dateTbl.addCell(getDestinationDate(departureTimeStr, jakartaPDLight));
 
         //START Terminal Frame (COL 3)
+        Table terminalTbl = new Table(new float[]{115});
 
         // nama kota
         String[] kota = transactionDto.getDetail()

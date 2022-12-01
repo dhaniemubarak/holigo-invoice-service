@@ -13,8 +13,11 @@ import id.holigo.services.holigoinvoiceservice.services.pdfCC.CCService;
 import id.holigo.services.holigoinvoiceservice.services.pdfDwall.DigitalWalletService;
 import id.holigo.services.holigoinvoiceservice.services.pdfEwall.EwallService;
 import id.holigo.services.holigoinvoiceservice.services.pdfGas.GasService;
+import id.holigo.services.holigoinvoiceservice.services.pdfHolicash.HolicashService;
 import id.holigo.services.holigoinvoiceservice.services.pdfHotel.PdfHotelService;
 import id.holigo.services.holigoinvoiceservice.services.pdfInsurance.InsuranceService;
+import id.holigo.services.holigoinvoiceservice.services.pdfKereta.EreceiptKeretaService;
+import id.holigo.services.holigoinvoiceservice.services.pdfKereta.EticketKeretaService;
 import id.holigo.services.holigoinvoiceservice.services.pdfMultifinance.MultifinanceService;
 import id.holigo.services.holigoinvoiceservice.services.pdfNeTV.NeTVService;
 import id.holigo.services.holigoinvoiceservice.services.pdfPDAM.PdamServce;
@@ -33,6 +36,13 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 public class InvoiceRestController {
+
+    private HolicashService holicashService;
+
+    @Autowired
+    public void setHolicashService(HolicashService holicashService) {
+        this.holicashService = holicashService;
+    }
 
     private NeTVService neTVService;
 
@@ -152,6 +162,20 @@ public class InvoiceRestController {
         this.multifinanceService = multifinanceService;
     }
 
+    private EreceiptKeretaService ereceiptKeretaService;
+
+    @Autowired
+    public void setKeretaService(EreceiptKeretaService ereceiptKeretaService) {
+        this.ereceiptKeretaService = ereceiptKeretaService;
+    }
+
+    private EticketKeretaService eticketKeretaService;
+
+    @Autowired
+    public void setEvoucherKeretaService(EticketKeretaService eticketKeretaService) {
+        this.eticketKeretaService = eticketKeretaService;
+    }
+
     //GENERAL
     @GetMapping("/web/v1/invoice/{id}/download")
     public void downloadReceipt(HttpServletResponse response, @PathVariable("id") UUID id) throws IOException, DocumentException {
@@ -181,9 +205,12 @@ public class InvoiceRestController {
 //        String json = "{\"id\":\"1d7070c0-fb54-422b-84bd-cafd4f014075\",\"invoiceNumber\":\"1294/20221107/48\",\"createdAt\":\"2022-11-07T04:37:56.768+00:00\",\"expiredAt\":\"2022-11-07T06:37:56.746+00:00\",\"discountAmount\":2498,\"fareAmount\":194724,\"ntaAmount\":192231,\"nraAmount\":2495,\"hpAmount\":77,\"adminAmount\":2498,\"indexProduct\":\"Postpaid|Pascabayar|Telkomsel Halo|08121413004\",\"transactionId\":\"48\",\"transactionType\":\"TLP\",\"paymentId\":\"ee707c8b-225b-4eb5-b685-71b930a699f3\",\"payment\":{\"id\":\"ee707c8b-225b-4eb5-b685-71b930a699f3\",\"fareAmount\":194724,\"serviceFeeAmount\":50,\"discountAmount\":2498,\"totalAmount\":124669,\"paymentServiceAmount\":124719,\"depositAmount\":67488,\"isSplitBill\":true,\"pointAmount\":69,\"remainingAmount\":124719,\"status\":\"PAID\",\"paymentService\":{\"id\":\"BT_BCA\",\"name\":\"BCA Bank Transfer\",\"imageUrl\":\"https://ik.imagekit.io/holigo/Bank/BCA_bGtQ3AAv4F-.png?ik-sdk-version=javascript-1.4.3\",\"openTime\":\"00:15:00\",\"closeTime\":\"21:00:00\",\"minimumAmount\":10000,\"maximumAmount\":null,\"serviceFee\":0,\"mdrPercent\":0,\"fdsAmount\":0,\"status\":\"AVAILABLE\",\"note\":\"payment_service.note.BT_BCA\"},\"detailId\":\"03765680-d115-4cc1-ae9b-a1cbd3262160\",\"detailType\":\"bankTransfer\",\"detailRoute\":\"/api/v1/payments/ee707c8b-225b-4eb5-b685-71b930a699f3/bankTransfer/03765680-d115-4cc1-ae9b-a1cbd3262160\",\"createdAt\":\"2022-11-07T04:38:30.480+00:00\",\"updatedAt\":\"2022-11-07T04:40:01.730+00:00\"},\"paymentStatus\":\"PAID\",\"orderStatus\":\"ISSUED\",\"serviceId\":1294,\"productId\":1300,\"detail\":{\"isPostpaid\":true,\"serviceCode\":\"TLP\",\"serviceName\":\"Pascabayar\",\"productCode\":\"TLPTSEL\",\"productName\":\"Telkomsel Halo\",\"productImageUrl\":\"https://ik.imagekit.io/holigo/operator/Telkomsel_g-KMOm9zbVp.png\",\"serviceImageUrl\":\"https://ik.imagekit.io/holigo/icon_produk_tagihan/pascabayar__8OiMs_IK.png?tr=h-192,w-192\",\"customerNumber\":\"08121413004\",\"customerName\":\"ROHXXXXXXYAD\",\"reference\":\"-\",\"billQty\":null,\"period\":null,\"adminAmount\":2498,\"fareAmount\":194724,\"billAmount\":192226,\"striketroughAdmin\":2500,\"discountAmount\":0,\"tempo\":\"-\"},\"serverTime\":\"2022-11-08T07:20:45.337+00:00\"}";
         //Multifnance
 //        String json = "{\"id\":\"c637c9fa-ab00-4575-ac6b-bdfa610d072c\",\"invoiceNumber\":\"1266/20221110/57\",\"createdAt\":\"2022-11-10T08:51:53.891+00:00\",\"expiredAt\":\"2022-11-10T10:51:53.846+00:00\",\"discountAmount\":0,\"fareAmount\":1179499,\"ntaAmount\":1175865,\"nraAmount\":3635,\"hpAmount\":113,\"adminAmount\":0,\"indexProduct\":\"Postpaid|Multifinance|Mega Auto Finance|1512100730\",\"transactionId\":\"57\",\"transactionType\":\"MFN\",\"paymentId\":\"dc5da691-348d-42b8-837f-3a1936c51b50\",\"payment\":{\"id\":\"dc5da691-348d-42b8-837f-3a1936c51b50\",\"fareAmount\":1179499,\"serviceFeeAmount\":91,\"discountAmount\":0,\"totalAmount\":1179499,\"paymentServiceAmount\":1179590,\"depositAmount\":0,\"isSplitBill\":false,\"pointAmount\":0,\"remainingAmount\":1179590,\"status\":\"PAYMENT_EXPIRED\",\"paymentService\":{\"id\":\"BT_BCA\",\"name\":\"BCA Bank Transfer\",\"imageUrl\":\"https://ik.imagekit.io/holigo/Bank/BCA_bGtQ3AAv4F-.png?ik-sdk-version=javascript-1.4.3\",\"openTime\":\"00:15:00\",\"closeTime\":\"21:00:00\",\"minimumAmount\":10000,\"maximumAmount\":null,\"serviceFee\":0,\"mdrPercent\":0,\"fdsAmount\":0,\"status\":\"AVAILABLE\",\"note\":\"payment_service.note.BT_BCA\"},\"detailId\":\"a5435b30-7faa-4076-bf32-ea3af1478dc9\",\"detailType\":\"bankTransfer\",\"detailRoute\":\"/api/v1/payments/dc5da691-348d-42b8-837f-3a1936c51b50/bankTransfer/a5435b30-7faa-4076-bf32-ea3af1478dc9\",\"createdAt\":\"2022-11-10T08:52:18.302+00:00\",\"updatedAt\":\"2022-11-10T10:51:54.113+00:00\"},\"paymentStatus\":\"PAYMENT_EXPIRED\",\"orderStatus\":\"ORDER_EXPIRED\",\"serviceId\":1266,\"productId\":1275,\"detail\":{\"isPostpaid\":true,\"serviceCode\":\"MFN\",\"serviceName\":\"Multifinance\",\"productCode\":\"FNMAF\",\"productName\":\"Mega Auto Finance\",\"productImageUrl\":\"https://ik.imagekit.io/holigo/multifinance/Mega_Auto_Finance_1tPOGH0SL.png?tr=h-192,w-192\",\"serviceImageUrl\":\"https://ik.imagekit.io/holigo/icon_produk_tagihan/multifinance_oyuJVzv3FP4.png?tr=h-192,w-192\",\"customerNumber\":\"1512100730\",\"customerName\":\"SUSANTY\",\"period\":\"14\",\"tenor\":null,\"tempo\":\"\",\"interest\":null,\"branch\":null,\"vehicle\":null,\"policeNumber\":\"\",\"reference\":null,\"orderStatus\":\"ORDER_EXPIRED\",\"paymentStatus\":\"PAYMENT_EXPIRED\",\"adminAmount\":0,\"billAmount\":1179500,\"fareAmount\":1179499,\"discountAmount\":1,\"striketroughAdmin\":0},\"serverTime\":\"2022-11-14T10:48:30.973+00:00\"}";
-
-//        TransactionDto transactionDto = objectMapper.readValue(json, TransactionDto.class);
-        TransactionDto transactionDto = transactionService.getTransactionDetail(id);
+        //Holicash
+//        String json = "{\"id\":\"9cdc0a73-138e-4986-b408-869b08317d0f\",\"invoiceNumber\":\"1380/20221128/376\",\"createdAt\":\"2022-11-28T14:27:16.305+07:00\",\"expiredAt\":\"2022-11-28T16:27:16.250+07:00\",\"discountAmount\":0,\"fareAmount\":100000,\"ntaAmount\":100000,\"nraAmount\":0,\"hpAmount\":0,\"adminAmount\":0,\"indexProduct\":\"Top Up|Holi Cash|100,000|628117876746\",\"transactionId\":\"376\",\"transactionType\":\"HTD\",\"paymentId\":\"43441303-5727-4722-9b5e-29cc402ac5ce\",\"payment\":{\"id\":\"43441303-5727-4722-9b5e-29cc402ac5ce\",\"fareAmount\":100000,\"serviceFeeAmount\":24,\"discountAmount\":0,\"totalAmount\":100000,\"paymentServiceAmount\":100024,\"depositAmount\":0,\"isSplitBill\":false,\"pointAmount\":0,\"remainingAmount\":100024,\"status\":\"PAID\",\"paymentService\":{\"id\":\"BT_BCA\",\"name\":\"BCA Bank Transfer\",\"imageUrl\":\"https://ik.imagekit.io/holigo/Bank/BCA_bGtQ3AAv4F-.png?ik-sdk-version=javascript-1.4.3\",\"openTime\":\"00:15:00\",\"closeTime\":\"21:00:00\",\"minimumAmount\":10000,\"maximumAmount\":null,\"serviceFee\":0,\"mdrPercent\":0,\"fdsAmount\":0,\"status\":\"AVAILABLE\",\"note\":\"payment_service.note.BT_BCA\"},\"detailId\":\"3f9180a9-7f49-4843-a758-cb6968603f4e\",\"detailType\":\"bankTransfer\",\"detailRoute\":\"/api/v1/payments/43441303-5727-4722-9b5e-29cc402ac5ce/bankTransfer/3f9180a9-7f49-4843-a758-cb6968603f4e\",\"createdAt\":\"2022-11-28T14:27:19.178+07:00\",\"updatedAt\":\"2022-11-28T14:28:04.997+07:00\"},\"paymentStatus\":\"PAID\",\"orderStatus\":\"ISSUED\",\"serviceId\":1380,\"productId\":1380,\"detail\":null,\"serverTime\":\"2022-11-29T11:54:35.938+07:00\"}";
+        //Train
+        String json = "{\"id\":\"247176f8-832a-4b4d-80a5-d0561f0503f1\",\"invoiceNumber\":\"3/20221129/21\",\"createdAt\":\"2022-11-29T16:27:57.560+07:00\",\"expiredAt\":\"2022-11-29T17:07:57.407+07:00\",\"discountAmount\":0,\"fareAmount\":52500,\"ntaAmount\":47500,\"nraAmount\":5000,\"hpAmount\":125,\"adminAmount\":7500,\"indexProduct\":\"O|Jakarta - Bandung|2022-12-22 17:55:00\",\"transactionId\":\"21\",\"transactionType\":\"TRAIN\",\"paymentId\":null,\"payment\":null,\"paymentStatus\":\"SELECTING_PAYMENT\",\"orderStatus\":\"BOOKED\",\"serviceId\":3,\"productId\":3,\"detail\":{\"id\":21,\"userId\":24403,\"iconUrl\":\"https://ik.imagekit.io/holigo/Icon_produk_homepage/pesawat_ZwrZ8JLMI.png?ik-sdk-version=javascript-1.4.3&updatedAt=1648702711249\",\"transactionId\":\"247176f8-832a-4b4d-80a5-d0561f0503f1\",\"contactPerson\":{\"name\":\"Rizki Pambudi\",\"phoneNumber\":\"628994636544\",\"email\":\"erpambudi0@gmail.com\"},\"tripType\":\"O\",\"trips\":[{\"id\":\"8e657800-b7d8-41e0-a62c-1400e2d49150\",\"passengers\":[{\"passenger\":{\"id\":null,\"type\":\"ADULT\",\"title\":\"MR\",\"name\":\"Ahmad Faisal Ibrahim\",\"phoneNumber\":null,\"identityCard\":{\"idCardNumber\":\"3671070902010001\"},\"passport\":null,\"baggageCode\":null,\"seatCode\":null},\"seatNumber\":\"EKO-EKO-1-3C\"}],\"paymentStatus\":\"SELECTING_PAYMENT\",\"orderStatus\":\"BOOKED\",\"trainName\":\"CIKURAY\",\"trainNumber\":\"7048B\",\"originStation\":{\"id\":\"PSE\",\"name\":\"Pasar Senen\",\"city\":\"Jakarta\"},\"destinationStation\":{\"id\":\"BD\",\"name\":\"Bandung\",\"city\":\"Bandung\"},\"adultAmount\":1,\"childAmount\":0,\"infantAmount\":0,\"departureDate\":\"2022-12-22\",\"departureTime\":\"17:55:00\",\"arrivalDate\":\"2022-12-22\",\"arrivalTime\":\"22:03:00\",\"imageUrl\":\"https://ik.imagekit.io/holigo/transportasi/logo-kai-main_SyEqhgYKx.png\",\"trainClass\":\"EKO\",\"trainSubClass\":\"C\",\"fareAmount\":45000,\"adminAmount\":0,\"hpAmount\":0,\"hpcAmount\":0,\"bookCode\":\"EGJ5YV4\"}],\"isBookable\":true,\"expiredAt\":\"2022-11-29T17:07:57.407+07:00\",\"paymentStatus\":\"SELECTING_PAYMENT\",\"orderStatus\":\"BOOKED\",\"fareAmount\":52500,\"adminAmount\":7500,\"discountAmount\":0,\"hpAmount\":125,\"hpcAmount\":125,\"seatMapUrl\":\"/api/v1/train/transactions/21/trips\"},\"serverTime\":\"2022-11-29T16:41:59.094+07:00\"}";
+        TransactionDto transactionDto = objectMapper.readValue(json, TransactionDto.class);
+//        TransactionDto transactionDto = transactionService.getTransactionDetail(id);
 
         StylePdfService stylePdfService = new StylePdfService();
 
@@ -274,6 +301,21 @@ public class InvoiceRestController {
 
                 multifinanceService.multifinanceInvoice(transactionDto, response, stylePdfService);
             }
+            case "HTD" -> {
+                response.setContentType("application/pdf");
+                response.addHeader("Content-Disposition",
+                        "attachment;filename=" + "invoice-Holicash-" + transactionDto.getInvoiceNumber() + ".pdf");
+
+                holicashService.invoiceHolicash(transactionDto, response, stylePdfService);
+            }
+            case "TRAIN" -> {
+                response.setContentType("application/pdf");
+                response.addHeader("Content-Disposition",
+                        "attachment;filename=" + "invoice-Train-" + transactionDto.getInvoiceNumber() + ".pdf");
+
+                ereceiptKeretaService.invoiceKereta(transactionDto, response, stylePdfService);
+            }
+
             default -> {
                 response.setContentType("application/pdf");
                 response.addHeader("Content-Disposition",
@@ -284,15 +326,24 @@ public class InvoiceRestController {
     }
     @GetMapping("/web/v1/invoice/{id}/eticket")
     public void downloadEvoucherEticket(HttpServletResponse response, @PathVariable("id") UUID id) throws IOException {
+        //train
+        String json = "{\"id\":\"247176f8-832a-4b4d-80a5-d0561f0503f1\",\"invoiceNumber\":\"3/20221129/21\",\"createdAt\":\"2022-11-29T16:27:57.560+07:00\",\"expiredAt\":\"2022-11-29T17:07:57.407+07:00\",\"discountAmount\":0,\"fareAmount\":52500,\"ntaAmount\":47500,\"nraAmount\":5000,\"hpAmount\":125,\"adminAmount\":7500,\"indexProduct\":\"O|Jakarta - Bandung|2022-12-22 17:55:00\",\"transactionId\":\"21\",\"transactionType\":\"TRAIN\",\"paymentId\":null,\"payment\":null,\"paymentStatus\":\"SELECTING_PAYMENT\",\"orderStatus\":\"BOOKED\",\"serviceId\":3,\"productId\":3,\"detail\":{\"id\":21,\"userId\":24403,\"iconUrl\":\"https://ik.imagekit.io/holigo/Icon_produk_homepage/pesawat_ZwrZ8JLMI.png?ik-sdk-version=javascript-1.4.3&updatedAt=1648702711249\",\"transactionId\":\"247176f8-832a-4b4d-80a5-d0561f0503f1\",\"contactPerson\":{\"name\":\"Rizki Pambudi\",\"phoneNumber\":\"628994636544\",\"email\":\"erpambudi0@gmail.com\"},\"tripType\":\"O\",\"trips\":[{\"id\":\"8e657800-b7d8-41e0-a62c-1400e2d49150\",\"passengers\":[{\"passenger\":{\"id\":null,\"type\":\"ADULT\",\"title\":\"MR\",\"name\":\"Ahmad Faisal Ibrahim\",\"phoneNumber\":null,\"identityCard\":{\"idCardNumber\":\"3671070902010001\"},\"passport\":null,\"baggageCode\":null,\"seatCode\":null},\"seatNumber\":\"EKO-EKO-1-3C\"}],\"paymentStatus\":\"SELECTING_PAYMENT\",\"orderStatus\":\"BOOKED\",\"trainName\":\"CIKURAY\",\"trainNumber\":\"7048B\",\"originStation\":{\"id\":\"PSE\",\"name\":\"Pasar Senen\",\"city\":\"Jakarta\"},\"destinationStation\":{\"id\":\"BD\",\"name\":\"Bandung\",\"city\":\"Bandung\"},\"adultAmount\":1,\"childAmount\":0,\"infantAmount\":0,\"departureDate\":\"2022-12-22\",\"departureTime\":\"17:55:00\",\"arrivalDate\":\"2022-12-22\",\"arrivalTime\":\"22:03:00\",\"imageUrl\":\"https://ik.imagekit.io/holigo/transportasi/logo-kai-main_SyEqhgYKx.png\",\"trainClass\":\"EKO\",\"trainSubClass\":\"C\",\"fareAmount\":45000,\"adminAmount\":0,\"hpAmount\":0,\"hpcAmount\":0,\"bookCode\":\"EGJ5YV4\"}],\"isBookable\":true,\"expiredAt\":\"2022-11-29T17:07:57.407+07:00\",\"paymentStatus\":\"SELECTING_PAYMENT\",\"orderStatus\":\"BOOKED\",\"fareAmount\":52500,\"adminAmount\":7500,\"discountAmount\":0,\"hpAmount\":125,\"hpcAmount\":125,\"seatMapUrl\":\"/api/v1/train/transactions/21/trips\"},\"serverTime\":\"2022-11-29T16:41:59.094+07:00\"}";
+        TransactionDto transactionDto = objectMapper.readValue(json, TransactionDto.class);
 
-        TransactionDto transactionDto = transactionService.getTransactionDetail(id);
+//        TransactionDto transactionDto = transactionService.getTransactionDetail(id);
+        StylePdfService stylePdfService = new StylePdfService();
         if (transactionDto.getTransactionType().equals("AIR")){
             response.setContentType("application/pdf");
             response.addHeader("Content-Disposition",
                     "attachment;filename=" + "eticket-" + transactionDto.getInvoiceNumber() + ".pdf");
             pdfAirlineService.airlineEticket(transactionDto,response);
-        }else {
-            System.err.print("transaction type is not AIR");
+        } else if (transactionDto.getTransactionType().equals("TRAIN")) {
+            response.setContentType("application/pdf");
+            response.addHeader("Content-Disposition",
+                    "attachment;filename=" + "eticket-" + transactionDto.getInvoiceNumber() + ".pdf");
+            eticketKeretaService.eticketKereta(transactionDto, response, stylePdfService);
+        } else {
+            System.err.print("transaction type is not availabel in this api");
         }
     }
     //HOTEL

@@ -9,10 +9,6 @@ import com.itextpdf.layout.border.SolidBorder;
 import com.itextpdf.layout.element.*;
 import com.itextpdf.layout.property.TextAlignment;
 import id.holigo.services.holigoinvoiceservice.web.model.TransactionDto;
-import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.MessageSource;
-import org.springframework.context.i18n.LocaleContextHolder;
 
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
@@ -81,7 +77,7 @@ public class StylePdfService {
                 .setBackgroundColor(new DeviceRgb(209, 244, 206))
                 .setPaddings(0, 0, 0, 7)
                 .setFontColor(new DeviceRgb(32, 34, 33));
-        cell.setNextRenderer(new RoundedBorderCellRenderer(cell,true));
+        cell.setNextRenderer(new RoundedBorderCellRenderer(cell, true));
         return cell;
     }
 
@@ -93,6 +89,19 @@ public class StylePdfService {
                 .setFont(plusJakarta)
                 .setFontColor(new DeviceRgb(97, 97, 97));
     }
+
+    public Cell getDetailProdukOutputDesc(String text, PdfFont plusJakarta) {
+        Paragraph paragraph = new Paragraph();
+        paragraph.add(text);
+        paragraph.setFixedLeading(0.7f);
+        return new Cell().add(paragraph)
+                .setBorder(Border.NO_BORDER)
+                .setFontSize(8)
+                .setTextAlignment(TextAlignment.LEFT)
+                .setFont(plusJakarta)
+                .setFontColor(new DeviceRgb(97, 97, 97));
+    }
+
     public Cell getDetailProdukOutputPricing(String text, PdfFont plusJakarta) {
         return new Cell().add(text)
                 .setBorder(Border.NO_BORDER)
@@ -235,10 +244,10 @@ public class StylePdfService {
         Table nestedBuktiTable = new Table(new float[]{350f});
         nestedBuktiTable.addCell(new Cell().add(title)
                 .setBorder(Border.NO_BORDER)
-                        .setFontColor(new DeviceRgb(0, 188, 22))
-                        .setFontSize(22).setBold().setFont(plusJakarta)
-                        .setRelativePosition(0, 5, 0, 0)
-                        .setPaddings(0, 0, 0, 0)
+                .setFontColor(new DeviceRgb(0, 188, 22))
+                .setFontSize(22).setBold().setFont(plusJakarta)
+                .setRelativePosition(0, 5, 0, 0)
+                .setPaddings(0, 0, 0, 0)
         );
         nestedBuktiTable.addCell(new Cell().add(subTitle)
                 .setBorder(Border.NO_BORDER)
@@ -250,15 +259,15 @@ public class StylePdfService {
         headerTable.setMarginTop(-24);
         headerTable.addCell(new Cell().add(nestedBuktiTable).setBorder(Border.NO_BORDER));
         headerTable.addCell(new Cell().add(imageLogo)
-                        .setRelativePosition(20,0,0,0)
+                        .setRelativePosition(20, 0, 0, 0)
 //                        .setPaddings(20, 0, 0, 44)
-                .setBorder(Border.NO_BORDER)
+                        .setBorder(Border.NO_BORDER)
         );
 
         return headerTable;
     }
 
-    public Table transaksiId(String idTransaksi,PdfFont plusJakarta, TransactionDto transactionDto) {
+    public Table transaksiId(String idTransaksi, PdfFont plusJakarta, TransactionDto transactionDto) {
 
         Table idTransaksiTbl = new Table(new float[]{100f, 50f});
         idTransaksiTbl.addCell(getHeaderTextCell(idTransaksi, plusJakarta));
@@ -271,7 +280,7 @@ public class StylePdfService {
                 .setFontColor(new DeviceRgb(32, 34, 33))
                 .setMargins(-2, 0, -2, 0)
                 .setPaddingBottom(-10);
-        cell.setNextRenderer(new RoundedBorderCellRenderer(cell,true));
+        cell.setNextRenderer(new RoundedBorderCellRenderer(cell, true));
         idTransaksiTbl.addCell(cell);
         idTransaksiTbl.setMarginBottom(8);
         return idTransaksiTbl;
@@ -347,15 +356,15 @@ public class StylePdfService {
         return footerTbl;
     }
 
-    public Cell disclaimer(String text,PdfFont pdfFont){
+    public Cell disclaimer(String text, PdfFont pdfFont) {
         return new Cell().add(text)
                 .setBorder(Border.NO_BORDER)
                 .setFont(pdfFont)
                 .setFontSize(10)
-                .setFontColor(new DeviceRgb(97,97,97));
+                .setFontColor(new DeviceRgb(97, 97, 97));
     }
 
-    public Cell totalOutput(Double finalPrice ,PdfFont pdfFont){
+    public Cell totalOutput(Double finalPrice, PdfFont pdfFont) {
         Cell cell = new Cell().add("Rp " + getPrice(finalPrice) + ",-")
                 .setPaddings(0, 5, 0, 5)
                 .setBackgroundColor(new DeviceRgb(209, 244, 206))
@@ -365,8 +374,46 @@ public class StylePdfService {
                 .setBorder(Border.NO_BORDER)
                 .setFontColor(Color.BLACK);
 
-        cell.setNextRenderer(new RoundedBorderCellRenderer(cell,true));
+        cell.setNextRenderer(new RoundedBorderCellRenderer(cell, true));
 
         return cell;
+    }
+
+    // AIRLINE
+    public Cell getDestination(String text, PdfFont font, TextAlignment textAlignment, boolean bold) {
+        if (bold) {
+            return new Cell().add(text)
+                    .setBorder(Border.NO_BORDER)
+                    .setFontSize(9)
+                    .setBold()
+                    .setFont(font)
+                    .setTextAlignment(textAlignment)
+                    .setFontColor(Color.BLACK);
+        } else {
+            return new Cell().add(text)
+                    .setBorder(Border.NO_BORDER)
+                    .setFontSize(9)
+                    .setFont(font)
+                    .setTextAlignment(textAlignment)
+                    .setFontColor(Color.BLACK);
+        }
+
+    }
+
+    public Cell getDetailPenumpangOutput(String text, PdfFont font) {
+        return new Cell().add(text)
+                .setFontSize(11)
+                .setFontColor(new DeviceRgb(97, 97, 97))
+                .setFont(font)
+                .setBorder(Border.NO_BORDER);
+    }
+
+    public Cell eticketInfo(String text, PdfFont plusJarkarta) {
+        return new Cell().add(text)
+                .setBorder(Border.NO_BORDER)
+                .setFontSize(8)
+                .setTextAlignment(TextAlignment.RIGHT)
+                .setFont(plusJarkarta)
+                .setFontColor(new DeviceRgb(123, 123, 123));
     }
 }

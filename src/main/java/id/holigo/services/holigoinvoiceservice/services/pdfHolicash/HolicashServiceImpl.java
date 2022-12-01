@@ -1,10 +1,8 @@
-package id.holigo.services.holigoinvoiceservice.services.pdfNeTV;
+package id.holigo.services.holigoinvoiceservice.services.pdfHolicash;
 
 import com.itextpdf.io.image.ImageData;
 import com.itextpdf.io.image.ImageDataFactory;
 import com.itextpdf.io.source.ByteArrayOutputStream;
-import com.itextpdf.kernel.color.Color;
-import com.itextpdf.kernel.color.DeviceRgb;
 import com.itextpdf.kernel.font.PdfFont;
 import com.itextpdf.kernel.font.PdfFontFactory;
 import com.itextpdf.kernel.geom.PageSize;
@@ -38,13 +36,14 @@ import java.util.Date;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class NeTVServiceImpl implements NeTVService {
+public class HolicashServiceImpl implements HolicashService {
 
     @Autowired
     private final MessageSource messageSource;
 
+
     @Override
-    public void invoiceNeTV(TransactionDto transactionDto, HttpServletResponse response, StylePdfService stylePdfService) throws MalformedURLException {
+    public void invoiceHolicash(TransactionDto transactionDto, HttpServletResponse response, StylePdfService stylePdfService) throws MalformedURLException {
         //starter pack
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         PdfDocument pdfDocument = new PdfDocument(new PdfWriter(baos));
@@ -75,11 +74,11 @@ public class NeTVServiceImpl implements NeTVService {
         Image phoneImg = new Image(phoneData).scaleAbsolute(9, 8);
 
         float col = 200f;
-        float[] twoCol = {350f, 200f};
+        float[] twoCol = {300f, 250f};
 
         // - - - - - HEADER  - - - - -
         String title = messageSource.getMessage("invoice.generic-title", null, LocaleContextHolder.getLocale());
-        String subTitle = messageSource.getMessage("invoice.netv-subtitle", null, LocaleContextHolder.getLocale());
+        String subTitle = messageSource.getMessage("invoice.subtitle-holicash", null, LocaleContextHolder.getLocale());
         document.add(stylePdfService.headerTitle(plusJakarta, imageLogo, title, subTitle));
         //--> ID TRANSAKSI
         String transactionId = messageSource.getMessage("invoice.id-transaksi", null, LocaleContextHolder.getLocale());
@@ -103,44 +102,18 @@ public class NeTVServiceImpl implements NeTVService {
         Table detailPemesananHead = new Table(new float[]{pdfDocument.getDefaultPageSize().getWidth()});
         String bookingDetails = messageSource.getMessage("invoice.detail-pemesanan", null, LocaleContextHolder.getLocale());
         detailPemesananHead.addCell(stylePdfService.getHeaderTextCell(bookingDetails, plusJakarta));
-        Table tblDetailPemesanan = new Table(new float[]{150, 30, 150, 30, 150});
+        Table tblDetailPemesanan = new Table(new float[]{150});
         tblDetailPemesanan.setMarginLeft(8);
         // PART 1 nama detail pemesanan
-        String namaCustomer = messageSource.getMessage("invoice.generic-name", null, LocaleContextHolder.getLocale());
-        tblDetailPemesanan.addCell(stylePdfService.getTextDetail(namaCustomer, plusJakarta)); //col 1
-        tblDetailPemesanan.addCell(stylePdfService.getTextDetail("", plusJakarta));
-
-        String meterNumber = messageSource.getMessage("invoice.generic-reference", null, LocaleContextHolder.getLocale());
-        tblDetailPemesanan.addCell(stylePdfService.getTextDetail(meterNumber, plusJakarta)); //col 2
-        tblDetailPemesanan.addCell(stylePdfService.getTextDetail("", plusJakarta));
-
-        String idPelanggan = messageSource.getMessage("invoice.generic-nomor-pelanggan", null, LocaleContextHolder.getLocale());
-        tblDetailPemesanan.addCell(stylePdfService.getTextDetail(idPelanggan, plusJakarta)); //col 3
+        String phoneNumber = messageSource.getMessage("invoice.phone-number", null, LocaleContextHolder.getLocale());
+        tblDetailPemesanan.addCell(stylePdfService.getTextDetail(phoneNumber, plusJakarta)); //col 1
 
         // pemesanan output
-        tblDetailPemesanan.addCell(stylePdfService.getDetailUserBold(transactionDto.getDetail().get("customerName").asText(), plusJakartaDisplayBold)); //col 1
-        tblDetailPemesanan.addCell(stylePdfService.getTextDetail("", plusJakarta));
-        tblDetailPemesanan.addCell(stylePdfService.getDetailUserBold(transactionDto.getDetail().get("reference").asText(), plusJakartaDisplayBold)); //col 2
-        tblDetailPemesanan.addCell(stylePdfService.getTextDetail("", plusJakarta));
-        tblDetailPemesanan.addCell(stylePdfService.getDetailUserBold(transactionDto.getDetail().get("customerNumber").asText(), plusJakartaDisplayBold)); //col 3
 
-        // PART 2 nama detail pemesanan
-        String reference = messageSource.getMessage("invoice.netv-biller", null, LocaleContextHolder.getLocale());
-        tblDetailPemesanan.addCell(stylePdfService.getTextDetail(reference, plusJakarta)); //col 1
-        tblDetailPemesanan.addCell(stylePdfService.getTextDetail("", plusJakarta));
+        String indexProduct = transactionDto.getIndexProduct().toString();
+        String[] indexSprated = indexProduct.split("\\|");
 
-        tblDetailPemesanan.addCell(stylePdfService.getTextDetail("", plusJakarta)); //col 2
-        tblDetailPemesanan.addCell(stylePdfService.getTextDetail("", plusJakarta));
-
-        tblDetailPemesanan.addCell(stylePdfService.getTextDetail("", plusJakarta));  //col 3
-        // pemesanan output
-        tblDetailPemesanan.addCell(stylePdfService.getDetailUserBold(transactionDto.getDetail().get("productName").asText(), plusJakartaDisplayBold)); //col 1
-        tblDetailPemesanan.addCell(stylePdfService.getTextDetail("", plusJakarta));
-
-        tblDetailPemesanan.addCell(stylePdfService.getTextDetail("", plusJakartaDisplayBold)); //col 2
-
-        tblDetailPemesanan.addCell(stylePdfService.getTextDetail("", plusJakarta));
-        tblDetailPemesanan.addCell(stylePdfService.getTextDetail("", plusJakarta)); // col 3
+        tblDetailPemesanan.addCell(stylePdfService.getDetailUserBold(indexSprated[3], plusJakartaDisplayBold)); //col 1
 
         document.add(stylePdfService.smallSpace(pdfDocument));
         document.add(detailPemesananHead);
@@ -199,32 +172,25 @@ public class NeTVServiceImpl implements NeTVService {
 
 
 //        Detail Produk title
-        Table detailProdukTbl = new Table(new float[]{60, 220, 230, 200, col});
+        Table detailProdukTbl = new Table(new float[]{60, 240, 400,col});
         detailProdukTbl.setMarginLeft(20);
         detailProdukTbl.addCell(stylePdfService.getHeaderTextCell("No.", plusJakarta)); //col1
+//        String product = "Produk";
         String product = messageSource.getMessage("invoice.generic-produk", null, LocaleContextHolder.getLocale());
-
         detailProdukTbl.addCell(stylePdfService.getHeaderTextCell(product, plusJakarta)); //col2
         String desctiptionProduct = messageSource.getMessage("invoice.generic-deskripsi", null, LocaleContextHolder.getLocale());
-
         detailProdukTbl.addCell(stylePdfService.getHeaderTextCell(desctiptionProduct, plusJakarta)); //col3
-        String quantity = messageSource.getMessage("invoice.netv-provider", null, LocaleContextHolder.getLocale());
-
-        detailProdukTbl.addCell(stylePdfService.getHeaderTextCell(quantity, plusJakarta)); //col4
         String price = messageSource.getMessage("invoice.generic-price", null, LocaleContextHolder.getLocale());
-
-        detailProdukTbl.addCell(stylePdfService.getHeaderTextCell(price, plusJakarta)); //col5
+        detailProdukTbl.addCell(stylePdfService.getHeaderTextCell(price, plusJakarta)); //col 4
 
 //        Detail Produk output
+        double serviceFeeAmoung = transactionDto.getPayment().getServiceFeeAmount().doubleValue();
         int count = 1; //dummy
         detailProdukTbl.addCell(stylePdfService.getDetailProdukOutput("" + count, plusJakarta)); //col 1
-        detailProdukTbl.addCell(stylePdfService.getDetailProdukOutput(transactionDto.getDetail().get("serviceName").asText(), plusJakarta)); //col 2
-        String produkName = transactionDto.getDetail().get("serviceName").asText();
-        detailProdukTbl.addCell(stylePdfService.getDetailProdukOutput(produkName, plusJakarta)); //col 3
-        String provider = transactionDto.getDetail().get("productName").asText();
-        detailProdukTbl.addCell(stylePdfService.getDetailProdukOutput(provider, plusJakarta)); // col 4
-        double billAmount = transactionDto.getDetail().get("billAmount").doubleValue();// col5
-        detailProdukTbl.addCell(stylePdfService.getDetailProdukOutput("Rp " + stylePdfService.getPrice(billAmount) + ",- ", plusJakarta));
+        detailProdukTbl.addCell(stylePdfService.getDetailProdukOutput(indexSprated[1], plusJakarta)); //col 2
+        detailProdukTbl.addCell(stylePdfService.getDetailProdukOutput(indexSprated[0]+" "+indexSprated[2], plusJakarta)); //col 3
+        double fareAmount = transactionDto.getFareAmount().doubleValue();// col4
+        detailProdukTbl.addCell(stylePdfService.getDetailProdukOutput("Rp " + stylePdfService.getPrice(fareAmount) + ",- ", plusJakarta));
 
         document.add(detailProdukTbl);
         document.add(stylePdfService.brokeLine(pdfDocument));
@@ -232,49 +198,47 @@ public class NeTVServiceImpl implements NeTVService {
 //        Bill / Price / harga
 
         // checking 0 or not
-        double adminAmount;
-        if (transactionDto.getAdminAmount() != null) {
-            adminAmount = transactionDto.getAdminAmount().doubleValue();
-        } else {
-            String adminAmountStr = "0";
-            adminAmount = Float.parseFloat(adminAmountStr);
-        }
+        double adminAmount = transactionDto.getAdminAmount().doubleValue();
         double discount = transactionDto.getDiscountAmount().doubleValue();
-        if (transactionDto.getDiscountAmount() != null && transactionDto.getDiscountAmount().doubleValue() > 0) {
-            String discountStr = transactionDto.getDiscountAmount().toString();
-            discount = Float.parseFloat(discountStr);
-        }
 
         Table priceTable = new Table(twoCol);
         Table nestedPrice = new Table(new float[]{100, 150});
         Table bungkusNestedPrice = new Table(new float[]{250});
         nestedPrice.addCell(stylePdfService.getHeaderTextCell("Sub Total", plusJakarta));
 
-        nestedPrice.addCell(stylePdfService.getDetailProdukOutput("Rp " + stylePdfService.getPrice(billAmount) + ",-", plusJakarta));
+        nestedPrice.addCell(stylePdfService.getDetailProdukOutputPricing("Rp " + stylePdfService.getPrice(fareAmount) + ",-", plusJakarta));
 
         //kalau tidak ada discount, teks discount hilang
         if (transactionDto.getDiscountAmount() != null && transactionDto.getDiscountAmount().doubleValue() > 0) {
-            String discountStr = messageSource.getMessage("invoice.generic-discount", null, LocaleContextHolder.getLocale());
+            String discountStr = messageSource.getMessage("invoice.generic-discount",null,LocaleContextHolder.getLocale());
             nestedPrice.addCell(stylePdfService.getHeaderTextCell(discountStr, plusJakarta));
-            nestedPrice.addCell(stylePdfService.getDetailProdukOutput("Rp - " + stylePdfService.getPrice(discount) + ",-", plusJakarta));
+            nestedPrice.addCell(stylePdfService.getDetailProdukOutputPricing("Rp - " + stylePdfService.getPrice(discount) + ",-", plusJakarta));
         } else {
             nestedPrice.addCell(stylePdfService.getHeaderTextCell(" ", plusJakarta));
             nestedPrice.addCell(stylePdfService.getDetailProdukOutput(" ", plusJakarta));
         }
         //kalau tidak ada admin amount, teks biaya jasa hilang
-        if (transactionDto.getDiscountAmount() != null && transactionDto.getAdminAmount().doubleValue() > 0) {
-            String biayaJasa = messageSource.getMessage("invoice.generic-admin-amount", null, LocaleContextHolder.getLocale());
+        if (transactionDto.getAdminAmount() != null && transactionDto.getAdminAmount().doubleValue() > 0) {
+            String biayaJasa = messageSource.getMessage("invoice.generic-admin-amount",null,LocaleContextHolder.getLocale());
             nestedPrice.addCell(stylePdfService.getHeaderTextCell(biayaJasa, plusJakarta));
-            nestedPrice.addCell(stylePdfService.getDetailProdukOutput("Rp " + stylePdfService.getPrice(adminAmount) + ",-", plusJakarta));
+            nestedPrice.addCell(stylePdfService.getDetailProdukOutputPricing("Rp " + stylePdfService.getPrice(adminAmount) + ",-", plusJakarta));
         } else {
             nestedPrice.addCell(stylePdfService.getHeaderTextCell(" ", plusJakarta));
             nestedPrice.addCell(stylePdfService.getDetailProdukOutput(" ", plusJakarta));
         }
-//        nestedPrice.addCell()
+        //kalau tidak ada service amount, teks service amount hilang
+        if (transactionDto.getPayment().getServiceFeeAmount() != null && transactionDto.getPayment().getServiceFeeAmount().doubleValue() > 0) {
+            String serviceAmount = messageSource.getMessage("invoice.generic-biaya-layanan",null,LocaleContextHolder.getLocale());
+            nestedPrice.addCell(stylePdfService.getHeaderTextCell(serviceAmount, plusJakarta));
+            nestedPrice.addCell(stylePdfService.getDetailProdukOutputPricing("Rp " + stylePdfService.getPrice(serviceFeeAmoung) + ",-", plusJakarta));
+        } else {
+            nestedPrice.addCell(stylePdfService.getHeaderTextCell(" ", plusJakarta));
+            nestedPrice.addCell(stylePdfService.getDetailProdukOutput(" ", plusJakarta));
+        }
         bungkusNestedPrice.addCell(new Cell().add(nestedPrice).setBorder(Border.NO_BORDER));
-        double serviceFeeAmoung = transactionDto.getPayment().getServiceFeeAmount().doubleValue();
-        double finalPrice = billAmount + adminAmount + serviceFeeAmoung - discount;
-        bungkusNestedPrice.addCell(new Cell().add(" - - - - - - - - - - - - - - - - - - - - - - - -").setBold().setBorder(Border.NO_BORDER));
+        //final price
+        double finalPrice = fareAmount + adminAmount + serviceFeeAmoung - discount;
+        bungkusNestedPrice.addCell(new Cell().add("- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -").setBold().setBorder(Border.NO_BORDER));
         Table totalTable = new Table(new float[]{100, 150});
         totalTable.addCell(stylePdfService.getHeaderTextCell("Total", plusJakarta));
         totalTable.addCell(stylePdfService.totalOutput(finalPrice,plusJakarta));
@@ -318,6 +282,5 @@ public class NeTVServiceImpl implements NeTVService {
         } catch (IOException e) {
             log.info("ERROR Download invoice,Invoice Number  -> {}", transactionDto.getInvoiceNumber());
         }
-
     }
 }
