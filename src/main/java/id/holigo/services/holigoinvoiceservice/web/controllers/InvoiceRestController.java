@@ -92,6 +92,7 @@ public class InvoiceRestController {
     public void setTransactionService(TransactionService transactionService) {
         this.transactionService = transactionService;
     }
+
     private PdfService pdfService;
 
     @Autowired
@@ -208,9 +209,9 @@ public class InvoiceRestController {
         //Holicash
 //        String json = "{\"id\":\"9cdc0a73-138e-4986-b408-869b08317d0f\",\"invoiceNumber\":\"1380/20221128/376\",\"createdAt\":\"2022-11-28T14:27:16.305+07:00\",\"expiredAt\":\"2022-11-28T16:27:16.250+07:00\",\"discountAmount\":0,\"fareAmount\":100000,\"ntaAmount\":100000,\"nraAmount\":0,\"hpAmount\":0,\"adminAmount\":0,\"indexProduct\":\"Top Up|Holi Cash|100,000|628117876746\",\"transactionId\":\"376\",\"transactionType\":\"HTD\",\"paymentId\":\"43441303-5727-4722-9b5e-29cc402ac5ce\",\"payment\":{\"id\":\"43441303-5727-4722-9b5e-29cc402ac5ce\",\"fareAmount\":100000,\"serviceFeeAmount\":24,\"discountAmount\":0,\"totalAmount\":100000,\"paymentServiceAmount\":100024,\"depositAmount\":0,\"isSplitBill\":false,\"pointAmount\":0,\"remainingAmount\":100024,\"status\":\"PAID\",\"paymentService\":{\"id\":\"BT_BCA\",\"name\":\"BCA Bank Transfer\",\"imageUrl\":\"https://ik.imagekit.io/holigo/Bank/BCA_bGtQ3AAv4F-.png?ik-sdk-version=javascript-1.4.3\",\"openTime\":\"00:15:00\",\"closeTime\":\"21:00:00\",\"minimumAmount\":10000,\"maximumAmount\":null,\"serviceFee\":0,\"mdrPercent\":0,\"fdsAmount\":0,\"status\":\"AVAILABLE\",\"note\":\"payment_service.note.BT_BCA\"},\"detailId\":\"3f9180a9-7f49-4843-a758-cb6968603f4e\",\"detailType\":\"bankTransfer\",\"detailRoute\":\"/api/v1/payments/43441303-5727-4722-9b5e-29cc402ac5ce/bankTransfer/3f9180a9-7f49-4843-a758-cb6968603f4e\",\"createdAt\":\"2022-11-28T14:27:19.178+07:00\",\"updatedAt\":\"2022-11-28T14:28:04.997+07:00\"},\"paymentStatus\":\"PAID\",\"orderStatus\":\"ISSUED\",\"serviceId\":1380,\"productId\":1380,\"detail\":null,\"serverTime\":\"2022-11-29T11:54:35.938+07:00\"}";
         //Train
-        String json = "{\"id\":\"247176f8-832a-4b4d-80a5-d0561f0503f1\",\"invoiceNumber\":\"3/20221129/21\",\"createdAt\":\"2022-11-29T16:27:57.560+07:00\",\"expiredAt\":\"2022-11-29T17:07:57.407+07:00\",\"discountAmount\":0,\"fareAmount\":52500,\"ntaAmount\":47500,\"nraAmount\":5000,\"hpAmount\":125,\"adminAmount\":7500,\"indexProduct\":\"O|Jakarta - Bandung|2022-12-22 17:55:00\",\"transactionId\":\"21\",\"transactionType\":\"TRAIN\",\"paymentId\":null,\"payment\":null,\"paymentStatus\":\"SELECTING_PAYMENT\",\"orderStatus\":\"BOOKED\",\"serviceId\":3,\"productId\":3,\"detail\":{\"id\":21,\"userId\":24403,\"iconUrl\":\"https://ik.imagekit.io/holigo/Icon_produk_homepage/pesawat_ZwrZ8JLMI.png?ik-sdk-version=javascript-1.4.3&updatedAt=1648702711249\",\"transactionId\":\"247176f8-832a-4b4d-80a5-d0561f0503f1\",\"contactPerson\":{\"name\":\"Rizki Pambudi\",\"phoneNumber\":\"628994636544\",\"email\":\"erpambudi0@gmail.com\"},\"tripType\":\"O\",\"trips\":[{\"id\":\"8e657800-b7d8-41e0-a62c-1400e2d49150\",\"passengers\":[{\"passenger\":{\"id\":null,\"type\":\"ADULT\",\"title\":\"MR\",\"name\":\"Ahmad Faisal Ibrahim\",\"phoneNumber\":null,\"identityCard\":{\"idCardNumber\":\"3671070902010001\"},\"passport\":null,\"baggageCode\":null,\"seatCode\":null},\"seatNumber\":\"EKO-EKO-1-3C\"}],\"paymentStatus\":\"SELECTING_PAYMENT\",\"orderStatus\":\"BOOKED\",\"trainName\":\"CIKURAY\",\"trainNumber\":\"7048B\",\"originStation\":{\"id\":\"PSE\",\"name\":\"Pasar Senen\",\"city\":\"Jakarta\"},\"destinationStation\":{\"id\":\"BD\",\"name\":\"Bandung\",\"city\":\"Bandung\"},\"adultAmount\":1,\"childAmount\":0,\"infantAmount\":0,\"departureDate\":\"2022-12-22\",\"departureTime\":\"17:55:00\",\"arrivalDate\":\"2022-12-22\",\"arrivalTime\":\"22:03:00\",\"imageUrl\":\"https://ik.imagekit.io/holigo/transportasi/logo-kai-main_SyEqhgYKx.png\",\"trainClass\":\"EKO\",\"trainSubClass\":\"C\",\"fareAmount\":45000,\"adminAmount\":0,\"hpAmount\":0,\"hpcAmount\":0,\"bookCode\":\"EGJ5YV4\"}],\"isBookable\":true,\"expiredAt\":\"2022-11-29T17:07:57.407+07:00\",\"paymentStatus\":\"SELECTING_PAYMENT\",\"orderStatus\":\"BOOKED\",\"fareAmount\":52500,\"adminAmount\":7500,\"discountAmount\":0,\"hpAmount\":125,\"hpcAmount\":125,\"seatMapUrl\":\"/api/v1/train/transactions/21/trips\"},\"serverTime\":\"2022-11-29T16:41:59.094+07:00\"}";
-        TransactionDto transactionDto = objectMapper.readValue(json, TransactionDto.class);
-//        TransactionDto transactionDto = transactionService.getTransactionDetail(id);
+//        String json = "{\"id\":\"247176f8-832a-4b4d-80a5-d0561f0503f1\",\"invoiceNumber\":\"3/20221129/21\",\"createdAt\":\"2022-11-29T16:27:57.560+07:00\",\"expiredAt\":\"2022-11-29T17:07:57.407+07:00\",\"discountAmount\":0,\"fareAmount\":52500,\"ntaAmount\":47500,\"nraAmount\":5000,\"hpAmount\":125,\"adminAmount\":7500,\"indexProduct\":\"O|Jakarta - Bandung|2022-12-22 17:55:00\",\"transactionId\":\"21\",\"transactionType\":\"TRAIN\",\"paymentId\":null,\"payment\":null,\"paymentStatus\":\"SELECTING_PAYMENT\",\"orderStatus\":\"BOOKED\",\"serviceId\":3,\"productId\":3,\"detail\":{\"id\":21,\"userId\":24403,\"iconUrl\":\"https://ik.imagekit.io/holigo/Icon_produk_homepage/pesawat_ZwrZ8JLMI.png?ik-sdk-version=javascript-1.4.3&updatedAt=1648702711249\",\"transactionId\":\"247176f8-832a-4b4d-80a5-d0561f0503f1\",\"contactPerson\":{\"name\":\"Rizki Pambudi\",\"phoneNumber\":\"628994636544\",\"email\":\"erpambudi0@gmail.com\"},\"tripType\":\"O\",\"trips\":[{\"id\":\"8e657800-b7d8-41e0-a62c-1400e2d49150\",\"passengers\":[{\"passenger\":{\"id\":null,\"type\":\"ADULT\",\"title\":\"MR\",\"name\":\"Ahmad Faisal Ibrahim\",\"phoneNumber\":null,\"identityCard\":{\"idCardNumber\":\"3671070902010001\"},\"passport\":null,\"baggageCode\":null,\"seatCode\":null},\"seatNumber\":\"EKO-EKO-1-3C\"}],\"paymentStatus\":\"SELECTING_PAYMENT\",\"orderStatus\":\"BOOKED\",\"trainName\":\"CIKURAY\",\"trainNumber\":\"7048B\",\"originStation\":{\"id\":\"PSE\",\"name\":\"Pasar Senen\",\"city\":\"Jakarta\"},\"destinationStation\":{\"id\":\"BD\",\"name\":\"Bandung\",\"city\":\"Bandung\"},\"adultAmount\":1,\"childAmount\":0,\"infantAmount\":0,\"departureDate\":\"2022-12-22\",\"departureTime\":\"17:55:00\",\"arrivalDate\":\"2022-12-22\",\"arrivalTime\":\"22:03:00\",\"imageUrl\":\"https://ik.imagekit.io/holigo/transportasi/logo-kai-main_SyEqhgYKx.png\",\"trainClass\":\"EKO\",\"trainSubClass\":\"C\",\"fareAmount\":45000,\"adminAmount\":0,\"hpAmount\":0,\"hpcAmount\":0,\"bookCode\":\"EGJ5YV4\"}],\"isBookable\":true,\"expiredAt\":\"2022-11-29T17:07:57.407+07:00\",\"paymentStatus\":\"SELECTING_PAYMENT\",\"orderStatus\":\"BOOKED\",\"fareAmount\":52500,\"adminAmount\":7500,\"discountAmount\":0,\"hpAmount\":125,\"hpcAmount\":125,\"seatMapUrl\":\"/api/v1/train/transactions/21/trips\"},\"serverTime\":\"2022-11-29T16:41:59.094+07:00\"}";
+//        TransactionDto transactionDto = objectMapper.readValue(json, TransactionDto.class);
+        TransactionDto transactionDto = transactionService.getTransactionDetail(id);
 
         StylePdfService stylePdfService = new StylePdfService();
 
@@ -227,12 +228,12 @@ public class InvoiceRestController {
                         "attachment;filename=" + "invoice-hotel-" + transactionDto.getInvoiceNumber() + ".pdf");
                 pdfHotelService.eReceiptHotel(transactionDto, response);
             }
-            case "PUL", "PD","PR","GAME" -> {
+            case "PUL", "PD", "PR", "GAME" -> {
                 response.setContentType("application/pdf");
                 response.addHeader("Content-Disposition",
                         "attachment;filename=" + "invoice-pulsa-" + transactionDto.getInvoiceNumber() + ".pdf");
                 String type = transactionDto.getTransactionType();
-                pdfPulsaService.invoicePulsa(transactionDto, response, stylePdfService,type);
+                pdfPulsaService.invoicePulsa(transactionDto, response, stylePdfService, type);
             }
             case "PLNPOST" -> {
                 response.setContentType("application/pdf");
@@ -324,6 +325,7 @@ public class InvoiceRestController {
             }
         }
     }
+
     @GetMapping("/web/v1/invoice/{id}/eticket")
     public void downloadEvoucherEticket(HttpServletResponse response, @PathVariable("id") UUID id) throws IOException {
         //train
@@ -332,11 +334,11 @@ public class InvoiceRestController {
 
 //        TransactionDto transactionDto = transactionService.getTransactionDetail(id);
         StylePdfService stylePdfService = new StylePdfService();
-        if (transactionDto.getTransactionType().equals("AIR")){
+        if (transactionDto.getTransactionType().equals("AIR")) {
             response.setContentType("application/pdf");
             response.addHeader("Content-Disposition",
                     "attachment;filename=" + "eticket-" + transactionDto.getInvoiceNumber() + ".pdf");
-            pdfAirlineService.airlineEticket(transactionDto,response);
+            pdfAirlineService.airlineEticket(transactionDto, response);
         } else if (transactionDto.getTransactionType().equals("TRAIN")) {
             response.setContentType("application/pdf");
             response.addHeader("Content-Disposition",
@@ -346,24 +348,23 @@ public class InvoiceRestController {
             System.err.print("transaction type is not availabel in this api");
         }
     }
+
     //HOTEL
     @GetMapping("/web/v1/invoice/{id}/evoucher")
     public void downloadEvoucher(HttpServletResponse response, @PathVariable("id") UUID id) throws IOException {
 
         TransactionDto transactionDto = transactionService.getTransactionDetail(id);
 
-        if (transactionDto.getTransactionType().equals("HTL")){
+        if (transactionDto.getTransactionType().equals("HTL")) {
             response.setContentType("application/pdf");
             response.addHeader("Content-Disposition",
                     "attachment;filename=" + "eVoucher-" + transactionDto.getInvoiceNumber() + ".pdf");
-            pdfHotelService.eVoucherHotel(transactionDto,response);
-        }else {
+            pdfHotelService.eVoucherHotel(transactionDto, response);
+        } else {
             System.err.print("transaction type is not HTL");
         }
 
     }
-
-
 
 
 }
