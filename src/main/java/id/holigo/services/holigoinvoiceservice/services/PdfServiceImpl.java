@@ -55,7 +55,13 @@ public class PdfServiceImpl implements PdfService {
             paymentMethodText = transactionDto.getPayment().getPaymentService().getName();
         }
         String productText = getProduct(transactionDto.getIndexProduct());
-        String customerNumberText = transactionDto.getDetail().get("customerNumber").asText();
+        String customerNumberText;
+        try {
+            customerNumberText = transactionDto.getDetail().get("customerNumber").asText();
+        }
+        catch (NullPointerException e){
+            customerNumberText = "";
+        }
         String getFareText = messageSource.getMessage("invoice.rupiah", null, LocaleContextHolder.getLocale())
                 + " ";
         String getTotalFareText = messageSource.getMessage("invoice.rupiah", null,
