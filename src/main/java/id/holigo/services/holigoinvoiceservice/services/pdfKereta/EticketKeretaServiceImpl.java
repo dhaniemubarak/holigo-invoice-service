@@ -318,7 +318,11 @@ public class EticketKeretaServiceImpl implements EticketKeretaService {
             detailPenumpangTable.addCell(stylePdfService.getDetailPenumpangOutput(count + "", plusJakarta));
             count = count + 1;
             //nama penumpang
-            detailPenumpangTable.addCell(stylePdfService.getDetailPenumpangOutput(transactionDto.getDetail().get("trips").get(0).get("passengers").get(passanger).get("passenger").get("name").asText(), plusJakarta));
+            try{
+                detailPenumpangTable.addCell(stylePdfService.getDetailPenumpangOutput(transactionDto.getDetail().get("trips").get(0).get("passengers").get(passanger).get("passenger").get("name").asText(), plusJakarta));
+            }catch (NullPointerException e){
+                detailPenumpangTable.addCell(stylePdfService.getDetailPenumpangOutput("-", plusJakarta));
+            }
             //nomor identitas
             try{
                 detailPenumpangTable.addCell(stylePdfService.getDetailPenumpangOutput(transactionDto.getDetail().get("trips").get(0).get("passengers").get(passanger).get("passenger").get("identityCard").get("idCardNumber").asText(), plusJakarta));
