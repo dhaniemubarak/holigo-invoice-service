@@ -112,7 +112,7 @@ public class EticketKeretaServiceImpl implements EticketKeretaService {
             document.add(stylePdfService.transaksiId(transactionId, plusJakarta, transactionDto));
             document.add(stylePdfService.oneLine(pdfDocument));
             document.add(space);
-            document.add(container1Page2(transactionDto, stylePdfService, plusJakarta, messageSource, page));
+            document.add(container1(transactionDto, stylePdfService, plusJakarta, messageSource, page));
             document.add(container2(transactionDto, stylePdfService, plusJakarta, messageSource, page));
             document.add(stylePdfService.footer(plusJakarta, pdfDocument, imageMail, phoneImg));
 
@@ -233,15 +233,14 @@ public class EticketKeretaServiceImpl implements EticketKeretaService {
 
         destinationTabel.addCell(new Cell().add("").setBorder(Border.NO_BORDER));
         String timeFlight;
-        String departureDateStr = transactionDto.getDetail().get("trips").get(0).get("departureDate").asText() + " " + transactionDto.getDetail().get("trips").get(0).get("departureTime").asText();
-        String arrivalDateStr = transactionDto.getDetail().get("trips").get(0).get("arrivalDate").asText() + " " + transactionDto.getDetail().get("trips").get(0).get("arrivalTime").asText();
-//        SimpleDateFormat formatDateDestination = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
-        SimpleDateFormat formatDateDestination = new SimpleDateFormat("YYYY-MM-dd HH:mm:ss");
+        String departureDateStr = transactionDto.getDetail().get("trips").get(page).get("departureDate").asText() + " " + transactionDto.getDetail().get("trips").get(page).get("departureTime").asText();
+        String arrivalDateStr = transactionDto.getDetail().get("trips").get(page).get("arrivalDate").asText() + " " + transactionDto.getDetail().get("trips").get(page).get("arrivalTime").asText();
+        SimpleDateFormat formatDateDestination = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         double diff;
         try {
             Date departureDate = formatDateDestination.parse(departureDateStr);
+            System.out.println( "departure date to string con 1 : "+departureDate.toString());
             Date arrivalDate = formatDateDestination.parse(arrivalDateStr);
-
             diff = arrivalDate.getTime() - departureDate.getTime();
         } catch (ParseException e) {
             throw new RuntimeException(" date error ");
@@ -295,7 +294,12 @@ public class EticketKeretaServiceImpl implements EticketKeretaService {
         destinationTabel.addCell(new Cell().add(kotaArrivalTable).setBorder(Border.NO_BORDER));
 
         Table parentDestination = new Table(new float[]{270});
-        parentDestination.addCell(new Cell().add(destinationTabel).setBorder(Border.NO_BORDER));
+        parentDestination.addCell(new Cell().add(destinationTabel)
+                .setBorder(Border.NO_BORDER)
+        );
+        parentDestination.addCell(stylePdfService.smallSpaceInColumn());
+        parentDestination.addCell(stylePdfService.smallSpaceInColumn());
+        parentDestination.addCell(stylePdfService.smallSpaceInColumn());
         String kodebooking = messageSource.getMessage("invoice.kereta-kodeBooking", null, LocaleContextHolder.getLocale());
         parentDestination.addCell(new Cell().add(kodebooking).setFont(plusJakarta)
                 .setFontSize(9)
@@ -310,6 +314,7 @@ public class EticketKeretaServiceImpl implements EticketKeretaService {
                 .setRelativePosition(5, 0, 0, 0)
                 .setBorder(Border.NO_BORDER)
                 .setBold());
+
         container1.addCell(new Cell().add(parentDestination).setBorder(Border.NO_BORDER)); // end Destination
 
         //        --TRAIN-- 3
@@ -423,17 +428,15 @@ public class EticketKeretaServiceImpl implements EticketKeretaService {
         destinationTabel.addCell(new Cell().add(kotaDepartureTable).setBorder(Border.NO_BORDER));
 
         destinationTabel.addCell(new Cell().add("").setBorder(Border.NO_BORDER));
-        String timeFlight;
-        String departureDateStr = transactionDto.getDetail().get("trips").get(page).get("departureDate").asText() + " " + transactionDto.getDetail().get("trips").get(1).get("departureTime").asText();
-        String arrivalDateStr = transactionDto.getDetail().get("trips").get(page).get("arrivalDate").asText() + " " + transactionDto.getDetail().get("trips").get(1).get("arrivalTime").asText();
+        String departureDateStr = transactionDto.getDetail().get("trips").get(page).get("departureDate").asText() + " " + transactionDto.getDetail().get("trips").get(page).get("departureTime").asText();
+        String arrivalDateStr = transactionDto.getDetail().get("trips").get(page).get("arrivalDate").asText() + " " + transactionDto.getDetail().get("trips").get(page).get("arrivalTime").asText();
 
-//        SimpleDateFormat formatDateDestination = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
         SimpleDateFormat formatDateDestination = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
         double diff;
         try {
             Date departureDate = formatDateDestination.parse(departureDateStr);
-            System.out.println("departure Date : " + departureDate);
+            System.out.println("Departure Date Con 2 : " + departureDate);
             Date arrivalDate = formatDateDestination.parse(arrivalDateStr);
             diff = arrivalDate.getTime() - departureDate.getTime();
         } catch (ParseException e) {
@@ -447,13 +450,12 @@ public class EticketKeretaServiceImpl implements EticketKeretaService {
             diffMinute = diffMinute - 60;
         }
         durationFlightMinute = diffMinute;
-        timeFlight = durationFlightHour + "j" + durationFlightMinute + "m";
+        String timeFlight = durationFlightHour + "j" + durationFlightMinute + "m";
         destinationTabel.addCell(new Cell().add(timeFlight).setBorder(Border.NO_BORDER)
                 .setFontSize(9)
                 .setFont(plusJakarta)
                 .setTextAlignment(TextAlignment.CENTER));
         destinationTabel.addCell(new Cell().add("").setBorder(Border.NO_BORDER));
-
 
         // arrival part
         Table dstDateArrival = new Table(new float[]{140});
@@ -472,10 +474,11 @@ public class EticketKeretaServiceImpl implements EticketKeretaService {
             arrivalTime = inputTime.parse(transactionDto.getDetail()
                     .get("trips").get(page)
                     .get("arrivalTime").asText());
-            dstDateArrival.addCell(stylePdfService.getDestination(outputTime.format(arrivalTime), plusJakarta, TextAlignment.RIGHT, true));
         } catch (ParseException e) {
-            throw new RuntimeException("Date Format Error");
+            throw new MalformedURLException("ERROR DATE");
         }
+        dstDateArrival.addCell(stylePdfService.getDestination(outputTime.format(arrivalTime), plusJakarta, TextAlignment.RIGHT, true));
+
 
         destinationTabel.addCell(new Cell().add(dstDateArrival).setBorder(Border.NO_BORDER));
         destinationTabel.addCell(new Cell().add(endPointImg.setRelativePosition(5, 0, 0, 0)).setBorder(Border.NO_BORDER));
@@ -507,7 +510,6 @@ public class EticketKeretaServiceImpl implements EticketKeretaService {
 
         //        --TRAIN-- 3
         Table maskapaiTabel = new Table(new float[]{135});
-
 
         maskapaiTabel.addCell(new Cell().add(maskapaiImg).setBorder(Border.NO_BORDER));
         String trainName = transactionDto.getDetail().get("trips").get(page).get("trainName").asText();
