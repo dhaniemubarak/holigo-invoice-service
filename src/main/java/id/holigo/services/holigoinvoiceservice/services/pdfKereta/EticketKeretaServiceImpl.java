@@ -362,11 +362,7 @@ public class EticketKeretaServiceImpl implements EticketKeretaService {
         String nomorIdentitas = messageSource.getMessage("invoice.generic-nomorIdentitas", null, LocaleContextHolder.getLocale());
         detailPenumpangTable.addCell(stylePdfService.getHeaderTextCell(nomorIdentitas, plusJakarta));
         String nomorKursi = messageSource.getMessage("invoice.generic-nomorKursi", null, LocaleContextHolder.getLocale());
-        if (nomorKursi.isEmpty()){
-            detailPenumpangTable.addCell(stylePdfService.getHeaderTextCell("-", plusJakarta));
-        }else {
-            detailPenumpangTable.addCell(stylePdfService.getHeaderTextCell(nomorKursi, plusJakarta));
-        }
+        detailPenumpangTable.addCell(stylePdfService.getHeaderTextCell(nomorKursi, plusJakarta));
 
         int countPenumpang = transactionDto.getDetail().get("trips").get(page).get("passengers").size();
         int count = 1;
@@ -386,8 +382,13 @@ public class EticketKeretaServiceImpl implements EticketKeretaService {
             } catch (NullPointerException e) {
                 detailPenumpangTable.addCell(stylePdfService.getDetailPenumpangOutput("-", plusJakarta));
             }
-            //nomer Kursi
-            detailPenumpangTable.addCell(stylePdfService.getDetailPenumpangOutput(transactionDto.getDetail().get("trips").get(page).get("passengers").get(passanger).get("seatNumber").asText(), plusJakarta));
+            //nomor Kursi
+            String nomorKursiOutput = transactionDto.getDetail().get("trips").get(page).get("passengers").get(passanger).get("seatNumber").asText();
+            if (nomorKursiOutput.isEmpty() || nomorKursiOutput.isBlank() || nomorKursiOutput == null){
+                detailPenumpangTable.addCell(stylePdfService.getDetailPenumpangOutput("-", plusJakarta));
+            }else{
+                detailPenumpangTable.addCell(stylePdfService.getDetailPenumpangOutput(nomorKursiOutput, plusJakarta));
+            }
         }
 
         container2.addCell(new Cell().add(detailPenumpangTable).setBorder(Border.NO_BORDER));
