@@ -352,7 +352,7 @@ public class EticketKeretaServiceImpl implements EticketKeretaService {
                 .setBold()
                 .setMaxHeight(20)
         );
-        Table detailPenumpangTable = new Table(new float[]{100, col, col, col});
+        Table detailPenumpangTable = new Table(new float[]{50, col, col, col,col});
         detailPenumpangTable.setMargins(0, 0, 0, 10);
 
 
@@ -363,6 +363,8 @@ public class EticketKeretaServiceImpl implements EticketKeretaService {
         detailPenumpangTable.addCell(stylePdfService.getHeaderTextCell(nomorIdentitas, plusJakarta));
         String nomorKursi = messageSource.getMessage("invoice.generic-nomorKursi", null, LocaleContextHolder.getLocale());
         detailPenumpangTable.addCell(stylePdfService.getHeaderTextCell(nomorKursi, plusJakarta));
+        String passport = messageSource.getMessage("invoice.kereta-passport", null, LocaleContextHolder.getLocale());
+        detailPenumpangTable.addCell(stylePdfService.getHeaderTextCell(passport, plusJakarta));
 
         int countPenumpang = transactionDto.getDetail().get("trips").get(page).get("passengers").size();
         int count = 1;
@@ -389,6 +391,14 @@ public class EticketKeretaServiceImpl implements EticketKeretaService {
             }else{
                 detailPenumpangTable.addCell(stylePdfService.getDetailPenumpangOutput(nomorKursiOutput, plusJakarta));
             }
+            //passport
+            try {
+                String passportOutput = transactionDto.getDetail().get("trips").get(page).get("passengers").get(passanger).get("passenger").get("passport").get("passportNumber").asText();
+                detailPenumpangTable.addCell(stylePdfService.getDetailPenumpangOutput(passportOutput, plusJakarta));
+            }catch (NullPointerException e){
+                detailPenumpangTable.addCell(stylePdfService.getDetailPenumpangOutput("-", plusJakarta));
+            }
+
         }
 
         container2.addCell(new Cell().add(detailPenumpangTable).setBorder(Border.NO_BORDER));
