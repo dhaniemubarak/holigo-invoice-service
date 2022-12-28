@@ -98,8 +98,8 @@ public class EreceiptKeretaServiceImpl implements EreceiptKeretaService {
         float[] twoCol = {350f, 200f};
 
         // - - - - - HEADER  - - - - -
-        String title = messageSource.getMessage("invoice.generic-title", null, LocaleContextHolder.getLocale());
-        String subTitle = messageSource.getMessage("invoice.netv-subtitle", null, LocaleContextHolder.getLocale());
+        String title = messageSource.getMessage("invoice.generic-title-bukti-pembayaran", null, LocaleContextHolder.getLocale());
+        String subTitle = messageSource.getMessage("invoice.subtitle-kereta", null, LocaleContextHolder.getLocale());
         document.add(stylePdfService.headerTitle(plusJakarta, imageLogo, title, subTitle));
         //--> ID TRANSAKSI
         String transactionId = messageSource.getMessage("invoice.id-transaksi", null, LocaleContextHolder.getLocale());

@@ -80,7 +80,7 @@ public class EticketKeretaServiceImpl implements EticketKeretaService {
                 .setFontSize(20).setTextAlignment(TextAlignment.CENTER));
 
         //      --> HEADER START
-        String title = messageSource.getMessage("invoice.generic-title", null, LocaleContextHolder.getLocale());
+        String title = messageSource.getMessage("invoice.generic-title-ETicket", null, LocaleContextHolder.getLocale());
         String subTitle = messageSource.getMessage("invoice.subtitle-kereta", null, LocaleContextHolder.getLocale());
         document.add(stylePdfService.headerTitle(plusJakarta, imageLogo, title, subTitle));
 
@@ -239,7 +239,6 @@ public class EticketKeretaServiceImpl implements EticketKeretaService {
         double diff;
         try {
             Date departureDate = formatDateDestination.parse(departureDateStr);
-            System.out.println( "departure date to string con 1 : "+departureDate.toString());
             Date arrivalDate = formatDateDestination.parse(arrivalDateStr);
             diff = arrivalDate.getTime() - departureDate.getTime();
         } catch (ParseException e) {
@@ -363,7 +362,11 @@ public class EticketKeretaServiceImpl implements EticketKeretaService {
         String nomorIdentitas = messageSource.getMessage("invoice.generic-nomorIdentitas", null, LocaleContextHolder.getLocale());
         detailPenumpangTable.addCell(stylePdfService.getHeaderTextCell(nomorIdentitas, plusJakarta));
         String nomorKursi = messageSource.getMessage("invoice.generic-nomorKursi", null, LocaleContextHolder.getLocale());
-        detailPenumpangTable.addCell(stylePdfService.getHeaderTextCell(nomorKursi, plusJakarta));
+        if (nomorKursi.isEmpty()){
+            detailPenumpangTable.addCell(stylePdfService.getHeaderTextCell("-", plusJakarta));
+        }else {
+            detailPenumpangTable.addCell(stylePdfService.getHeaderTextCell(nomorKursi, plusJakarta));
+        }
 
         int countPenumpang = transactionDto.getDetail().get("trips").get(page).get("passengers").size();
         int count = 1;
