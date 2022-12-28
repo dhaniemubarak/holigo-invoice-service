@@ -230,7 +230,7 @@ public class EreceiptKeretaServiceImpl implements EreceiptKeretaService {
         String amountStr = Integer.toString(amount);
         detailProdukTbl.addCell(stylePdfService.getDetailProdukOutput(amountStr, plusJakarta));
 
-        double billAmount = transactionDto.getDetail().get("fareAmount").doubleValue();// col5
+        double billAmount = transactionDto.getDetail().get("billAmount").doubleValue();// col5
         detailProdukTbl.addCell(stylePdfService.getDetailProdukOutput("Rp " + stylePdfService.getPrice(billAmount) + ",- ", plusJakarta));
 
         document.add(detailProdukTbl);
