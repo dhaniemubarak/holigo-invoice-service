@@ -229,8 +229,12 @@ public class EreceiptKeretaServiceImpl implements EreceiptKeretaService {
         int amount = transactionDto.getDetail().get("trips").get(0).get("adultAmount").intValue() + transactionDto.getDetail().get("trips").get(0).get("childAmount").intValue() + transactionDto.getDetail().get("trips").get(0).get("infantAmount").intValue();
         String amountStr = Integer.toString(amount);
         detailProdukTbl.addCell(stylePdfService.getDetailProdukOutput(amountStr, plusJakarta));
-
-        double billAmount = transactionDto.getDetail().get("billAmount").doubleValue();// col5
+        double billAmount;
+        try {
+            billAmount= transactionDto.getDetail().get("billAmount").doubleValue();// col5
+        }catch (NullPointerException e){
+            billAmount= 0;// col5
+        }
         detailProdukTbl.addCell(stylePdfService.getDetailProdukOutput("Rp " + stylePdfService.getPrice(billAmount) + ",- ", plusJakarta));
 
         document.add(detailProdukTbl);

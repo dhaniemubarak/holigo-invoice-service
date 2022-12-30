@@ -97,10 +97,12 @@ public class EticketKeretaServiceImpl implements EticketKeretaService {
         // CONTAINER 2
         document.add(container2(transactionDto, stylePdfService, plusJakarta, messageSource, page));
         // END CONTAINER 2
+        // CONTAINER 3
+        document.add(container3(transactionDto, stylePdfService, plusJakarta, messageSource, page));
+        // END CONTAINER 3
 
-        Table contrainer3 = new Table(new float[]{525});
-        String termCondition = messageSource.getMessage("invoice.term-condition-voucher", null, LocaleContextHolder.getLocale());
-        contrainer3.addCell(new Cell().add(termCondition));
+
+
         document.add(stylePdfService.footer(plusJakarta, pdfDocument, imageMail, phoneImg));
 
         // page 2
@@ -114,9 +116,10 @@ public class EticketKeretaServiceImpl implements EticketKeretaService {
             document.add(space);
             document.add(container1(transactionDto, stylePdfService, plusJakarta, messageSource, page));
             document.add(container2(transactionDto, stylePdfService, plusJakarta, messageSource, page));
+            document.add(container3(transactionDto, stylePdfService, plusJakarta, messageSource, page));
             document.add(stylePdfService.footer(plusJakarta, pdfDocument, imageMail, phoneImg));
-
         }
+
 
 
         document.close();
@@ -338,7 +341,6 @@ public class EticketKeretaServiceImpl implements EticketKeretaService {
         return container1;
     }
 
-
     private static Table container2(TransactionDto transactionDto, StylePdfService stylePdfService, PdfFont plusJakarta, MessageSource messageSource, int page) {
         float col = 200f;
         Table container2 = new Table(new float[]{525});
@@ -352,7 +354,7 @@ public class EticketKeretaServiceImpl implements EticketKeretaService {
                 .setBold()
                 .setMaxHeight(20)
         );
-        Table detailPenumpangTable = new Table(new float[]{50, col, col, col,col});
+        Table detailPenumpangTable = new Table(new float[]{100, col, col, col});
         detailPenumpangTable.setMargins(0, 0, 0, 10);
 
 
@@ -361,10 +363,11 @@ public class EticketKeretaServiceImpl implements EticketKeretaService {
         detailPenumpangTable.addCell(stylePdfService.getHeaderTextCell(namaPenumpang, plusJakarta));
         String nomorIdentitas = messageSource.getMessage("invoice.generic-nomorIdentitas", null, LocaleContextHolder.getLocale());
         detailPenumpangTable.addCell(stylePdfService.getHeaderTextCell(nomorIdentitas, plusJakarta));
+
+
         String nomorKursi = messageSource.getMessage("invoice.generic-nomorKursi", null, LocaleContextHolder.getLocale());
         detailPenumpangTable.addCell(stylePdfService.getHeaderTextCell(nomorKursi, plusJakarta));
-        String passport = messageSource.getMessage("invoice.kereta-passport", null, LocaleContextHolder.getLocale());
-        detailPenumpangTable.addCell(stylePdfService.getHeaderTextCell(passport, plusJakarta));
+
 
         int countPenumpang = transactionDto.getDetail().get("trips").get(page).get("passengers").size();
         int count = 1;
@@ -378,26 +381,25 @@ public class EticketKeretaServiceImpl implements EticketKeretaService {
             } catch (NullPointerException e) {
                 detailPenumpangTable.addCell(stylePdfService.getDetailPenumpangOutput("-", plusJakarta));
             }
-            //nomor identitas
+            //nomor identitas || passport
             try {
-                detailPenumpangTable.addCell(stylePdfService.getDetailPenumpangOutput(transactionDto.getDetail().get("trips").get(page).get("passengers").get(passanger).get("passenger").get("identityCard").get("idCardNumber").asText(), plusJakarta));
+                //nomor identitas
+                String nomorIdentitasOutput = transactionDto.getDetail().get("trips").get(page).get("passengers").get(passanger).get("passenger").get("identityCard").get("idCardNumber").asText();
+                detailPenumpangTable.addCell(stylePdfService.getDetailPenumpangOutput(nomorIdentitasOutput, plusJakarta));
             } catch (NullPointerException e) {
-                detailPenumpangTable.addCell(stylePdfService.getDetailPenumpangOutput("-", plusJakarta));
-            }
-            //nomor Kursi
-            String nomorKursiOutput = transactionDto.getDetail().get("trips").get(page).get("passengers").get(passanger).get("seatNumber").asText();
-            if (nomorKursiOutput.isEmpty() || nomorKursiOutput.isBlank() || nomorKursiOutput == null){
-                detailPenumpangTable.addCell(stylePdfService.getDetailPenumpangOutput("-", plusJakarta));
-            }else{
-                detailPenumpangTable.addCell(stylePdfService.getDetailPenumpangOutput(nomorKursiOutput, plusJakarta));
-            }
-            //passport
-            try {
+                //passport
                 String passportOutput = transactionDto.getDetail().get("trips").get(page).get("passengers").get(passanger).get("passenger").get("passport").get("passportNumber").asText();
                 detailPenumpangTable.addCell(stylePdfService.getDetailPenumpangOutput(passportOutput, plusJakarta));
-            }catch (NullPointerException e){
-                detailPenumpangTable.addCell(stylePdfService.getDetailPenumpangOutput("-", plusJakarta));
             }
+
+            //nomor Kursi
+            String nomorKursiOutput = transactionDto.getDetail().get("trips").get(page).get("passengers").get(passanger).get("seatNumber").asText();
+            if (nomorKursiOutput.isEmpty() || nomorKursiOutput.isBlank() || nomorKursiOutput == null) {
+                detailPenumpangTable.addCell(stylePdfService.getDetailPenumpangOutput("-", plusJakarta));
+            } else {
+                detailPenumpangTable.addCell(stylePdfService.getDetailPenumpangOutput(nomorKursiOutput, plusJakarta));
+            }
+
 
         }
 
@@ -413,5 +415,31 @@ public class EticketKeretaServiceImpl implements EticketKeretaService {
                 .setMaxHeight(20)
         );
         return container2;
+    }
+
+    private static Table container3(TransactionDto transactionDto, StylePdfService stylePdfService, PdfFont plusJakarta, MessageSource messageSource, int page){
+        Table contrainer3 = new Table(new float[]{525});
+//        String termCondition = messageSource.getMessage("invoice.term-condition-voucher", null, LocaleContextHolder.getLocale());
+//        contrainer3.addCell(stylePdfService.getSyaratKetentuan(termCondition,plusJakarta).setBorder(Border.NO_BORDER));
+        String term =  messageSource.getMessage("invoice.term-condition-train", null, LocaleContextHolder.getLocale());
+        String term1 =  messageSource.getMessage("invoice.term-condition-train1", null, LocaleContextHolder.getLocale());
+        String term2 =  messageSource.getMessage("invoice.term-condition-train2", null, LocaleContextHolder.getLocale());
+        String term3 =  messageSource.getMessage("invoice.term-condition-train3", null, LocaleContextHolder.getLocale());
+        String term4 =  messageSource.getMessage("invoice.term-condition-train4", null, LocaleContextHolder.getLocale());
+        String term5 =  messageSource.getMessage("invoice.term-condition-train5", null, LocaleContextHolder.getLocale());
+        String term6 =  messageSource.getMessage("invoice.term-condition-train6", null, LocaleContextHolder.getLocale());
+        String term7 =  messageSource.getMessage("invoice.term-condition-train7", null, LocaleContextHolder.getLocale());
+        String termEnd =  messageSource.getMessage("invoice.term-condition-trainEnd", null, LocaleContextHolder.getLocale());
+        contrainer3.addCell(stylePdfService.getSyaratKetentuan(term,plusJakarta).setBorder(Border.NO_BORDER));
+        contrainer3.addCell(stylePdfService.getSyaratKetentuan(term1,plusJakarta).setBorder(Border.NO_BORDER));
+        contrainer3.addCell(stylePdfService.getSyaratKetentuan(term2,plusJakarta).setBorder(Border.NO_BORDER));
+        contrainer3.addCell(stylePdfService.getSyaratKetentuan(term3,plusJakarta).setBorder(Border.NO_BORDER));
+        contrainer3.addCell(stylePdfService.getSyaratKetentuan(term4,plusJakarta).setBorder(Border.NO_BORDER));
+        contrainer3.addCell(stylePdfService.getSyaratKetentuan(term5,plusJakarta).setBorder(Border.NO_BORDER));
+        contrainer3.addCell(stylePdfService.getSyaratKetentuan(term6,plusJakarta).setBorder(Border.NO_BORDER));
+        contrainer3.addCell(stylePdfService.getSyaratKetentuan(term7,plusJakarta).setBorder(Border.NO_BORDER));
+        contrainer3.addCell(stylePdfService.getSyaratKetentuan(termEnd,plusJakarta).setBorder(Border.NO_BORDER));
+
+        return contrainer3;
     }
 }
