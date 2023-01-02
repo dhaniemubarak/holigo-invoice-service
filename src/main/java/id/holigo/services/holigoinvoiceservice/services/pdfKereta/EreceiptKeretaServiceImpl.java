@@ -131,11 +131,9 @@ public class EreceiptKeretaServiceImpl implements EreceiptKeretaService {
         tblDetailPemesanan.addCell(stylePdfService.getTextDetail("", plusJakarta));
         tblDetailPemesanan.addCell(stylePdfService.getDetailUserBold(transactionDto.getDetail().get("contactPerson").get("phoneNumber").asText(), plusJakartaDisplayBold)); //col 3
 
-
         document.add(stylePdfService.smallSpace(pdfDocument));
         document.add(detailPemesananHead);
         document.add(tblDetailPemesanan);
-
 
         //        Detail Pembayaran output
         boolean statusPayment = false;
@@ -207,35 +205,42 @@ public class EreceiptKeretaServiceImpl implements EreceiptKeretaService {
 
 //        Detail Produk output
         int count = 1; //dummy
-        detailProdukTbl.addCell(stylePdfService.getDetailProdukOutput("" + count, plusJakarta)); //col 1
+        int sizeTrips = transactionDto.getDetail().get("trips").size();
+        for (int tripsIndex = 0; tripsIndex < sizeTrips; tripsIndex++) {
+            detailProdukTbl.addCell(stylePdfService.getDetailProdukOutput("" + count, plusJakarta)); //col 1
+            count = count + 1;
+            String produk = messageSource.getMessage("invoice.kereta-produk", null, LocaleContextHolder.getLocale()); //col 2
+            detailProdukTbl.addCell(stylePdfService.getDetailProdukOutput(produk, plusJakarta));
 
-        String produk = messageSource.getMessage("invoice.kereta-produk",null,LocaleContextHolder.getLocale()); //col 2
-        detailProdukTbl.addCell(stylePdfService.getDetailProdukOutput(produk, plusJakarta));
+            Table deskripsiTable = new Table(new float[]{230});
+            String trainName = transactionDto.getDetail().get("trips").get(tripsIndex).get("trainName").asText(); //col 3
+            String[] originStation = {transactionDto.getDetail().get("trips").get(tripsIndex).get("originStation").get("city").asText()};
+            String[] destinationStation = {transactionDto.getDetail().get("trips").get(tripsIndex).get("destinationStation").get("city").asText()};
+            String[] trainClass = {transactionDto.getDetail().get("trips").get(tripsIndex).get("trainClass").asText(), transactionDto.getDetail().get("trips").get(tripsIndex).get("trainSubClass").asText()};
+            String trainNumber = transactionDto.getDetail().get("trips").get(tripsIndex).get("trainNumber").asText();
 
-        Table deskripsiTable = new Table(new float[] {230});
-        String trainName = transactionDto.getDetail().get("trips").get(0).get("trainName").asText(); //col 3
-        String[] destination = transactionDto.getIndexProduct().split("\\|");
-        String[] trainClass = {transactionDto.getDetail().get("trips").get(0).get("trainClass").asText(),transactionDto.getDetail().get("trips").get(0).get("trainSubClass").asText()};
-        String trainNumber = transactionDto.getDetail().get("trips").get(0).get("trainNumber").asText();
+            deskripsiTable.addCell(stylePdfService.getDetailProdukOutput(trainName, plusJakarta));
 
-        deskripsiTable.addCell(stylePdfService.getDetailProdukOutput(trainName,plusJakarta));
-        deskripsiTable.addCell(stylePdfService.getDetailProdukOutputDesc(destination[1],plusJakarta));
-        deskripsiTable.addCell(stylePdfService.getDetailProdukOutputDesc(trainClass[0]+" - " +trainClass[1],plusJakarta));
-        deskripsiTable.addCell(stylePdfService.getDetailProdukOutputDesc(trainNumber,plusJakarta));
+            deskripsiTable.addCell(stylePdfService.getDetailProdukOutputDesc(originStation[0]+"-"+destinationStation[0], plusJakarta));
+            deskripsiTable.addCell(stylePdfService.getDetailProdukOutputDesc(trainClass[0] + " - " + trainClass[1], plusJakarta));
 
-        detailProdukTbl.addCell(new Cell().add(deskripsiTable.setBorder(Border.NO_BORDER)).setBorder(Border.NO_BORDER));
+            deskripsiTable.addCell(stylePdfService.getDetailProdukOutputDesc(trainNumber, plusJakarta));
 
-        // col 4
-        int amount = transactionDto.getDetail().get("trips").get(0).get("adultAmount").intValue() + transactionDto.getDetail().get("trips").get(0).get("childAmount").intValue() + transactionDto.getDetail().get("trips").get(0).get("infantAmount").intValue();
-        String amountStr = Integer.toString(amount);
-        detailProdukTbl.addCell(stylePdfService.getDetailProdukOutput(amountStr, plusJakarta));
-        double billAmount;
-        try {
-            billAmount= transactionDto.getDetail().get("billAmount").doubleValue();// col5
-        }catch (NullPointerException e){
-            billAmount= 0;// col5
+            detailProdukTbl.addCell(new Cell().add(deskripsiTable.setBorder(Border.NO_BORDER)).setBorder(Border.NO_BORDER));
+
+            // col 4
+            int amount = transactionDto.getDetail().get("trips").get(tripsIndex).get("adultAmount").intValue() + transactionDto.getDetail().get("trips").get(tripsIndex).get("childAmount").intValue() + transactionDto.getDetail().get("trips").get(tripsIndex).get("infantAmount").intValue();
+
+            String amountStr = Integer.toString(amount);
+            detailProdukTbl.addCell(stylePdfService.getDetailProdukOutput(amountStr, plusJakarta));
+            double fareAmounnt;
+            try {
+                fareAmounnt = transactionDto.getDetail().get("trips").get(tripsIndex).get("fareAmount").doubleValue();// col5
+            } catch (NullPointerException e) {
+                fareAmounnt = 0;// col5
+            }
+            detailProdukTbl.addCell(stylePdfService.getDetailProdukOutput("Rp " + stylePdfService.getPrice(fareAmounnt) + ",- ", plusJakarta));
         }
-        detailProdukTbl.addCell(stylePdfService.getDetailProdukOutput("Rp " + stylePdfService.getPrice(billAmount) + ",- ", plusJakarta));
 
         document.add(detailProdukTbl);
         document.add(stylePdfService.brokeLine(pdfDocument));
@@ -243,6 +248,12 @@ public class EreceiptKeretaServiceImpl implements EreceiptKeretaService {
 //        Bill / Price / harga
 
         // checking 0 or not
+        double billAmount;
+        try {
+            billAmount = transactionDto.getFareAmount().doubleValue() - transactionDto.getAdminAmount().doubleValue() ;// col5
+        } catch (NullPointerException e) {
+            billAmount = 0;// col5
+        }
         double adminAmount;
         if (transactionDto.getAdminAmount() != null) {
             adminAmount = transactionDto.getAdminAmount().doubleValue();
@@ -285,7 +296,7 @@ public class EreceiptKeretaServiceImpl implements EreceiptKeretaService {
         double serviceFeeAmoung;
         try {
             serviceFeeAmoung = transactionDto.getPayment().getServiceFeeAmount().doubleValue();
-        }catch (NullPointerException e){
+        } catch (NullPointerException e) {
             serviceFeeAmoung = 0.0;
         }
 
@@ -293,7 +304,7 @@ public class EreceiptKeretaServiceImpl implements EreceiptKeretaService {
         bungkusNestedPrice.addCell(new Cell().add(" - - - - - - - - - - - - - - - - - - - - - - - -").setBold().setBorder(Border.NO_BORDER));
         Table totalTable = new Table(new float[]{100, 150});
         totalTable.addCell(stylePdfService.getHeaderTextCell("Total", plusJakarta));
-        totalTable.addCell(stylePdfService.totalOutput(finalPrice,plusJakarta));
+        totalTable.addCell(stylePdfService.totalOutput(finalPrice, plusJakarta));
 
         bungkusNestedPrice.addCell(new Cell().add(totalTable).setBorder(Border.NO_BORDER));
 
