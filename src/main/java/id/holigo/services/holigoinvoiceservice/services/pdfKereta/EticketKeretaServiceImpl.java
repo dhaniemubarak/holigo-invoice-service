@@ -45,7 +45,7 @@ public class EticketKeretaServiceImpl implements EticketKeretaService {
     public void eticketKereta(TransactionDto transactionDto, HttpServletResponse response, StylePdfService stylePdfService) throws MalformedURLException {
 
         ImageData imageDataLogo = ImageDataFactory.create("https://ik.imagekit.io/holigo/invoice/logo_uAoxJeYaC.png?ik-sdk-version=javascript-1.4.3&updatedAt=1663143887020");
-        Image imageLogo = new Image(imageDataLogo).scaleAbsolute(168, 56);
+        Image imageLogo = new Image(imageDataLogo).scaleAbsolute(84, 28);
         ImageData imageDataEmail = ImageDataFactory.create("https://ik.imagekit.io/holigo/invoice/mail-huge_hktWHMzK0.png?ik-sdk-version=javascript-1.4.3&updatedAt=1663143472868");
         Image imageMail = new Image(imageDataEmail).scaleAbsolute(9, 8);
         ImageData phoneData = ImageDataFactory.create("https://ik.imagekit.io/holigo/invoice/phone-huge_MSWlXRVSC.png?ik-sdk-version=javascript-1.4.3&updatedAt=1663143417375");
@@ -79,14 +79,27 @@ public class EticketKeretaServiceImpl implements EticketKeretaService {
                 .setFontColor(new DeviceRgb(199, 199, 199))
                 .setFontSize(20).setTextAlignment(TextAlignment.CENTER));
 
-        //      --> HEADER START
-        String title = messageSource.getMessage("invoice.generic-title-ETicket", null, LocaleContextHolder.getLocale());
+        // - - - - - HEADER  - - - - -
+        ImageData imageDataAtaTour = null;
+        ImageData imageDataKai =null;
+
+        try {
+            imageDataAtaTour = ImageDataFactory.create("https://ik.imagekit.io/holigo/transportasi/ATA_TOUR_logo_2oxKzullM.png?ik-sdk-version=javascript-1.4.3&updatedAt=1672655066539");
+            imageDataKai = ImageDataFactory.create("https://ik.imagekit.io/holigo/transportasi/logo-kai-main_SyEqhgYKx.png?ik-sdk-version=javascript-1.4.3&updatedAt=1672655146525");
+        } catch (MalformedURLException e) {
+            throw new RuntimeException(e);
+        }
+        Image imageAtaTour = new Image(imageDataAtaTour).scaleAbsolute(90, 90);
+        Image imageKai = new Image(imageDataKai).scaleAbsolute(50, 50);
+
+        document.add(stylePdfService.headerTrain(imageAtaTour,imageKai,imageLogo));
+
+        String title = messageSource.getMessage("invoice.generic-title-bukti-pembayaran", null, LocaleContextHolder.getLocale());
         String subTitle = messageSource.getMessage("invoice.subtitle-kereta", null, LocaleContextHolder.getLocale());
-        document.add(stylePdfService.headerTitle(plusJakarta, imageLogo, title, subTitle));
+        document.add(stylePdfService.headerTitleNoImage(plusJakarta, title, subTitle));
 
-        //      --> ID TRANSAKSI START
+        //--> ID TRANSAKSI
         String transactionId = messageSource.getMessage("invoice.id-transaksi", null, LocaleContextHolder.getLocale());
-
         document.add(stylePdfService.transaksiId(transactionId, plusJakarta, transactionDto));
         document.add(stylePdfService.oneLine(pdfDocument));
         document.add(space);
@@ -109,8 +122,10 @@ public class EticketKeretaServiceImpl implements EticketKeretaService {
         int trips = transactionDto.getDetail().get("trips").size();
         if (trips == 2) {
             page = 1;
+
             document.add(new AreaBreak(AreaBreakType.NEXT_PAGE));
-            document.add(stylePdfService.headerTitle(plusJakarta, imageLogo, title, subTitle));
+            document.add(stylePdfService.headerTrain(imageAtaTour,imageKai,imageLogo));
+            document.add(stylePdfService.headerTitleNoImage(plusJakarta, title, subTitle));
             document.add(stylePdfService.transaksiId(transactionId, plusJakarta, transactionDto));
             document.add(stylePdfService.oneLine(pdfDocument));
             document.add(space);
@@ -164,7 +179,7 @@ public class EticketKeretaServiceImpl implements EticketKeretaService {
         Image endPointImg = new Image(endPointData).scaleAbsolute(10, 40);
 
         ImageData maskapaiImgData = ImageDataFactory.create(transactionDto.getDetail().get("trips").get(page).get("imageUrl").asText());
-        Image maskapaiImg = new Image(maskapaiImgData).scaleAbsolute(maskapaiImgData.getWidth(), maskapaiImgData.getHeight());
+        Image maskapaiImg = new Image(maskapaiImgData).scaleAbsolute(100 , 100);
         Table container1 = new Table(new float[]{155, 5, 265, 100});
 
         // Formating Date

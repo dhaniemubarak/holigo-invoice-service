@@ -65,13 +65,13 @@ public class EreceiptKeretaServiceImpl implements EreceiptKeretaService {
         pdfDocument.addNewPage();
 
         //image Data
-        ImageData imageDataLogo = null;
+        ImageData imageDataLogo;
         try {
             imageDataLogo = ImageDataFactory.create("https://ik.imagekit.io/holigo/invoice/logo_uAoxJeYaC.png?ik-sdk-version=javascript-1.4.3&updatedAt=1663143887020");
         } catch (MalformedURLException e) {
             throw new RuntimeException(e);
         }
-        Image imageLogo = new Image(imageDataLogo).scaleAbsolute(168, 56);
+        Image imageLogo = new Image(imageDataLogo).scaleAbsolute(84, 28);
         ImageData imageDataPaid = null;
         try {
             imageDataPaid = ImageDataFactory.create("https://ik.imagekit.io/holigo/invoice/holigo-paid_ahXX6qW67gl.png?ik-sdk-version=javascript-1.4.3&updatedAt=1663143805976");
@@ -79,6 +79,7 @@ public class EreceiptKeretaServiceImpl implements EreceiptKeretaService {
             throw new RuntimeException(e);
         }
         Image imagePaid = new Image(imageDataPaid).scaleAbsolute(128, 128);
+
         ImageData imageDataEmail = null;
         try {
             imageDataEmail = ImageDataFactory.create("https://ik.imagekit.io/holigo/invoice/mail-huge_hktWHMzK0.png?ik-sdk-version=javascript-1.4.3&updatedAt=1663143472868");
@@ -98,9 +99,24 @@ public class EreceiptKeretaServiceImpl implements EreceiptKeretaService {
         float[] twoCol = {350f, 200f};
 
         // - - - - - HEADER  - - - - -
+        ImageData imageDataAtaTour = null;
+        ImageData imageDataKai =null;
+
+        try {
+            imageDataAtaTour = ImageDataFactory.create("https://ik.imagekit.io/holigo/transportasi/ATA_TOUR_logo_2oxKzullM.png?ik-sdk-version=javascript-1.4.3&updatedAt=1672655066539");
+            imageDataKai = ImageDataFactory.create("https://ik.imagekit.io/holigo/transportasi/logo-kai-main_SyEqhgYKx.png?ik-sdk-version=javascript-1.4.3&updatedAt=1672655146525");
+        } catch (MalformedURLException e) {
+            throw new RuntimeException(e);
+        }
+        Image imageAtaTour = new Image(imageDataAtaTour).scaleAbsolute(90, 90);
+        Image imageKai = new Image(imageDataKai).scaleAbsolute(50, 50);
+
+        document.add(stylePdfService.headerTrain(imageAtaTour,imageKai,imageLogo));
+
         String title = messageSource.getMessage("invoice.generic-title-bukti-pembayaran", null, LocaleContextHolder.getLocale());
         String subTitle = messageSource.getMessage("invoice.subtitle-kereta", null, LocaleContextHolder.getLocale());
-        document.add(stylePdfService.headerTitle(plusJakarta, imageLogo, title, subTitle));
+        document.add(stylePdfService.headerTitleNoImage(plusJakarta, title, subTitle));
+
         //--> ID TRANSAKSI
         String transactionId = messageSource.getMessage("invoice.id-transaksi", null, LocaleContextHolder.getLocale());
         document.add(stylePdfService.transaksiId(transactionId, plusJakarta, transactionDto));

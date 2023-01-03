@@ -10,6 +10,7 @@ import com.itextpdf.layout.element.*;
 import com.itextpdf.layout.property.TextAlignment;
 import id.holigo.services.holigoinvoiceservice.web.model.TransactionDto;
 
+import java.lang.reflect.InaccessibleObjectException;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 
@@ -215,6 +216,17 @@ public class StylePdfService {
                 .setFont(font);
     }
 
+    public Cell getSyaratKetentuanPrg(Paragraph text, PdfFont font) {
+
+        return new Cell().add(text)
+                .setPaddings(0, 0, 0, 10)
+//                .setPaddings(-3,0,-3,10)
+                .setFontColor(new DeviceRgb(97, 97, 97))
+                .setFontSize(8)
+                .setBorder(Border.NO_BORDER)
+                .setFont(font);
+    }
+
 
     public Cell getCheck(String text, PdfFont pdfFont) {
         return new Cell().add(text)
@@ -238,6 +250,13 @@ public class StylePdfService {
                 .setBorder(Border.NO_BORDER);
     }
 
+    public Table headerTrain(Image ataTour, Image kaiImage, Image holigoImage) {
+        Table headerTrain = new Table(new float[]{175, 175, 175});
+        headerTrain.addCell(new Cell().add(ataTour).setRelativePosition(0,0,0,0).setBorder(Border.NO_BORDER));
+        headerTrain.addCell(new Cell().add(kaiImage).setRelativePosition(50,15,0,0).setBorder(Border.NO_BORDER));
+        headerTrain.addCell(new Cell().add(holigoImage).setRelativePosition(50,27,0,0).setBorder(Border.NO_BORDER));
+        return headerTrain;
+    }
 
     public Table headerTitle(PdfFont plusJakarta, Image imageLogo, String title, String subTitle) {
 
@@ -267,6 +286,29 @@ public class StylePdfService {
         return headerTable;
     }
 
+    public Table headerTitleNoImage(PdfFont plusJakarta, String title, String subTitle) {
+
+        Table nestedBuktiTable = new Table(new float[]{350f});
+        nestedBuktiTable.addCell(new Cell().add(title)
+                .setBorder(Border.NO_BORDER)
+                .setFontColor(new DeviceRgb(0, 188, 22))
+                .setFontSize(22).setBold().setFont(plusJakarta)
+                .setRelativePosition(0, 5, 0, 0)
+                .setPaddings(0, 0, 0, 0)
+        );
+        nestedBuktiTable.addCell(new Cell().add(subTitle)
+                .setBorder(Border.NO_BORDER)
+//                .setPaddings(-10, 0, 0, 1)
+                .setRelativePosition(0, 0, 1, 3)
+                .setFontColor(new DeviceRgb(123, 123, 123))
+                .setFont(plusJakarta).setFontSize(12).setBold());
+        Table headerTable = new Table(new float[]{350f, 200f});
+        headerTable.setMarginTop(-24);
+        headerTable.addCell(new Cell().add(nestedBuktiTable).setBorder(Border.NO_BORDER));
+
+        return headerTable;
+    }
+
     public Table transaksiId(String idTransaksi, PdfFont plusJakarta, TransactionDto transactionDto) {
 
         Table idTransaksiTbl = new Table(new float[]{100f, 50f});
@@ -285,6 +327,7 @@ public class StylePdfService {
         idTransaksiTbl.setMarginBottom(8);
         return idTransaksiTbl;
     }
+
 
     public Table footer(PdfFont plusJakarta, PdfDocument pdfDocument, Image imageMail, Image phoneImg) {
         //      Left Footer
