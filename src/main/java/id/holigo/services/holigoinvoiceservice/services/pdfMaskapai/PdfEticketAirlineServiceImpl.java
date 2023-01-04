@@ -326,7 +326,7 @@ public class PdfEticketAirlineServiceImpl implements PdfEticketAirlineService {
                 try {
                     Date departureTrans = formatDateDestination.parse(transactionDto.getDetail().get("trips").get(page).get("itineraries").get(1).get("departureDate").asText() + " " + transactionDto.getDetail().get("trips").get(page).get("itineraries").get(1).get("departureTime").asText());
                     Date arrivalDateTrans = formatDateDestination.parse(transactionDto.getDetail().get("trips").get(page).get("itineraries").get(0).get("arrivalDate").asText() + " " + transactionDto.getDetail().get("trips").get(page).get("itineraries").get(0).get("arrivalTime").asText());
-                    transitTime =  departureTrans.getTime() - arrivalDateTrans.getTime();
+                    transitTime = departureTrans.getTime() - arrivalDateTrans.getTime();
                 } catch (ParseException e) {
                     throw new RuntimeException(" date error ");
                 }
@@ -378,8 +378,16 @@ public class PdfEticketAirlineServiceImpl implements PdfEticketAirlineService {
             String airlaneNumber = transactionDto.getDetail().get("trips").get(page).get("itineraries").get(itineraries).get("flightNumber").asText();
             maskapaiTabel.addCell(stylePdfService.eticketInfo(airlaneNumber, plusJakarta));
 
-            String[] airlaneClass = {transactionDto.getDetail().get("trips").get(page).get("seatClass").asText(), transactionDto.getDetail().get("trips").get(page).get("itineraries").get(itineraries).get("subclass").asText()};
-            String trainClassInfo = "";
+            String[] airlaneClass = new String[2];
+            try {
+                airlaneClass[0] = transactionDto.getDetail().get("trips").get(page).get("seatClass").asText();
+                airlaneClass[1] = transactionDto.getDetail().get("trips").get(page).get("itineraries").get(itineraries).get("subclass").asText();
+            } catch (NullPointerException e) {
+                airlaneClass[0] = "-";
+                airlaneClass[1] = "-";
+
+            }
+            String trainClassInfo = "-";
             if (airlaneClass[0].equalsIgnoreCase("E")) {
                 String economi = messageSource.getMessage("invoice.maskapai-economi", null, LocaleContextHolder.getLocale());
                 trainClassInfo = airlaneClass[0] + " " + economi;
@@ -467,19 +475,19 @@ public class PdfEticketAirlineServiceImpl implements PdfEticketAirlineService {
                 .setBold()
                 .setMaxHeight(20)
         );
-        Table detailPenumpangTable = new Table(new float[]{100, col, col, col});
+        Table detailPenumpangTable = new Table(new float[]{70, 300, col});
         detailPenumpangTable.setMargins(0, 0, 0, 10);
 
 
         detailPenumpangTable.addCell(stylePdfService.getHeaderTextCell("No.", plusJakarta));
         String namaPenumpang = messageSource.getMessage("invoice.generic-namaPenumpang", null, LocaleContextHolder.getLocale());
         detailPenumpangTable.addCell(stylePdfService.getHeaderTextCell(namaPenumpang, plusJakarta));
-        String nomorIdentitas = messageSource.getMessage("invoice.generic-nomorIdentitas", null, LocaleContextHolder.getLocale());
-        detailPenumpangTable.addCell(stylePdfService.getHeaderTextCell(nomorIdentitas, plusJakarta));
-
-
-        String nomorKursi = messageSource.getMessage("invoice.generic-nomorKursi", null, LocaleContextHolder.getLocale());
-        detailPenumpangTable.addCell(stylePdfService.getHeaderTextCell(nomorKursi, plusJakarta));
+//        String nomorIdentitas = messageSource.getMessage("invoice.generic-nomorIdentitas", null, LocaleContextHolder.getLocale());
+//        detailPenumpangTable.addCell(stylePdfService.getHeaderTextCell(nomorIdentitas, plusJakarta));
+//        String nomorKursi = messageSource.getMessage("invoice.generic-nomorKursi", null, LocaleContextHolder.getLocale());
+//        detailPenumpangTable.addCell(stylePdfService.getHeaderTextCell(nomorKursi, plusJakarta));
+        String nomorTiket = messageSource.getMessage("invoice.maskapai.nomer-tiket", null, LocaleContextHolder.getLocale());
+        detailPenumpangTable.addCell(stylePdfService.getHeaderTextCell(nomorTiket, plusJakarta));
 
 
         int countPenumpang = transactionDto.getDetail().get("trips").get(page).get("passengers").size();
@@ -494,39 +502,72 @@ public class PdfEticketAirlineServiceImpl implements PdfEticketAirlineService {
             } catch (NullPointerException e) {
                 detailPenumpangTable.addCell(stylePdfService.getDetailPenumpangOutput("-", plusJakarta));
             }
-            //nomor identitas || passport
+            //ticket number / nomer tiket
             try {
-                //nomor identitas
-                String nomorIdentitasOutput = transactionDto.getDetail().get("trips").get(page).get("passengers").get(passanger).get("passenger").get("identityCard").get("idCardNumber").asText();
-                detailPenumpangTable.addCell(stylePdfService.getDetailPenumpangOutput(nomorIdentitasOutput, plusJakarta));
-            } catch (NullPointerException e) {
-                //passport
-                String passportOutput = transactionDto.getDetail().get("trips").get(page).get("passengers").get(passanger).get("passenger").get("passport").get("passportNumber").asText();
-                detailPenumpangTable.addCell(stylePdfService.getDetailPenumpangOutput(passportOutput, plusJakarta));
+                String ticketNumber = transactionDto.getDetail().get("trips").get(page).get("passengers").get(passanger).get("passenger").get("ticketNumber").asText();
+                if (ticketNumber.contentEquals("null")) {
+                    detailPenumpangTable.addCell(stylePdfService.getDetailPenumpangOutput("-", plusJakarta));
+                } else {
+                    detailPenumpangTable.addCell(stylePdfService.getDetailPenumpangOutput(ticketNumber, plusJakarta));
+                }
+            } catch (NullPointerException nullPointerException) {
+                detailPenumpangTable.addCell(stylePdfService.getDetailPenumpangOutput("-", plusJakarta));
             }
+
+            //nomor identitas || passport
+//            try {
+            //nomor identitas
+//                String nomorIdentitasOutput = transactionDto.getDetail().get("trips").get(page).get("passengers").get(passanger).get("passenger").get("identityCard").get("idCardNumber").asText();
+//                detailPenumpangTable.addCell(stylePdfService.getDetailPenumpangOutput(nomorIdentitasOutput, plusJakarta));
+//            } catch (NullPointerException e) {
+            //passport
+//                String passportOutput = transactionDto.getDetail().get("trips").get(page).get("passengers").get(passanger).get("passenger").get("passport").get("passportNumber").asText();
+//                detailPenumpangTable.addCell(stylePdfService.getDetailPenumpangOutput(passportOutput, plusJakarta));
+//            }
+
 
             //nomor Kursi
 //            String nomorKursiOutput = transactionDto.getDetail().get("trips").get(page).get("passengers").get(passanger).get("seatNumber").asText();
-            String nomorKursiOutput = "-";
-            if (nomorKursiOutput.isEmpty() || nomorKursiOutput.isBlank() || nomorKursiOutput == null) {
-                detailPenumpangTable.addCell(stylePdfService.getDetailPenumpangOutput("-", plusJakarta));
-            } else {
-                detailPenumpangTable.addCell(stylePdfService.getDetailPenumpangOutput(nomorKursiOutput, plusJakarta));
-            }
+//            String nomorKursiOutput = "-";
+//            if (nomorKursiOutput.isEmpty() || nomorKursiOutput.isBlank() || nomorKursiOutput == null) {
+//                detailPenumpangTable.addCell(stylePdfService.getDetailPenumpangOutput("-", plusJakarta));
+//            } else {
+//                detailPenumpangTable.addCell(stylePdfService.getDetailPenumpangOutput(nomorKursiOutput, plusJakarta));
+//            }
 
 
         }
 
-        container2.addCell(new Cell().add(detailPenumpangTable).setBorder(Border.NO_BORDER));
+        container2.addCell(new
+
+                Cell().
+
+                add(detailPenumpangTable).
+
+                setBorder(Border.NO_BORDER));
 
         container2.addCell(stylePdfService.smallSpaceInColumn());
-        container2.addCell(new Cell()
-                .add("- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -")
-                .setBorder(Border.NO_BORDER)
-                .setPaddings(-10, 0, 0, 0)
-                .setFontColor(new DeviceRgb(199, 199, 199))
-                .setBold()
-                .setMaxHeight(20)
+        container2.addCell(new
+
+                Cell()
+                .
+
+                add("- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -")
+                        .
+
+                setBorder(Border.NO_BORDER)
+                        .
+
+                setPaddings(-10, 0, 0, 0)
+                        .
+
+                setFontColor(new DeviceRgb(199, 199, 199))
+                        .
+
+                setBold()
+                        .
+
+                setMaxHeight(20)
         );
         return container2;
     }

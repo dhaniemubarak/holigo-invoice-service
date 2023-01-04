@@ -220,7 +220,7 @@ public class EreceiptKeretaServiceImpl implements EreceiptKeretaService {
         detailProdukTbl.addCell(stylePdfService.getHeaderTextCell(price, plusJakarta)); //col5
 
 //        Detail Produk output
-        int count = 1; //dummy
+        int count = 1;
         int sizeTrips = transactionDto.getDetail().get("trips").size();
         for (int tripsIndex = 0; tripsIndex < sizeTrips; tripsIndex++) {
             detailProdukTbl.addCell(stylePdfService.getDetailProdukOutput("" + count, plusJakarta)); //col 1
@@ -283,7 +283,7 @@ public class EreceiptKeretaServiceImpl implements EreceiptKeretaService {
         }
 
         Table priceTable = new Table(twoCol);
-        Table nestedPrice = new Table(new float[]{100, 150});
+        Table nestedPrice = new Table(new float[]{150, 150});
         Table bungkusNestedPrice = new Table(new float[]{250});
         nestedPrice.addCell(stylePdfService.getHeaderTextCell("Sub Total", plusJakarta));
 
@@ -300,8 +300,8 @@ public class EreceiptKeretaServiceImpl implements EreceiptKeretaService {
         }
         //kalau tidak ada admin amount, teks biaya jasa hilang
         if (transactionDto.getDiscountAmount() != null && transactionDto.getAdminAmount().doubleValue() > 0) {
-            String biayaJasa = messageSource.getMessage("invoice.generic-admin-amount", null, LocaleContextHolder.getLocale());
-            nestedPrice.addCell(stylePdfService.getHeaderTextCell(biayaJasa, plusJakarta));
+//            String biayaJasa = messageSource.getMessage("invoice.generic-admin-amount", null, LocaleContextHolder.getLocale());
+            nestedPrice.addCell(stylePdfService.getHeaderTextCell("Convenience fee", plusJakarta));
             nestedPrice.addCell(stylePdfService.getDetailProdukOutput("Rp " + stylePdfService.getPrice(adminAmount) + ",-", plusJakarta));
         } else {
             nestedPrice.addCell(stylePdfService.getHeaderTextCell(" ", plusJakarta));

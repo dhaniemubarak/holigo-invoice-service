@@ -41,6 +41,7 @@ public class PdfEreceiptAirlineServiceImpl extends HttpServlet implements PdfEre
 
     @Autowired
     private final MessageSource messageSource;
+
     @Override
     public void airlineEreceipt(TransactionDto transactionDto, HttpServletResponse response) throws IOException {
 
@@ -103,7 +104,7 @@ public class PdfEreceiptAirlineServiceImpl extends HttpServlet implements PdfEre
 
 //      --> ID TRANSAKSI START
 //        String transactionId = messageSource.getMessage("invoice.id-transaksi",null, LocaleContextHolder.getLocale());
-        document.add(stylePdfService.transaksiId("ID Transaksi",plusJakarta, transactionDto));
+        document.add(stylePdfService.transaksiId("ID Transaksi", plusJakarta, transactionDto));
         document.add(stylePdfService.oneLine(pdfDocument));
 
 
@@ -128,51 +129,52 @@ public class PdfEreceiptAirlineServiceImpl extends HttpServlet implements PdfEre
 
 
 //        Header Detail Pembayaran
-        Table detailPembayaranHead = new Table(new float[]{pdfDocument.getDefaultPageSize().getWidth()});
-        String detailiPembayaran = messageSource.getMessage("invoice.generic-method-payment", null, LocaleContextHolder.getLocale());
-        detailPembayaranHead.addCell(getHeaderTextCell(detailiPembayaran, plusJakarta));
+        try {
+            Table detailPembayaranHead = new Table(new float[]{pdfDocument.getDefaultPageSize().getWidth()});
+            Table detailPembayaran = new Table(new float[]{150, 10, 60, 20, col});
 
-//        Detail Pembayaran atribute
-        Table detailPembayaran = new Table(new float[]{col - 50f, 10, 60, 20, col});
-        detailPembayaran.setMarginLeft(8);
-        String waktuPembayaran = messageSource.getMessage("invoice.generic-date-payment", null, LocaleContextHolder.getLocale());
-        detailPembayaran.addCell(getTextDetail(waktuPembayaran, plusJakarta));
-        detailPembayaran.addCell(getTextDetail(" ", plusJakarta));
-        detailPembayaran.addCell(getTextDetail(" ", plusJakarta));
-        detailPembayaran.addCell(getTextDetail(" ", plusJakarta));
-        String metodePembayaran = messageSource.getMessage("invoice.generic-method-payment", null, LocaleContextHolder.getLocale());
-        detailPembayaran.addCell(getTextDetail(metodePembayaran, plusJakarta));
-        document.add(smallSpace);
-        document.add(detailPemesananHead);
-        document.add(tblDetailPemesanan);
-        document.add(space);
+            String detailiPembayaran = messageSource.getMessage("invoice.generic-method-payment", null, LocaleContextHolder.getLocale());
+            detailPembayaranHead.addCell(getHeaderTextCell(detailiPembayaran, plusJakarta));
+            detailPembayaran.setMarginLeft(8);
+            String waktuPembayaran = messageSource.getMessage("invoice.generic-date-payment", null, LocaleContextHolder.getLocale());
+            detailPembayaran.addCell(getTextDetail(waktuPembayaran, plusJakarta));
+            detailPembayaran.addCell(getTextDetail(" ", plusJakarta));
+            detailPembayaran.addCell(getTextDetail(" ", plusJakarta));
+            detailPembayaran.addCell(getTextDetail(" ", plusJakarta));
+            String metodePembayaran = messageSource.getMessage("invoice.generic-method-payment", null, LocaleContextHolder.getLocale());
+            detailPembayaran.addCell(getTextDetail(metodePembayaran, plusJakarta));
+            document.add(smallSpace);
+            document.add(detailPemesananHead);
+            document.add(tblDetailPemesanan);
+            document.add(space);
 
 //        Detail Pembayaran user
-        //     payment
-        DateFormat inputDatePayment = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.S");
-        DateFormat outputDatePayment = new SimpleDateFormat("EE, dd MMM yyyy");
-        DateFormat outputTimePayment = new SimpleDateFormat("HH:mm");
+            //     payment
+            DateFormat inputDatePayment = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.S");
+            DateFormat outputDatePayment = new SimpleDateFormat("EE, dd MMM yyyy");
+            DateFormat outputTimePayment = new SimpleDateFormat("HH:mm");
 
-        try {
             Date datePayment = inputDatePayment.parse(transactionDto.getPayment().getUpdatedAt().toString());
             detailPembayaran.addCell(stylePdfService.getDetailUserBold(outputDatePayment.format(datePayment), plusJakartaDisplayBold)); // tanggal
             detailPembayaran.addCell(getTextDetail(" ", plusJakartaDisplayBold));
 
             Date paymentTime = inputDatePayment.parse(transactionDto.getPayment().getUpdatedAt().toString());
-            detailPembayaran.addCell(stylePdfService.getDetailUserBold(outputTimePayment.format(paymentTime) +" WIB", plusJakartaDisplayBold).setTextAlignment(TextAlignment.CENTER) // time
+            detailPembayaran.addCell(stylePdfService.getDetailUserBold(outputTimePayment.format(paymentTime) + " WIB", plusJakartaDisplayBold).setTextAlignment(TextAlignment.CENTER) // time
                     .setPaddings(0, 0, 0, 0));
+
+
+            detailPembayaran.addCell(getTextDetail(" ", plusJakartaDisplayBold));
+//        Payment method
+            String paymentMetode = transactionDto.getPayment().getPaymentService().getName();
+            detailPembayaran.addCell(stylePdfService.getDetailUserBold(paymentMetode, plusJakartaDisplayBold)); // metode
+
+
+            document.add(detailPembayaranHead);
+            document.add(detailPembayaran);
         } catch (ParseException e) {
             throw new RuntimeException(e);
         }
 
-        detailPembayaran.addCell(getTextDetail(" ", plusJakartaDisplayBold));
-//        Payment method
-        String paymentMetode = transactionDto.getPayment().getPaymentService().getName();
-        detailPembayaran.addCell(stylePdfService.getDetailUserBold(paymentMetode, plusJakartaDisplayBold)); // metode
-
-
-        document.add(detailPembayaranHead);
-        document.add(detailPembayaran);
         document.add(smallSpace);
         document.add(brokeLine);
 
@@ -192,7 +194,6 @@ public class PdfEreceiptAirlineServiceImpl extends HttpServlet implements PdfEre
         int sizeTrips = transactionDto.getDetail().get("trips").size();
 
 
-
         // pricing
 
         String adminAmountStr = transactionDto.getDetail().get("adminAmount").asText();
@@ -201,7 +202,7 @@ public class PdfEreceiptAirlineServiceImpl extends HttpServlet implements PdfEre
         discount = Float.parseFloat(discountStr);
 
         int count = 1;
-        for (int index=0;index<sizeTrips;index++){
+        for (int index = 0; index < sizeTrips; index++) {
 //            detailProdukTbl = new Table(new float[]{colHalf, col, col, col, col});
 
             String airlanesName = transactionDto.getDetail().get("trips").get(index).get("itineraries").get(0).get("airlinesName").asText();
@@ -216,7 +217,7 @@ public class PdfEreceiptAirlineServiceImpl extends HttpServlet implements PdfEre
 
             //deskripsi
             deskripsiProduk.addCell(getDetailProdukOutput(airlanesName, plusJakarta));
-            deskripsiProduk.addCell(getDetailProdukOutput( originAirport+ "-" + destinationAirport, plusJakarta).setFontSize(8).setPaddingTop(-6));
+            deskripsiProduk.addCell(getDetailProdukOutput(originAirport + "-" + destinationAirport, plusJakarta).setFontSize(8).setPaddingTop(-6));
             deskripsiProduk.addCell(getDetailProdukOutput("Kode Booking : " + kodeBooking, plusJakarta).setFontSize(8).setPaddingTop(-6));
             detailProdukTbl.addCell(new Cell().add(deskripsiProduk).setBorder(Border.NO_BORDER));
             deskripsiProduk = new Table(new float[]{100f});
@@ -227,7 +228,7 @@ public class PdfEreceiptAirlineServiceImpl extends HttpServlet implements PdfEre
             double fareAmount = Float.parseFloat(fareAmountStr);
             detailProdukTbl.addCell(getDetailProdukOutput("Rp " + fareAmount + ",-", plusJakarta));
 
-            count=count+1;
+            count = count + 1;
         }
         String fareAmountStr = transactionDto.getFareAmount().toString();
         double fareAmount = Float.parseFloat(fareAmountStr);
@@ -258,8 +259,8 @@ public class PdfEreceiptAirlineServiceImpl extends HttpServlet implements PdfEre
                 .setFontSize(12)
                 .setBorder(Border.NO_BORDER)
                 .setFontColor(Color.BLACK);
-        totalCell.setNextRenderer(new RoundedBorderCellRenderer(totalCell,true));
-        nestedPrice.addCell(totalCell);  
+        totalCell.setNextRenderer(new RoundedBorderCellRenderer(totalCell, true));
+        nestedPrice.addCell(totalCell);
 
 //        Paid Logo, logo position
         priceTable.addCell(new Cell().add(imagePaid).setPaddings(10, 0, 0, 100).setBorder(Border.NO_BORDER));

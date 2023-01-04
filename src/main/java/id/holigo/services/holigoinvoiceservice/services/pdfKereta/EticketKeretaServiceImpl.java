@@ -18,12 +18,23 @@ import id.holigo.services.holigoinvoiceservice.services.style.StylePdfService;
 import id.holigo.services.holigoinvoiceservice.web.model.TransactionDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import net.sourceforge.barbecue.Barcode;
+import net.sourceforge.barbecue.BarcodeException;
+import net.sourceforge.barbecue.BarcodeFactory;
+import net.sourceforge.barbecue.BarcodeImageHandler;
+import org.krysalis.barcode4j.impl.pdf417.PDF417;
+import org.krysalis.barcode4j.impl.upcean.EAN13Bean;
+import org.krysalis.barcode4j.output.bitmap.BitmapCanvasProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Service;
 
+import javax.imageio.ImageIO;
 import javax.servlet.http.HttpServletResponse;
+import javax.swing.*;
+import java.awt.image.BufferedImage;
+import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.MalformedURLException;
@@ -318,13 +329,34 @@ public class EticketKeretaServiceImpl implements EticketKeretaService {
         parentDestination.addCell(stylePdfService.smallSpaceInColumn());
         parentDestination.addCell(stylePdfService.smallSpaceInColumn());
         String kodebooking = messageSource.getMessage("invoice.kereta-kodeBooking", null, LocaleContextHolder.getLocale());
+        String bookingCodeOut = transactionDto.getDetail().get("trips").get(page).get("bookCode").asText();
+
+        // BARCODE
+        try {
+            //Barcode4j
+            PDF417 barcodeGenerator = new PDF417();
+            BitmapCanvasProvider canvas = new BitmapCanvasProvider(160, BufferedImage.TYPE_BYTE_BINARY, false, 0);
+            barcodeGenerator.generateBarcode(canvas, bookingCodeOut);
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+
+            ImageIO.write(canvas.getBufferedImage(), "jpg", baos);
+            byte[] bytes = baos.toByteArray();
+
+            ImageData imageData = ImageDataFactory.create(bytes);
+            Image image = new Image(imageData).scaleAbsolute(100,40);
+            parentDestination.addCell(new Cell().add(image).setBorder(Border.NO_BORDER).setRelativePosition(7,0,0,0));
+
+
+        } catch (Exception e ) {
+            throw new RuntimeException(e);
+        }
+
         parentDestination.addCell(new Cell().add(kodebooking).setFont(plusJakarta)
                 .setFontSize(9)
                 .setFontColor(new DeviceRgb(97, 97, 97))
                 .setRelativePosition(5, 10, 0, 0)
                 .setBorder(Border.NO_BORDER)
         );
-        String bookingCodeOut = transactionDto.getDetail().get("trips").get(page).get("bookCode").asText();
         parentDestination.addCell(new Cell().add(bookingCodeOut).setFont(plusJakarta)
                 .setFontSize(20)
                 .setFontColor(new DeviceRgb(0, 189, 23))
@@ -369,7 +401,7 @@ public class EticketKeretaServiceImpl implements EticketKeretaService {
                 .setBold()
                 .setMaxHeight(20)
         );
-        Table detailPenumpangTable = new Table(new float[]{100, col, col, col});
+        Table detailPenumpangTable = new Table(new float[]{60, 260, 180, col});
         detailPenumpangTable.setMargins(0, 0, 0, 10);
 
 
@@ -409,7 +441,7 @@ public class EticketKeretaServiceImpl implements EticketKeretaService {
 
             //nomor Kursi
             String nomorKursiOutput = transactionDto.getDetail().get("trips").get(page).get("passengers").get(passanger).get("seatNumber").asText();
-            if (nomorKursiOutput.isEmpty() || nomorKursiOutput.isBlank() || nomorKursiOutput == null) {
+            if (nomorKursiOutput.isEmpty() || nomorKursiOutput.isBlank() || nomorKursiOutput.equalsIgnoreCase("null")) {
                 detailPenumpangTable.addCell(stylePdfService.getDetailPenumpangOutput("-", plusJakarta));
             } else {
                 detailPenumpangTable.addCell(stylePdfService.getDetailPenumpangOutput(nomorKursiOutput, plusJakarta));
