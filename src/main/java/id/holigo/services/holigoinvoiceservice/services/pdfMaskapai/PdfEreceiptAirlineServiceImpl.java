@@ -181,11 +181,16 @@ public class PdfEreceiptAirlineServiceImpl extends HttpServlet implements PdfEre
 //        Detail Produk Head
         Table detailProdukTbl = new Table(new float[]{colHalf, col, col, col, col});
         detailProdukTbl.setMarginLeft(20);
+
         detailProdukTbl.addCell(getHeaderTextCell("No.", plusJakarta));
-        detailProdukTbl.addCell(getHeaderTextCell("Produk", plusJakarta));
-        detailProdukTbl.addCell(getHeaderTextCell("Deskripsi", plusJakarta));
-        detailProdukTbl.addCell(getHeaderTextCell("Jumlah", plusJakarta));
-        detailProdukTbl.addCell(getHeaderTextCell("Harga", plusJakarta));
+        String produk = messageSource.getMessage("invoice.product-name-ereceipt",null,LocaleContextHolder.getLocale());
+        detailProdukTbl.addCell(getHeaderTextCell(produk, plusJakarta));
+        String deskripsi = messageSource.getMessage("invoice.generic-deskripsi",null,LocaleContextHolder.getLocale());
+        detailProdukTbl.addCell(getHeaderTextCell(deskripsi, plusJakarta));
+        String jumlah = messageSource.getMessage("invoice.generic-quantity",null,LocaleContextHolder.getLocale());
+        detailProdukTbl.addCell(getHeaderTextCell(jumlah, plusJakarta));
+        String harga = messageSource.getMessage("invoice.generic-price",null,LocaleContextHolder.getLocale());
+        detailProdukTbl.addCell(getHeaderTextCell(harga, plusJakarta));
 
 //        Detail Produk
         double adminAmount;
@@ -208,17 +213,19 @@ public class PdfEreceiptAirlineServiceImpl extends HttpServlet implements PdfEre
             String airlanesName = transactionDto.getDetail().get("trips").get(index).get("itineraries").get(0).get("airlinesName").asText();
             String originAirport = transactionDto.getDetail().get("trips").get(index).get("itineraries").get(0).get("originAirport").get("id").asText();
             String destinationAirport = transactionDto.getDetail().get("trips").get(index).get("itineraries").get(0).get("destinationAirport").get("id").asText();
-            String kodeBooking = transactionDto.getDetail().get("trips").get(index).get("itineraries").get(0).get("pnr").asText();
+            String kodeBookingout = transactionDto.getDetail().get("trips").get(index).get("itineraries").get(0).get("pnr").asText();
 
 
             detailProdukTbl.addCell(getDetailProdukOutput(Integer.toString(count), plusJakarta));
             //judul/title
-            detailProdukTbl.addCell(getDetailProdukOutput("Tiket pesawat", plusJakarta));
+            String tiketPesawat = messageSource.getMessage("invoice.maskapai-tiket",null,LocaleContextHolder.getLocale());
+            detailProdukTbl.addCell(getDetailProdukOutput(tiketPesawat, plusJakarta));
 
             //deskripsi
             deskripsiProduk.addCell(getDetailProdukOutput(airlanesName, plusJakarta));
             deskripsiProduk.addCell(getDetailProdukOutput(originAirport + "-" + destinationAirport, plusJakarta).setFontSize(8).setPaddingTop(-6));
-            deskripsiProduk.addCell(getDetailProdukOutput("Kode Booking : " + kodeBooking, plusJakarta).setFontSize(8).setPaddingTop(-6));
+            String kodeBooking = messageSource.getMessage("invoice.generic-kodeBooking", null,LocaleContextHolder.getLocale());
+            deskripsiProduk.addCell(getDetailProdukOutput(kodeBooking+" : " + kodeBookingout, plusJakarta).setFontSize(8).setPaddingTop(-6));
             detailProdukTbl.addCell(new Cell().add(deskripsiProduk).setBorder(Border.NO_BORDER));
             deskripsiProduk = new Table(new float[]{100f});
             //jumlah
@@ -226,7 +233,7 @@ public class PdfEreceiptAirlineServiceImpl extends HttpServlet implements PdfEre
             detailProdukTbl.addCell(getDetailProdukOutput(String.valueOf(sizePassager), plusJakarta));
             String fareAmountStr = transactionDto.getDetail().get("trips").get(index).get("fareAmount").asText();
             double fareAmount = Float.parseFloat(fareAmountStr);
-            detailProdukTbl.addCell(getDetailProdukOutput("Rp " + fareAmount + ",-", plusJakarta));
+            detailProdukTbl.addCell(getDetailProdukOutput("Rp " +stylePdfService.getPrice(fareAmount)+ ",-", plusJakarta));
 
             count = count + 1;
         }
