@@ -18,12 +18,7 @@ import id.holigo.services.holigoinvoiceservice.services.style.StylePdfService;
 import id.holigo.services.holigoinvoiceservice.web.model.TransactionDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import net.sourceforge.barbecue.Barcode;
-import net.sourceforge.barbecue.BarcodeException;
-import net.sourceforge.barbecue.BarcodeFactory;
-import net.sourceforge.barbecue.BarcodeImageHandler;
 import org.krysalis.barcode4j.impl.pdf417.PDF417;
-import org.krysalis.barcode4j.impl.upcean.EAN13Bean;
 import org.krysalis.barcode4j.output.bitmap.BitmapCanvasProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
@@ -32,9 +27,7 @@ import org.springframework.stereotype.Service;
 
 import javax.imageio.ImageIO;
 import javax.servlet.http.HttpServletResponse;
-import javax.swing.*;
 import java.awt.image.BufferedImage;
-import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.MalformedURLException;
@@ -92,7 +85,7 @@ public class EticketKeretaServiceImpl implements EticketKeretaService {
 
         // - - - - - HEADER  - - - - -
         ImageData imageDataAtaTour = null;
-        ImageData imageDataKai =null;
+        ImageData imageDataKai = null;
 
         try {
             imageDataAtaTour = ImageDataFactory.create("https://ik.imagekit.io/holigo/transportasi/ATA_TOUR_logo_2oxKzullM.png?ik-sdk-version=javascript-1.4.3&updatedAt=1672655066539");
@@ -103,7 +96,7 @@ public class EticketKeretaServiceImpl implements EticketKeretaService {
         Image imageAtaTour = new Image(imageDataAtaTour).scaleAbsolute(90, 90);
         Image imageKai = new Image(imageDataKai).scaleAbsolute(50, 50);
 
-        document.add(stylePdfService.headerTrain(imageAtaTour,imageKai,imageLogo));
+        document.add(stylePdfService.headerTrain(imageAtaTour, imageKai, imageLogo));
 
         String title = messageSource.getMessage("invoice.generic-title-bukti-pembayaran", null, LocaleContextHolder.getLocale());
         String subTitle = messageSource.getMessage("invoice.subtitle-kereta", null, LocaleContextHolder.getLocale());
@@ -126,7 +119,6 @@ public class EticketKeretaServiceImpl implements EticketKeretaService {
         // END CONTAINER 3
 
 
-
         document.add(stylePdfService.footer(plusJakarta, pdfDocument, imageMail, phoneImg));
 
         // page 2
@@ -135,7 +127,7 @@ public class EticketKeretaServiceImpl implements EticketKeretaService {
             page = 1;
 
             document.add(new AreaBreak(AreaBreakType.NEXT_PAGE));
-            document.add(stylePdfService.headerTrain(imageAtaTour,imageKai,imageLogo));
+            document.add(stylePdfService.headerTrain(imageAtaTour, imageKai, imageLogo));
             document.add(stylePdfService.headerTitleNoImage(plusJakarta, title, subTitle));
             document.add(stylePdfService.transaksiId(transactionId, plusJakarta, transactionDto));
             document.add(stylePdfService.oneLine(pdfDocument));
@@ -145,7 +137,6 @@ public class EticketKeretaServiceImpl implements EticketKeretaService {
             document.add(container3(transactionDto, stylePdfService, plusJakarta, messageSource, page));
             document.add(stylePdfService.footer(plusJakarta, pdfDocument, imageMail, phoneImg));
         }
-
 
 
         document.close();
@@ -190,7 +181,7 @@ public class EticketKeretaServiceImpl implements EticketKeretaService {
         Image endPointImg = new Image(endPointData).scaleAbsolute(10, 40);
 
         ImageData maskapaiImgData = ImageDataFactory.create(transactionDto.getDetail().get("trips").get(page).get("imageUrl").asText());
-        Image maskapaiImg = new Image(maskapaiImgData).scaleAbsolute(100 , 100);
+        Image maskapaiImg = new Image(maskapaiImgData).scaleAbsolute(100, 100);
         Table container1 = new Table(new float[]{155, 5, 265, 100});
 
         // Formating Date
@@ -343,11 +334,11 @@ public class EticketKeretaServiceImpl implements EticketKeretaService {
             byte[] bytes = baos.toByteArray();
 
             ImageData imageData = ImageDataFactory.create(bytes);
-            Image image = new Image(imageData).scaleAbsolute(100,40);
-            parentDestination.addCell(new Cell().add(image).setBorder(Border.NO_BORDER).setRelativePosition(7,0,0,0));
+            Image image = new Image(imageData).scaleAbsolute(100, 40);
+            parentDestination.addCell(new Cell().add(image).setBorder(Border.NO_BORDER).setRelativePosition(7, 0, 0, 0));
 
 
-        } catch (Exception e ) {
+        } catch (Exception e) {
             throw new RuntimeException(e);
         }
 
@@ -464,28 +455,28 @@ public class EticketKeretaServiceImpl implements EticketKeretaService {
         return container2;
     }
 
-    private static Table container3(TransactionDto transactionDto, StylePdfService stylePdfService, PdfFont plusJakarta, MessageSource messageSource, int page){
+    private static Table container3(TransactionDto transactionDto, StylePdfService stylePdfService, PdfFont plusJakarta, MessageSource messageSource, int page) {
         Table contrainer3 = new Table(new float[]{525});
 //        String termCondition = messageSource.getMessage("invoice.term-condition-voucher", null, LocaleContextHolder.getLocale());
 //        contrainer3.addCell(stylePdfService.getSyaratKetentuan(termCondition,plusJakarta).setBorder(Border.NO_BORDER));
-        String term =  messageSource.getMessage("invoice.term-condition-train", null, LocaleContextHolder.getLocale());
-        String term1 =  messageSource.getMessage("invoice.term-condition-train1", null, LocaleContextHolder.getLocale());
-        String term2 =  messageSource.getMessage("invoice.term-condition-train2", null, LocaleContextHolder.getLocale());
-        String term3 =  messageSource.getMessage("invoice.term-condition-train3", null, LocaleContextHolder.getLocale());
-        String term4 =  messageSource.getMessage("invoice.term-condition-train4", null, LocaleContextHolder.getLocale());
-        String term5 =  messageSource.getMessage("invoice.term-condition-train5", null, LocaleContextHolder.getLocale());
-        String term6 =  messageSource.getMessage("invoice.term-condition-train6", null, LocaleContextHolder.getLocale());
-        String term7 =  messageSource.getMessage("invoice.term-condition-train7", null, LocaleContextHolder.getLocale());
-        String termEnd =  messageSource.getMessage("invoice.term-condition-trainEnd", null, LocaleContextHolder.getLocale());
-        contrainer3.addCell(stylePdfService.getSyaratKetentuan(term,plusJakarta).setBorder(Border.NO_BORDER));
-        contrainer3.addCell(stylePdfService.getSyaratKetentuan(term1,plusJakarta).setBorder(Border.NO_BORDER));
-        contrainer3.addCell(stylePdfService.getSyaratKetentuan(term2,plusJakarta).setBorder(Border.NO_BORDER));
-        contrainer3.addCell(stylePdfService.getSyaratKetentuan(term3,plusJakarta).setBorder(Border.NO_BORDER));
-        contrainer3.addCell(stylePdfService.getSyaratKetentuan(term4,plusJakarta).setBorder(Border.NO_BORDER));
-        contrainer3.addCell(stylePdfService.getSyaratKetentuan(term5,plusJakarta).setBorder(Border.NO_BORDER));
-        contrainer3.addCell(stylePdfService.getSyaratKetentuan(term6,plusJakarta).setBorder(Border.NO_BORDER));
-        contrainer3.addCell(stylePdfService.getSyaratKetentuan(term7,plusJakarta).setBorder(Border.NO_BORDER));
-        contrainer3.addCell(stylePdfService.getSyaratKetentuan(termEnd,plusJakarta).setBorder(Border.NO_BORDER));
+        String term = messageSource.getMessage("invoice.term-condition-train", null, LocaleContextHolder.getLocale());
+        String term1 = messageSource.getMessage("invoice.term-condition-train1", null, LocaleContextHolder.getLocale());
+        String term2 = messageSource.getMessage("invoice.term-condition-train2", null, LocaleContextHolder.getLocale());
+        String term3 = messageSource.getMessage("invoice.term-condition-train3", null, LocaleContextHolder.getLocale());
+        String term4 = messageSource.getMessage("invoice.term-condition-train4", null, LocaleContextHolder.getLocale());
+        String term5 = messageSource.getMessage("invoice.term-condition-train5", null, LocaleContextHolder.getLocale());
+        String term6 = messageSource.getMessage("invoice.term-condition-train6", null, LocaleContextHolder.getLocale());
+        String term7 = messageSource.getMessage("invoice.term-condition-train7", null, LocaleContextHolder.getLocale());
+        String termEnd = messageSource.getMessage("invoice.term-condition-trainEnd", null, LocaleContextHolder.getLocale());
+        contrainer3.addCell(stylePdfService.getSyaratKetentuan(term, plusJakarta).setBorder(Border.NO_BORDER));
+        contrainer3.addCell(stylePdfService.getSyaratKetentuan(term1, plusJakarta).setBorder(Border.NO_BORDER));
+        contrainer3.addCell(stylePdfService.getSyaratKetentuan(term2, plusJakarta).setBorder(Border.NO_BORDER));
+        contrainer3.addCell(stylePdfService.getSyaratKetentuan(term3, plusJakarta).setBorder(Border.NO_BORDER));
+        contrainer3.addCell(stylePdfService.getSyaratKetentuan(term4, plusJakarta).setBorder(Border.NO_BORDER));
+        contrainer3.addCell(stylePdfService.getSyaratKetentuan(term5, plusJakarta).setBorder(Border.NO_BORDER));
+        contrainer3.addCell(stylePdfService.getSyaratKetentuan(term6, plusJakarta).setBorder(Border.NO_BORDER));
+        contrainer3.addCell(stylePdfService.getSyaratKetentuan(term7, plusJakarta).setBorder(Border.NO_BORDER));
+        contrainer3.addCell(stylePdfService.getSyaratKetentuan(termEnd, plusJakarta).setBorder(Border.NO_BORDER));
 
         return contrainer3;
     }
