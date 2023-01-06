@@ -659,7 +659,8 @@ public class PdfHotelServiceImpl implements PdfHotelService {
         int[] duration = {durationDay, durationNight};
         String day = messageSource.getMessage("invoice.duration-day-voucher", null, LocaleContextHolder.getLocale());
         String night = messageSource.getMessage("invoice.duration-night-voucher", null, LocaleContextHolder.getLocale());
-        dateCheckSplitDuration.addCell(new Cell().add(duration[0] + " " + day + " " + duration[1] + " " + night).setFontSize(7).setFontColor(new DeviceRgb(71, 71, 71)).setTextAlignment(TextAlignment.CENTER).setBorder(Border.NO_BORDER));
+//        dateCheckSplitDuration.addCell(new Cell().add(duration[0] + " " + day + " " + duration[1] + " " + night).setFontSize(7).setFontColor(new DeviceRgb(71, 71, 71)).setTextAlignment(TextAlignment.CENTER).setBorder(Border.NO_BORDER));
+        dateCheckSplitDuration.addCell(new Cell().add(duration[0] + night).setFontSize(7).setFontColor(new DeviceRgb(71, 71, 71)).setTextAlignment(TextAlignment.CENTER).setBorder(Border.NO_BORDER));
         dateCheckSplitDuration.addCell(new Cell().add(lineImg).setRelativePosition(29.5f, 0, 0, 0).setPaddingBottom(-2).setBorder(Border.NO_BORDER));
         dateCheckSplitDuration.addCell(new Cell().add(endImg).setRelativePosition(25, 0, 0, 0).setBorder(Border.NO_BORDER));
         //closer in COL 2
