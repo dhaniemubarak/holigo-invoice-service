@@ -98,7 +98,7 @@ public class EticketKeretaServiceImpl implements EticketKeretaService {
 
         document.add(stylePdfService.headerTrain(imageAtaTour, imageKai, imageLogo));
 
-        String title = messageSource.getMessage("invoice.generic-title-bukti-pembayaran", null, LocaleContextHolder.getLocale());
+        String title = messageSource.getMessage("invoice.generic-title-ETicket", null, LocaleContextHolder.getLocale());
         String subTitle = messageSource.getMessage("invoice.subtitle-kereta", null, LocaleContextHolder.getLocale());
         document.add(stylePdfService.headerTitleNoImage(plusJakarta, title, subTitle));
 
