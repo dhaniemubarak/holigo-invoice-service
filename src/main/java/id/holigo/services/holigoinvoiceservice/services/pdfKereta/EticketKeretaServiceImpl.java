@@ -359,26 +359,24 @@ public class EticketKeretaServiceImpl implements EticketKeretaService {
 
         //        --TRAIN-- 3
         Table maskapaiTabel = new Table(new float[]{135});
-
-
-        maskapaiTabel.addCell(new Cell().add(maskapaiImg).setBorder(Border.NO_BORDER));
+//        maskapaiTabel.addCell(new Cell().add(maskapaiImg).setBorder(Border.NO_BORDER));
         String trainName = transactionDto.getDetail().get("trips").get(page).get("trainName").asText();
         maskapaiTabel.addCell(stylePdfService.eticketInfo(trainName, plusJakarta));
 
         String trainNumber = transactionDto.getDetail().get("trips").get(page).get("trainNumber").asText();
-        maskapaiTabel.addCell(stylePdfService.eticketInfo(trainNumber, plusJakarta));
+        maskapaiTabel.addCell(stylePdfService.eticketInfo("Train Number: " + trainNumber, plusJakarta));
 
         String[] trainClass = {transactionDto.getDetail().get("trips").get(page).get("trainClass").asText(), transactionDto.getDetail().get("trips").get(page).get("trainSubClass").asText()};
         String trainClassInfo = trainClass[0] + "-subclass " + trainClass[1];
         maskapaiTabel.addCell(stylePdfService.eticketInfo(trainClassInfo, plusJakarta));
-        maskapaiTabel.addCell(new Cell().add(" ").setFontSize(20).setHeight(20).setBorder(Border.NO_BORDER));
-
+        maskapaiTabel.addCell(new Cell().add("").setFontSize(20).setHeight(20).setBorder(Border.NO_BORDER));
+        maskapaiTabel.addCell(new Cell().add(stylePdfService.spaceInColumn()).setBorder(Border.NO_BORDER));
+        maskapaiTabel.addCell(new Cell().add(stylePdfService.spaceInColumn()).setBorder(Border.NO_BORDER));
         maskapaiTabel.addCell(new Cell().add(trainImg).setBorder(Border.NO_BORDER));
         container1.addCell(new Cell().add(maskapaiTabel).setBorder(Border.NO_BORDER));
 
         return container1;
     }
-
     private static Table container2(TransactionDto transactionDto, StylePdfService stylePdfService, PdfFont plusJakarta, MessageSource messageSource, int page) {
         float col = 200f;
         Table container2 = new Table(new float[]{525});
@@ -452,6 +450,8 @@ public class EticketKeretaServiceImpl implements EticketKeretaService {
                 .setBold()
                 .setMaxHeight(20)
         );
+
+
         return container2;
     }
 

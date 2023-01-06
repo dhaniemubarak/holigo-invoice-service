@@ -316,6 +316,9 @@ public class PdfEticketAirlineServiceImpl implements PdfEticketAirlineService {
             String kodebooking = messageSource.getMessage("invoice.kereta-kodeBooking", null, LocaleContextHolder.getLocale());
             String bookingCodeOut = transactionDto.getDetail().get("trips").get(page).get("itineraries").get(itineraries).get("pnr").asText();
 
+            if (bookingCodeOut.equalsIgnoreCase("null") || bookingCodeOut.isEmpty() || bookingCodeOut.isBlank()){
+                bookingCodeOut = "-";
+            }
             if (itineraries == 0 && itinerariesSize > 1) {
                 parentDestination.addCell(new Cell().add("- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -")
                         .setBorder(Border.NO_BORDER)
@@ -504,7 +507,7 @@ public class PdfEticketAirlineServiceImpl implements PdfEticketAirlineService {
             }
             //ticket number / nomer tiket
             try {
-                String ticketNumber = transactionDto.getDetail().get("trips").get(page).get("passengers").get(passanger).get("passenger").get("ticketNumber").asText();
+                String ticketNumber = transactionDto.getDetail().get("trips").get(page).get("passengers").get(passanger).get("ticketNumber").asText();
                 if (ticketNumber.contentEquals("null")) {
                     detailPenumpangTable.addCell(stylePdfService.getDetailPenumpangOutput("-", plusJakarta));
                 } else {

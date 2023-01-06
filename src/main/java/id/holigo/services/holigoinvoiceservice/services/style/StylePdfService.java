@@ -113,7 +113,8 @@ public class StylePdfService {
     }
 
     public Paragraph spaceInColumn() {
-        return new Paragraph("\n");
+
+        return new Paragraph("\n").setBorder(Border.NO_BORDER);
     }
 
     public Cell getInfo(Paragraph text, PdfFont font) {
