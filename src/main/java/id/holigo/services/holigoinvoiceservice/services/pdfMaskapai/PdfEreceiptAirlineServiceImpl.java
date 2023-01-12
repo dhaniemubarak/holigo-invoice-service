@@ -100,24 +100,29 @@ public class PdfEreceiptAirlineServiceImpl extends HttpServlet implements PdfEre
                 .setFontSize(20).setTextAlignment(TextAlignment.CENTER));
 
 //        //      --> HEADER START
-        document.add(stylePdfService.headerTitle(plusJakarta, imageLogo, "Bukti Pembayaran", "Penerbangan Pesawat"));
+        String title = messageSource.getMessage("invoice.generic-title-bukti-pembayaran",null,LocaleContextHolder.getLocale());
+        String subTitle = messageSource.getMessage("invoice.subtitle-maskapai",null,LocaleContextHolder.getLocale());
+        document.add(stylePdfService.headerTitle(plusJakarta, imageLogo, title, subTitle));
 
 //      --> ID TRANSAKSI START
-//        String transactionId = messageSource.getMessage("invoice.id-transaksi",null, LocaleContextHolder.getLocale());
-        document.add(stylePdfService.transaksiId("ID Transaksi", plusJakarta, transactionDto));
+        String transactionId = messageSource.getMessage("invoice.id-transaksi",null, LocaleContextHolder.getLocale());
+        document.add(stylePdfService.transaksiId(transactionId, plusJakarta, transactionDto));
         document.add(stylePdfService.oneLine(pdfDocument));
 
 
 //        Detail Pemesanan start
         Table detailPemesananHead = new Table(new float[]{pdfDocument.getDefaultPageSize().getWidth()});
-        detailPemesananHead.addCell(getHeaderTextCell("Detail Pemesanan", plusJakarta));
+        String detailPayment = messageSource.getMessage("invoice.bookings-detail",null, LocaleContextHolder.getLocale());
+        detailPemesananHead.addCell(getHeaderTextCell(detailPayment, plusJakarta));
         Table tblDetailPemesanan = new Table(new float[]{col, 30, col, 30, col});
         tblDetailPemesanan.setMarginLeft(8);
-        tblDetailPemesanan.addCell(getTextDetail("Nama Lengkap", plusJakarta));
+        String fullName = messageSource.getMessage("invoice.full-name",null, LocaleContextHolder.getLocale());
+        tblDetailPemesanan.addCell(getTextDetail(fullName, plusJakarta));
         tblDetailPemesanan.addCell(getTextDetail("", plusJakarta));
         tblDetailPemesanan.addCell(getTextDetail("Email", plusJakarta));
         tblDetailPemesanan.addCell(getTextDetail("", plusJakarta));
-        tblDetailPemesanan.addCell(getTextDetail("Nomor Ponsel", plusJakarta));
+        String phoneNumber = messageSource.getMessage("invoice.phone-number",null, LocaleContextHolder.getLocale());
+        tblDetailPemesanan.addCell(getTextDetail(phoneNumber, plusJakarta));
 
 //        Detail Pemesanan buyer
 
@@ -250,7 +255,8 @@ public class PdfEreceiptAirlineServiceImpl extends HttpServlet implements PdfEre
         Table nestedPrice = new Table(new float[]{col / 2, col - 50});
         nestedPrice.addCell(getHeaderTextCell("Sub Total", plusJakarta));
         nestedPrice.addCell(getDetailProdukOutput("Rp " + getPrice(billAmount) + ",-", plusJakarta));
-        nestedPrice.addCell(getHeaderTextCell("Biaya Jasa", plusJakarta));
+        String adminFee = messageSource.getMessage("invoice.admin-fee",null,LocaleContextHolder.getLocale());
+        nestedPrice.addCell(getHeaderTextCell(adminFee, plusJakarta));
         nestedPrice.addCell(getDetailProdukOutput("Rp " + getPrice(adminAmount) + ",-", plusJakarta));
         nestedPrice.addCell(getHeaderTextCell("Discount", plusJakarta));
         nestedPrice.addCell(getDetailProdukOutput("Rp " + getPrice(discount) + ",-", plusJakarta));
